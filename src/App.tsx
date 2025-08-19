@@ -12,6 +12,9 @@ import SideBar from "@/components/SideBar";
 import type { currentPageType } from "./types/sidebarTypes";
 import TextArticleTest from "./pages/TextArticleTest";
 import LoginPage from "./pages/LoginPage";
+import cijlogo from "./assets/cijlogo.png";
+import { Bell } from "lucide-react";
+import Navigation from "./components/Navigation";
 
 export default function App() {
   const [currentView, setCurrentView] = useState<currentPageType>("dashboard");
@@ -93,19 +96,21 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex bg-background">
-      <SideBar
-        onNavigateToDrafts={navigateToDrafts}
-        onNavigateToReverted={navigateToReverted}
-        onNavigateToHistory={navigateToHistory}
-        onNavigateToNewsFeeds={navigateToNewsFeeds}
-        onCreateNewTextArticle={createNewTextArticle}
-        onCreateNewAudioArticle={createNewAudioArticle}
-        onCreateNewVideoArticle={createNewVideoArticle}
-        onNavigateToDashboard={navigateToDashboard}
-        currentView={currentView}
-      />
-      {currentView === "dashboard" && (
+    <div>
+      <Navigation></Navigation>
+      <div className="min-h-screen flex bg-background">
+        <SideBar
+          onNavigateToDrafts={navigateToDrafts}
+          onNavigateToReverted={navigateToReverted}
+          onNavigateToHistory={navigateToHistory}
+          onNavigateToNewsFeeds={navigateToNewsFeeds}
+          onCreateNewTextArticle={createNewTextArticle}
+          onCreateNewAudioArticle={createNewAudioArticle}
+          onCreateNewVideoArticle={createNewVideoArticle}
+          onNavigateToDashboard={navigateToDashboard}
+          currentView={currentView}
+        />
+        {currentView === "dashboard" && (
         <Dashboard
           onEditStory={navigateToEditor}
           onNavigateToDrafts={navigateToDrafts}
@@ -198,6 +203,7 @@ export default function App() {
           onCreateNewVideoArticle={createNewVideoArticle}
         />
       )}
+      </div>
     </div>
   );
 }

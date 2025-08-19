@@ -32,21 +32,6 @@ const SideBar: React.FC<SidebarTypes> = ({
       : "hover:bg-accent hover:text-accent-foreground";
   return (
     <div className="w-64 bg-card border-r border-border flex flex-col">
-      {/* Logo/Header */}
-      <div className="p-4 border-b border-border">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-green-600 rounded flex items-center justify-center">
-            <span className="text-white font-bold text-sm">CIJ</span>
-          </div>
-          <div>
-            <div className="font-semibold text-sm">CHENNAI</div>
-            <div className="text-xs text-muted-foreground">
-              INSTITUTE OF JOURNALISM
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div className="flex-1 p-4">
         <div className="space-y-1">
           <Button
