@@ -10,6 +10,8 @@ import FilteredContentPage from "@/pages/FilteredContentPage";
 import NewsFeedsPage from "@/pages/NewsFeedsPage";
 import SideBar from "@/components/SideBar";
 import type { currentPageType } from "./types/sidebarTypes";
+import TextArticleTest from "./pages/TextArticleTest";
+import LoginPage from "./pages/LoginPage";
 
 export default function App() {
   const [currentView, setCurrentView] = useState<currentPageType>("dashboard");

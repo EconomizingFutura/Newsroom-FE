@@ -1,0 +1,36 @@
+.editor-container {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 12px;
+    background: #fff;
+    max-width: 900px;
+    margin: auto;
+  }
+  
+  .editor-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  
+  .editor-toolbar button {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    background: #f8f8f8;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .editor-toolbar button:hover {
+    background: #eee;
+  }
+  
+  .editor-content {
+    min-height: 300px;
+    border: 1px solid #ddd;
+    padding: 12px;
+    border-radius: 6px;
+  }
+  
