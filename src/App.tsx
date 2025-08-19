@@ -1,26 +1,18 @@
 import React, { useState } from "react";
-import Dashboard from "./components/Dashboard";
-import TextArticleEditor from "./components/TextArticleEditor";
-import AudioArticleEditor from "./components/AudioArticleEditor";
-import VideoArticleEditor from "./components/VideoArticleEditor";
-import DraftsPage from "./components/DraftsPage";
-import RevertedPostPage from "./components/RevertedPostPage";
-import HistoryLogPage from "./components/HistoryLogPage";
-import FilteredContentPage from "./components/FilteredContentPage";
-import NewsFeedsPage from "./components/NewsFeedsPage";
+import Dashboard from "@/pages/Dashboard";
+import TextArticleEditor from "@/pages/TextArticleEditor";
+import AudioArticleEditor from "@/pages/AudioArticleEditor";
+import VideoArticleEditor from "@/pages/VideoArticleEditor";
+import DraftsPage from "@/pages/DraftsPage";
+import RevertedPostPage from "@/pages/RevertedPostPage";
+import HistoryLogPage from "@/pages/HistoryLogPage";
+import FilteredContentPage from "@/pages/FilteredContentPage";
+import NewsFeedsPage from "@/pages/NewsFeedsPage";
+import SideBar from "@/components/SideBar";
+import type { currentPageType } from "./types/sidebarTypes";
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<
-    | "dashboard"
-    | "editor"
-    | "audioEditor"
-    | "videoEditor"
-    | "drafts"
-    | "reverted"
-    | "history"
-    | "filtered"
-    | "newsFeeds"
-  >("dashboard");
+  const [currentView, setCurrentView] = useState<currentPageType>("dashboard");
   const [selectedArticle, setSelectedArticle] = useState<any>(null);
   const [filterType, setFilterType] = useState<string>("All Type");
 
@@ -99,7 +91,18 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex bg-background">
+      <SideBar
+        onNavigateToDrafts={navigateToDrafts}
+        onNavigateToReverted={navigateToReverted}
+        onNavigateToHistory={navigateToHistory}
+        onNavigateToNewsFeeds={navigateToNewsFeeds}
+        onCreateNewTextArticle={createNewTextArticle}
+        onCreateNewAudioArticle={createNewAudioArticle}
+        onCreateNewVideoArticle={createNewVideoArticle}
+        onNavigateToDashboard={navigateToDashboard}
+        currentView={currentView}
+      />
       {currentView === "dashboard" && (
         <Dashboard
           onEditStory={navigateToEditor}
