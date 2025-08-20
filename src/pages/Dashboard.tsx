@@ -1,6 +1,13 @@
 import ContentHeader from "@/components/ContentHeader";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { StatCard, DashboardListCard } from "@/components/ui/card";
+import { Clock, CheckCircle, RotateCcw, FilePen } from "lucide-react";
+
+type StatCardProps = {
+  title: string;
+  count: number;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  color: string;
+};
 
 interface DashboardProps {
   onEditStory: (article: any) => void;
@@ -15,39 +22,33 @@ interface DashboardProps {
 
 export default function Dashboard({ onEditStory }: DashboardProps) {
   // Mock data for demonstration
-  const stats = {
-    totalPosts: 7,
-    drafts: 3,
-    submitted: 1,
-    approved: 10,
-    needRevision: 5,
-  };
+  const stats: StatCardProps[] = [
+    { title: "Total Posts", count: 7, icon: FilePen, color: "#155DFC" }, // blue
+    { title: "Draft", count: 5, icon: FilePen, color: "#4A5565" },       // gray
+    { title: "Submitted", count: 1, icon: Clock, color: "#2B7FFF" },    // blue
+    { title: "Approved", count: 10, icon: CheckCircle, color: "#008001" }, // green
+    { title: "Need Revision", count: 5, icon: RotateCcw, color: "#E7000B" }, // red
+  ];
 
-  const urgentActions = [
+  const notificationList = [
     {
-      id: 1,
-      type: "Article Approved",
-      title: "THE FIRST UP ON POLITICAL MESSAGE THE FIGHT AGAINST ALLEGIATION",
-      status: "approved",
+      title: "Article Approved",
+      message: 'Your article "Tech Conference Interview" has been approved and published',
+      buttonText: "Edit Story",
+      onClick: () => alert("Editing story..."),
     },
     {
-      id: 2,
-      type: "Article Approved",
-      title: "THE FIRST UP ON POLITICAL MESSAGE THE FIGHT AGAINST ALLEGIATION",
-      status: "approved",
+      title: "Article Approved",
+      message: 'Your article "AI in 2025" has been approved and published',
+      buttonText: "Edit Story",
+      onClick: () => alert("Editing AI article..."),
     },
     {
-      id: 3,
-      type: "Article Approved",
-      title: "THE FIRST UP ON POLITICAL MESSAGE THE FIGHT AGAINST ALLEGIATION",
-      status: "approved",
-    },
-    {
-      id: 4,
-      type: "Article Approved",
-      title: "THE FIRST UP ON POLITICAL MESSAGE THE FIGHT AGAINST ALLEGIATION",
-      status: "approved",
-    },
+      title: "Article Approved",
+      message: 'Your article "Blockchain Future" has been approved and published',
+      buttonText: "Edit Story",
+      onClick: () => alert("Editing blockchain article..."),
+    }
   ];
 
   return (
@@ -55,7 +56,7 @@ export default function Dashboard({ onEditStory }: DashboardProps) {
       {/* Left Sidebar */}
 
       {/* Main Content */}
-      <div className=" flex flex-col">
+      <div className=" flex flex-col bg-[#F6FAF6]">
         {/* Top Bar */}
         <ContentHeader
           text="Welcome back, Muthu!"
@@ -64,73 +65,46 @@ export default function Dashboard({ onEditStory }: DashboardProps) {
 
         {/* Stats Section */}
         <div className="p-6">
-          <div className="grid grid-cols-5 gap-4 mb-8">
-            <Card className="p-4 text-center">
-              <div className="text-2xl font-bold text-blue-600">
-                {stats.totalPosts}
-              </div>
-              <div className="text-sm text-muted-foreground">Total Posts</div>
-            </Card>
-            <Card className="p-4 text-center">
-              <div className="text-2xl font-bold text-orange-600">
-                {stats.drafts}
-              </div>
-              <div className="text-sm text-muted-foreground">Drafts</div>
-            </Card>
-            <Card className="p-4 text-center">
-              <div className="text-2xl font-bold text-gray-600">
-                {stats.submitted}
-              </div>
-              <div className="text-sm text-muted-foreground">Submitted</div>
-            </Card>
-            <Card className="p-4 text-center">
-              <div className="text-2xl font-bold text-green-600">
-                {stats.approved}
-              </div>
-              <div className="text-sm text-muted-foreground">Approved</div>
-            </Card>
-            <Card className="p-4 text-center">
-              <div className="text-2xl font-bold text-red-600">
-                {stats.needRevision}
-              </div>
-              <div className="text-sm text-muted-foreground">Need Revision</div>
-            </Card>
-          </div>
-
-          {/* Urgent Actions Required */}
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-              <h2 className="text-lg font-medium">Urgent Actions Required</h2>
-              <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">
-                {urgentActions.length}
-              </span>
+          <div className="grid gap-4 mb-8">
+          <div className="flex gap-4">
+            {stats.map((stat, index) => (
+              <StatCard
+                key={index}
+                title={stat.title}
+                count={stat.count}
+                icon={stat.icon}
+                color={stat.color}
+              />
+            ))}
             </div>
-
+          </div>
+          <div>
             <div className="space-y-3">
-              {urgentActions.map((action) => (
-                <Card key={action.id} className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-                          {action.type}
+            <div style={{ borderLeftWidth: "2px"}} className="border-red-500 bg-white rounded-2xl px-[24px] py-[16px] shadow-md">
+                <div className="flex flex-col gap-[16px]">
+                  <div className="flex flex-col gap-[24px]">
+                    {/* Header */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 warning-color font-semibold text-lg">
+                        <RotateCcw className="w-5 h-5 warning-color" />
+                        Urgent Actions Required
+                        <span className="ml-2 bg-red-100 warning-color text-sm px-2 py-0.5 rounded-full">
+                          {notificationList.length}
                         </span>
                       </div>
-                      <p className="text-sm font-medium text-red-600 leading-relaxed">
-                        {action.title}
-                      </p>
                     </div>
-                    <Button
-                      size="sm"
-                      className="bg-red-600 hover:bg-red-700 text-white"
-                      onClick={() => onEditStory(action)}
-                    >
-                      Edit Story
-                    </Button>
+
+                      {/* Divider */}
+                      <hr className="border-t border-gray-200" />
                   </div>
-                </Card>
-              ))}
+                  <div className="flex flex-col gap-[12px]">
+                    {/* Notifications */}
+                    {notificationList.map((note, index) => (
+                      <DashboardListCard key={index} {...note} />
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

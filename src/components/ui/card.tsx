@@ -1,6 +1,19 @@
 import * as React from "react";
 
 import { cn } from "./utils";
+type StatCardProps = {
+  title: string;
+  count: number;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>; // 👈 type for icon
+  color: string;
+};
+
+type NotificationCardProps = {
+  title: string;
+  message: string;
+  buttonText: string;
+  onClick: () => void;
+};
 
 function Card({ className, ...props }: React.ComponentProps<"div">) {
   return (
@@ -81,6 +94,43 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
+function StatCard({ title, count, icon: Icon, color } : StatCardProps) {
+  return (
+    <div className="flex items-center justify-between rounded-2xl shadow-md bg-white p-5 w-56">
+      {/* Left Section */}
+      <div>
+        <p className="text-gray-500 text-sm font-medium">{title}</p>
+        <p className="text-2xl font-semibold text-gray-900 mt-1">{count}</p>
+      </div>
+
+      {/* Right Icon */}
+      <div className={`p-3 rounded-xl`} style={{ backgroundColor: color }}>
+        <Icon className="w-6 h-6 text-white" />
+      </div>
+    </div>
+  );
+}
+
+function DashboardListCard ({ title, message, buttonText, onClick }: NotificationCardProps) {
+  return (
+    <div className="flex items-center justify-between bg-red-50 rounded-xl p-4 shadow-sm">
+      {/* Left Section */}
+      <div>
+        <p className="font-semibold warning-color mb-[8px]">{title}</p>
+        <p className="text-[#E7000B]">{message}</p>
+      </div>
+
+      {/* Right Button */}
+      <button
+        onClick={onClick}
+        className="px-4 py-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 text-white font-medium hover:from-red-600 hover:to-red-700 transition"
+      >
+        {buttonText}
+      </button>
+    </div>
+  );
+}
+
 export {
   Card,
   CardHeader,
@@ -89,4 +139,6 @@ export {
   CardAction,
   CardDescription,
   CardContent,
+  StatCard,
+  DashboardListCard
 };

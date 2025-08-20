@@ -187,3 +187,7 @@
 html {
   font-size: var(--font-size);
 }
+
+.warning-color {
+  color:#C10007 !important;
+}
