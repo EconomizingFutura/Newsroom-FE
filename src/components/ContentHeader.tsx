@@ -2,12 +2,16 @@ import { Grid3x3, List, MoveLeft, Save, Send } from "lucide-react";
 import React from "react";
 import { Button } from "./ui/button";
 import { HeaderIcon, type HeaderKey } from "@/utils/HeaderIcons";
+import { cn } from "./ui/utils";
 
 interface ContentHeaderProps {
   text: string;
   onClick?: () => void;
   description?: string;
   showSaveSubmit?: boolean;
+  onClickGridList?: [() => void, () => void, viewMode: string];
+  onClickSubmitSave?: (() => void)[];
+  onClickBack?: () => void;
   showGrid?: boolean;
   number?: number;
   showBackButton?: boolean;
@@ -24,6 +28,8 @@ const ContentHeader: React.FC<ContentHeaderProps> = ({
   showBackButton,
   showArticle,
   iconName,
+  onClickGridList,
+  onClickBack,
 }) => {
   return (
     <div className="flex justify-between">
@@ -33,6 +39,7 @@ const ContentHeader: React.FC<ContentHeaderProps> = ({
             <div className="relative items-center flex gap-2">
               {showBackButton && (
                 <Button
+                  onClick={onClickBack}
                   variant="ghost"
                   size="sm"
                   className="border border-[#E5E7EB] h-10 w-10  bg-[#F8FAF9] text-[#2C3E50] rounded-[8.5px]"
@@ -69,16 +76,28 @@ const ContentHeader: React.FC<ContentHeaderProps> = ({
       {showGrid && (
         <div className="flex items-center gap-2 px-2">
           <Button
+            onClick={onClickGridList?.[0]}
             variant="ghost"
             size="sm"
-            className="border border-[#E5E7EB] h-10 w-10  hover:border-[#B3E6B3] bg-[#F8FAF9] text-[#2C3E50] hover:text-[#006601] hover:bg-[#ebffeb] rounded-[8.5px]"
+            className={cn(
+              "border border-[#E5E7EB] h-10 w-10 bg-[#F8FAF9] text-[#2C3E50] rounded-[8.5px]",
+              onClickGridList?.[2] === "grid"
+                ? "bg-[#B3E6B3] text-[#006601]"
+                : ""
+            )}
           >
             <Grid3x3 className="w-4 h-4" />
           </Button>
           <Button
+            onClick={onClickGridList?.[1]}
             variant="ghost"
             size="sm"
-            className="border border-[#E5E7EB] h-10 w-10  hover:border-[#B3E6B3] bg-[#F8FAF9] text-[#2C3E50] hover:text-[#006601] hover:bg-[#ebffeb] rounded-[8.5px]"
+            className={cn(
+              "border border-[#E5E7EB] h-10 w-10 bg-[#F8FAF9] text-[#2C3E50] rounded-[8.5px]",
+              onClickGridList?.[2] === "list"
+                ? "bg-[#B3E6B3] text-[#006601]"
+                : ""
+            )}
           >
             <List className="w-4 h-4" />
           </Button>

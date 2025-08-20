@@ -255,6 +255,11 @@ export default function DraftsPage({
           number={filteredArticles.length}
           iconName="Drafts"
           showGrid
+          onClickGridList={[
+            () => setViewMode("grid"),
+            () => setViewMode("list"),
+            viewMode,
+          ]}
         />
 
         {/* Search and Filters */}

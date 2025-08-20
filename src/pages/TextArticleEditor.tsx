@@ -59,7 +59,12 @@ export default function TextArticleEditor({
           text="Text Article"
           showArticle
           showSaveSubmit
+          onClickBack={onBack}
           showBackButton
+          onClickSubmitSave={[
+            () => console.log("Save"),
+            () => console.log("Submit"),
+          ]}
         />
 
         {/* Main Content */}
