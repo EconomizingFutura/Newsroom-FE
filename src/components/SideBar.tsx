@@ -31,7 +31,7 @@ const SideBar: React.FC<SidebarTypes> = ({
       ? "bg-green-600 text-white hover:bg-green-700"
       : "hover:bg-accent hover:text-accent-foreground";
   return (
-    <div className="w-64 bg-card border-r border-border flex flex-col">
+    <div className="w-64 mt-16 py-2 bg-[#F8FAF9] border-r border-border flex flex-col">
       <div className="flex-1 p-4">
         <div className="space-y-1">
           <Button

@@ -9,7 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { History, Search, Eye, Bell, Download } from "lucide-react";
+import { Search, Eye, Download } from "lucide-react";
+import ContentHeader from "@/components/ContentHeader";
 
 interface HistoryLogPageProps {
   onViewArticle: (article: any) => void;
@@ -140,31 +141,11 @@ export default function HistoryLogPage({ onViewArticle }: HistoryLogPageProps) {
   });
 
   return (
-    <div className=" flex-1 h-screen bg-gray-50">
+    <div className=" flex-1 py-16 h-screen bg-gray-50">
       {/* Main Content */}
       <div className=" flex flex-col">
         {/* Top Header */}
-        <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-6 h-6 bg-blue-100 rounded flex items-center justify-center">
-              <History className="w-4 h-4 text-blue-600" />
-            </div>
-            <div>
-              <h1 className="text-lg font-medium">History Log</h1>
-              <p className="text-sm text-gray-500">
-                Track all article activities and changes
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Bell className="w-5 h-5 text-gray-400" />
-            <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
-              <span className="text-white text-sm font-medium">U</span>
-            </div>
-            <span className="text-sm text-gray-600">User Reporter</span>
-          </div>
-        </div>
-
+        <ContentHeader text="History Log" iconName="History" />
         {/* Search and Filters */}
         <div className="bg-white border-b border-gray-200 p-6">
           <div className="flex items-center justify-between">

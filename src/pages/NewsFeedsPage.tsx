@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
-import { Rss, Bell, Circle } from "lucide-react";
+import { Circle } from "lucide-react";
+import ContentHeader from "@/components/ContentHeader";
 
 export default function NewsFeedsPage() {
   const [activeSource, setActiveSource] = useState("BBC");
@@ -126,43 +127,10 @@ export default function NewsFeedsPage() {
     newsArticles[activeSource as keyof typeof newsArticles] || [];
 
   return (
-    <div className=" flex-1 w-full h-screen bg-gray-50">
+    <div className=" flex-1 w-full h-screen mt-16 ">
       {/* Main Content */}
+      <ContentHeader text="News Feeds" iconName="News Feeds" />
       <div className=" flex flex-col">
-        {/* Top Header */}
-        <div className="bg-white border-b border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-6 h-6 bg-green-100 rounded flex items-center justify-center">
-                <Rss className="w-4 h-4 text-green-600" />
-              </div>
-              <h1 className="text-lg font-medium">News Feeds</h1>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Bell className="w-5 h-5 text-gray-400" />
-                <div className="relative">
-                  <div className="w-2 h-2 bg-green-500 rounded-full absolute -top-1 -right-1"></div>
-                  <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm font-medium">U</span>
-                  </div>
-                </div>
-                <span className="text-sm text-gray-600">User Reporter</span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm">
-                  Register
-                </Button>
-                <Button size="sm" className="bg-gray-900 text-white">
-                  Sign In
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* News Source Tabs */}
         <div className="bg-white border-b border-gray-200 px-6 py-4">
           <div className="flex gap-4">
@@ -185,7 +153,7 @@ export default function NewsFeedsPage() {
         </div>
 
         {/* News Articles */}
-        <div className="flex-1 p-6 bg-gray-50 overflow-auto">
+        <div className="flex-1 p-6  overflow-y-auto">
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-2 gap-6">
               {/* Left Column - Featured Articles */}
@@ -199,7 +167,7 @@ export default function NewsFeedsPage() {
                       <ImageWithFallback
                         src={article.image}
                         alt={article.title}
-                        className="w-full h-full object-cover"
+                        className="w-full  h-full object-cover"
                       />
                       {article.isLive && (
                         <div className="absolute top-3 left-3 flex items-center gap-1 bg-red-600 text-white px-2 py-1 rounded text-xs font-medium">

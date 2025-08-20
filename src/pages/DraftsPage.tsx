@@ -4,16 +4,15 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
-  FileText,
   Plus,
   Search,
   Grid3X3,
   List,
   Edit,
   Trash2,
-  Bell,
   FolderOpen,
 } from "lucide-react";
+import ContentHeader from "@/components/ContentHeader";
 
 interface DraftsPageProps {
   onEditDraft: (article: any) => void;
@@ -246,30 +245,17 @@ export default function DraftsPage({
   );
 
   return (
-    <div className="flex-1 h-screen bg-gray-50">
+    <div className="flex-1 py-16 h-screen bg-gray-50">
       {/* Main Content */}
       <div className=" flex flex-col">
         {/* Top Header */}
-        <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-6 h-6 bg-green-100 rounded flex items-center justify-center">
-              <FileText className="w-4 h-4 text-green-600" />
-            </div>
-            <div>
-              <h1 className="text-lg font-medium">Drafts</h1>
-              <p className="text-sm text-gray-500">
-                Your saved drafts and work in progress
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Bell className="w-5 h-5 text-gray-400" />
-            <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
-              <span className="text-white text-sm font-medium">U</span>
-            </div>
-            <span className="text-sm text-gray-600">User Reporter</span>
-          </div>
-        </div>
+        <ContentHeader
+          text="Drafts"
+          description="Your saved drafts and work in progress."
+          number={filteredArticles.length}
+          iconName="Drafts"
+          showGrid
+        />
 
         {/* Search and Filters */}
         <div className="bg-white border-b border-gray-200 px-6 py-4">
@@ -302,7 +288,7 @@ export default function DraftsPage({
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className=" hidden items-center gap-2">
               <Button
                 variant={viewMode === "grid" ? "default" : "outline"}
                 size="sm"

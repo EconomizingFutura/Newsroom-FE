@@ -97,7 +97,7 @@ export default function App() {
 
   return (
     <div>
-      <Navigation></Navigation>
+      <Navigation />
       <div className="min-h-screen flex bg-background">
         <SideBar
           onNavigateToDrafts={navigateToDrafts}
@@ -110,99 +110,101 @@ export default function App() {
           onNavigateToDashboard={navigateToDashboard}
           currentView={currentView}
         />
-        {currentView === "dashboard" && (
-        <Dashboard
-          onEditStory={navigateToEditor}
-          onNavigateToDrafts={navigateToDrafts}
-          onNavigateToReverted={navigateToReverted}
-          onNavigateToHistory={navigateToHistory}
-          onNavigateToNewsFeeds={navigateToNewsFeeds}
-          onCreateNewTextArticle={createNewTextArticle}
-          onCreateNewAudioArticle={createNewAudioArticle}
-          onCreateNewVideoArticle={createNewVideoArticle}
-        />
-      )}
-      {currentView === "editor" && (
-        <TextArticleEditor
-          article={selectedArticle}
-          onBack={navigateToDashboard}
-          onNavigateToNewsFeeds={navigateToNewsFeeds}
-        />
-      )}
-      {currentView === "audioEditor" && (
-        <AudioArticleEditor
-          article={selectedArticle}
-          onBack={() => setCurrentView("filtered")}
-          onNavigateToNewsFeeds={navigateToNewsFeeds}
-        />
-      )}
-      {currentView === "videoEditor" && (
-        <VideoArticleEditor
-          article={selectedArticle}
-          onBack={navigateToDashboard}
-          onNavigateToNewsFeeds={navigateToNewsFeeds}
-        />
-      )}
-      {currentView === "drafts" && (
-        <DraftsPage
-          onEditDraft={navigateToEditor}
-          onNavigateToDashboard={navigateToDashboard}
-          onNavigateToReverted={navigateToReverted}
-          onNavigateToHistory={navigateToHistory}
-          onNavigateToNewsFeeds={navigateToNewsFeeds}
-          onCreateNewTextArticle={createNewTextArticle}
-          onCreateNewAudioArticle={createNewAudioArticle}
-          onCreateNewVideoArticle={createNewVideoArticle}
-        />
-      )}
-      {currentView === "reverted" && (
-        <RevertedPostPage
-          onEditReverted={navigateToEditor}
-          onNavigateToDashboard={navigateToDashboard}
-          onNavigateToDrafts={navigateToDrafts}
-          onNavigateToHistory={navigateToHistory}
-          onNavigateToFilteredContent={navigateToFilteredContent}
-          onNavigateToNewsFeeds={navigateToNewsFeeds}
-          onCreateNewTextArticle={createNewTextArticle}
-          onCreateNewAudioArticle={createNewAudioArticle}
-          onCreateNewVideoArticle={createNewVideoArticle}
-        />
-      )}
-      {currentView === "history" && (
-        <HistoryLogPage
-          onViewArticle={navigateToEditor}
-          onNavigateToDashboard={navigateToDashboard}
-          onNavigateToDrafts={navigateToDrafts}
-          onNavigateToReverted={navigateToReverted}
-          onNavigateToNewsFeeds={navigateToNewsFeeds}
-          onCreateNewTextArticle={createNewTextArticle}
-          onCreateNewAudioArticle={createNewAudioArticle}
-          onCreateNewVideoArticle={createNewVideoArticle}
-        />
-      )}
-      {currentView === "filtered" && (
-        <FilteredContentPage
-          contentType={filterType}
-          onViewArticle={navigateToEditor}
-          onNavigateToDashboard={navigateToDashboard}
-          onNavigateToDrafts={navigateToDrafts}
-          onNavigateToReverted={navigateToReverted}
-          onNavigateToHistory={navigateToHistory}
-          onNavigateToNewsFeeds={navigateToNewsFeeds}
-          onCreateNewVideoArticle={createNewVideoArticle}
-        />
-      )}
-      {currentView === "newsFeeds" && (
-        <NewsFeedsPage
-          onNavigateToDashboard={navigateToDashboard}
-          onNavigateToDrafts={navigateToDrafts}
-          onNavigateToReverted={navigateToReverted}
-          onNavigateToHistory={navigateToHistory}
-          onCreateNewTextArticle={createNewTextArticle}
-          onCreateNewAudioArticle={createNewAudioArticle}
-          onCreateNewVideoArticle={createNewVideoArticle}
-        />
-      )}
+        <div className="flex-1 w-full h-screen overflow-y-auto ">
+          {currentView === "dashboard" && (
+            <Dashboard
+              onEditStory={navigateToEditor}
+              onNavigateToDrafts={navigateToDrafts}
+              onNavigateToReverted={navigateToReverted}
+              onNavigateToHistory={navigateToHistory}
+              onNavigateToNewsFeeds={navigateToNewsFeeds}
+              onCreateNewTextArticle={createNewTextArticle}
+              onCreateNewAudioArticle={createNewAudioArticle}
+              onCreateNewVideoArticle={createNewVideoArticle}
+            />
+          )}
+          {currentView === "editor" && (
+            <TextArticleEditor
+              article={selectedArticle}
+              onBack={navigateToDashboard}
+              onNavigateToNewsFeeds={navigateToNewsFeeds}
+            />
+          )}
+          {currentView === "audioEditor" && (
+            <AudioArticleEditor
+              article={selectedArticle}
+              onBack={() => setCurrentView("filtered")}
+              onNavigateToNewsFeeds={navigateToNewsFeeds}
+            />
+          )}
+          {currentView === "videoEditor" && (
+            <VideoArticleEditor
+              article={selectedArticle}
+              onBack={navigateToDashboard}
+              onNavigateToNewsFeeds={navigateToNewsFeeds}
+            />
+          )}
+          {currentView === "drafts" && (
+            <DraftsPage
+              onEditDraft={navigateToEditor}
+              onNavigateToDashboard={navigateToDashboard}
+              onNavigateToReverted={navigateToReverted}
+              onNavigateToHistory={navigateToHistory}
+              onNavigateToNewsFeeds={navigateToNewsFeeds}
+              onCreateNewTextArticle={createNewTextArticle}
+              onCreateNewAudioArticle={createNewAudioArticle}
+              onCreateNewVideoArticle={createNewVideoArticle}
+            />
+          )}
+          {currentView === "reverted" && (
+            <RevertedPostPage
+              onEditReverted={navigateToEditor}
+              onNavigateToDashboard={navigateToDashboard}
+              onNavigateToDrafts={navigateToDrafts}
+              onNavigateToHistory={navigateToHistory}
+              onNavigateToFilteredContent={navigateToFilteredContent}
+              onNavigateToNewsFeeds={navigateToNewsFeeds}
+              onCreateNewTextArticle={createNewTextArticle}
+              onCreateNewAudioArticle={createNewAudioArticle}
+              onCreateNewVideoArticle={createNewVideoArticle}
+            />
+          )}
+          {currentView === "history" && (
+            <HistoryLogPage
+              onViewArticle={navigateToEditor}
+              onNavigateToDashboard={navigateToDashboard}
+              onNavigateToDrafts={navigateToDrafts}
+              onNavigateToReverted={navigateToReverted}
+              onNavigateToNewsFeeds={navigateToNewsFeeds}
+              onCreateNewTextArticle={createNewTextArticle}
+              onCreateNewAudioArticle={createNewAudioArticle}
+              onCreateNewVideoArticle={createNewVideoArticle}
+            />
+          )}
+          {currentView === "filtered" && (
+            <FilteredContentPage
+              contentType={filterType}
+              onViewArticle={navigateToEditor}
+              onNavigateToDashboard={navigateToDashboard}
+              onNavigateToDrafts={navigateToDrafts}
+              onNavigateToReverted={navigateToReverted}
+              onNavigateToHistory={navigateToHistory}
+              onNavigateToNewsFeeds={navigateToNewsFeeds}
+              onCreateNewVideoArticle={createNewVideoArticle}
+            />
+          )}
+          {currentView === "newsFeeds" && (
+            <NewsFeedsPage
+              onNavigateToDashboard={navigateToDashboard}
+              onNavigateToDrafts={navigateToDrafts}
+              onNavigateToReverted={navigateToReverted}
+              onNavigateToHistory={navigateToHistory}
+              onCreateNewTextArticle={createNewTextArticle}
+              onCreateNewAudioArticle={createNewAudioArticle}
+              onCreateNewVideoArticle={createNewVideoArticle}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

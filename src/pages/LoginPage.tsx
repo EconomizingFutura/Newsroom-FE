@@ -20,17 +20,29 @@ export default function LoginPage() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Tamil Nadu Government Logo */}
           <div className="flex-shrink-0">
-          <img src={tnlogo} alt="Tamil Nadu Govt Logo" className="w-40 h-auto"/>
+            <img
+              src={tnlogo}
+              alt="Tamil Nadu Govt Logo"
+              className="w-40 h-auto"
+            />
           </div>
 
           {/* Title */}
           <div className=" text-center px-8">
-          <img src={cijlogo} alt="Tamil Nadu Govt Logo" className="w-[430px] h-auto"/>
+            <img
+              src={cijlogo}
+              alt="Tamil Nadu Govt Logo"
+              className="w-[430px] h-auto"
+            />
           </div>
 
           {/* Official Photo */}
           <div className="flex-shrink-0">
-            <img src={mkstalin} alt="Tamil Nadu Govt Logo" className="w-40 h-auto"/>
+            <img
+              src={mkstalin}
+              alt="Tamil Nadu Govt Logo"
+              className="w-40 h-auto"
+            />
           </div>
         </div>
       </header>
@@ -52,7 +64,11 @@ export default function LoginPage() {
           <div className="w-full max-w-md">
             <div className="bg-white rounded-2xl shadow-xl p-8 flex flex-col gap-[24px]">
               <div className="flex flex-col gap-[16px] items-center">
-                <img src={tnlogo} alt="Tamil Nadu Govt Logo" className="w-[100px] h-auto"/>
+                <img
+                  src={tnlogo}
+                  alt="Tamil Nadu Govt Logo"
+                  className="w-[100px] h-auto"
+                />
                 <div className="flex flex-col gap-[12px]">
                   {/* <div> 
                     <h2 className="text-2xl font-bold text-green-700">
@@ -70,7 +86,10 @@ export default function LoginPage() {
               <form className="space-y-6">
                 {/* Email Field */}
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-[8px] text-[14px] leading-none tracking-[0px] text-[#1E2939]">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium  mb-[8px] text-[14px] leading-none tracking-[0px] text-[#1E2939]"
+                  >
                     Email Address
                   </label>
                   <div className="relative">
@@ -90,7 +109,7 @@ export default function LoginPage() {
                 <div>
                   <label
                     htmlFor="password"
-                    className="block text-sm font-medium text-gray-700 mb-[8px] text-[14px] leading-none tracking-[0px] text-[#1E2939]"
+                    className="block text-sm font-medium mb-[8px] text-[14px] leading-none tracking-[0px] text-[#1E2939]"
                   >
                     Password
                   </label>

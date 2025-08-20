@@ -1,3 +1,4 @@
+import ContentHeader from "@/components/ContentHeader";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -49,31 +50,17 @@ export default function Dashboard({ onEditStory }: DashboardProps) {
     },
   ];
 
-  const userName = "Muthul";
-
   return (
-    <div className="flex-1 h-screen bg-background">
+    <div className="flex-1 py-16 h-screen bg-background">
       {/* Left Sidebar */}
 
       {/* Main Content */}
       <div className=" flex flex-col">
         {/* Top Bar */}
-        <div className="bg-card border-b border-border px-6 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-lg font-medium">Welcome back, {userName}!</h1>
-            <p className="text-sm text-muted-foreground">
-              Manage your stories and track your progress
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button size="sm" className="bg-green-600 hover:bg-green-700">
-              Save Draft
-            </Button>
-            <Button size="sm" className="bg-green-600 hover:bg-green-700">
-              Submit For Review
-            </Button>
-          </div>
-        </div>
+        <ContentHeader
+          text="Welcome back, Muthu!"
+          description="Here's what's happening in your newsroom today."
+        />
 
         {/* Stats Section */}
         <div className="p-6">

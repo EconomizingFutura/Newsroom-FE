@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, FileText, Save, Send, X, Plus, Bell } from "lucide-react";
+import { X, Plus } from "lucide-react";
+import ContentHeader from "@/components/ContentHeader";
 
 interface TextArticleEditorProps {
   article?: any;
@@ -51,55 +52,15 @@ export default function TextArticleEditor({
   };
 
   return (
-    <div className=" flex-1 h-screen bg-gray-50">
+    <div className=" flex-1 h-screen py-16 bg-gray-50">
       {/* Main Content */}
       <div className=" flex flex-col">
-        {/* Header */}
-        <div className="bg-white border-b border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onBack}
-                className="gap-2"
-              >
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
-
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-blue-600 rounded flex items-center justify-center">
-                  <FileText className="w-4 h-4 text-white" />
-                </div>
-                <h1 className="text-lg font-medium">Text Article</h1>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Bell className="w-5 h-5 text-gray-400" />
-                <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm font-medium">U</span>
-                </div>
-                <span className="text-sm text-gray-600">User Reporter</span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" className="gap-2">
-                  <Save className="w-4 h-4" />
-                  Save Draft
-                </Button>
-                <Button
-                  size="sm"
-                  className="bg-green-600 hover:bg-green-700 gap-2"
-                >
-                  <Send className="w-4 h-4" />
-                  Submit for Review
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <ContentHeader
+          text="Text Article"
+          showArticle
+          showSaveSubmit
+          showBackButton
+        />
 
         {/* Main Content */}
         <div className="max-w-4xl mx-auto p-6 space-y-6 flex-1">
