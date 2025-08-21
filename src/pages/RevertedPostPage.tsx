@@ -12,6 +12,8 @@ import {
   AlertCircle,
 } from "lucide-react";
 import ContentHeader from "@/components/ContentHeader";
+import SearchFilterTab from "@/components/SearchFilterTab";
+import SharedCard from "@/components/shared/Card";
 
 interface RevertedPostPageProps {
   onEditReverted: (article: any) => void;
@@ -29,11 +31,25 @@ export default function RevertedPostPage({
   onNavigateToFilteredContent,
 }: RevertedPostPageProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeFilter, setActiveFilter] = useState("All Type");
+  const [activeFilter, setActiveFilter] = useState<
+    "All Type" | "Text" | "Audio" | "Video"
+  >("All Type");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-
+  type ArticleType = "Text" | "Audio" | "Video";
+  type ArticleStatus = "Auto-saved" | "Reverted";
+  interface RevertedArticle {
+    id: number;
+    title: string;
+    type: ArticleType;
+    status: ArticleStatus;
+    wordCount: number;
+    lastUpdated: string;
+    timeAgo: string;
+    reason: string;
+    editor: string;
+  }
   // Mock reverted articles data
-  const revertedArticles = [
+  const revertedArticles: RevertedArticle[] = [
     {
       id: 1,
       title: "Climate Change Report: Impact on Local Communities",
@@ -83,7 +99,7 @@ export default function RevertedPostPage({
   });
 
   const handleFilterClick = (filter: string) => {
-    setActiveFilter(filter);
+    setActiveFilter(filter as "All Type" | "Text" | "Audio" | "Video");
 
     // Navigate to filtered content page for specific content types
     if (filter !== "All Type") {
@@ -107,54 +123,17 @@ export default function RevertedPostPage({
   const renderGridView = () => (
     <div className="grid grid-cols-3 gap-6">
       {filteredArticles.map((article) => (
-        <Card
+        <SharedCard
           key={article.id}
-          className="p-4 bg-white border-red-200 hover:shadow-md transition-shadow"
-        >
-          <div className="space-y-3">
-            <div className="flex items-start justify-between">
-              <h3 className="text-sm font-medium leading-tight pr-2">
-                {article.title}
-              </h3>
-              <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
-            </div>
-
-            <div className="flex gap-2">
-              <Badge className={`text-xs ${getTypeColor(article.type)}`}>
-                {article.type}
-              </Badge>
-              <Badge className="text-xs bg-red-100 text-red-800">
-                {article.status}
-              </Badge>
-            </div>
-
-            <div className="text-xs text-gray-500 space-y-1">
-              <div>Reverted {article.lastUpdated}</div>
-              <div>{article.wordCount} words</div>
-              <div className="text-red-600">Editor: {article.editor}</div>
-            </div>
-
-            <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-              <div className="text-xs font-medium text-red-800 mb-1">
-                Revision Required
-              </div>
-              <div className="text-xs text-red-700 leading-relaxed">
-                {article.reason}
-              </div>
-            </div>
-
-            <div className="flex gap-2 pt-2">
-              <Button
-                size="sm"
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white gap-2"
-                onClick={() => onEditReverted(article)}
-              >
-                <Eye className="w-3 h-3" />
-                View Details
-              </Button>
-            </div>
-          </div>
-        </Card>
+          title={article.title}
+          updatedDate={article.lastUpdated}
+          wordCount={article.wordCount}
+          savedTime={article.timeAgo}
+          type={article.type}
+          status={article.status}
+          remarkMessage={article.reason}
+          contentPreview={article.title}
+        />
       ))}
     </div>
   );
@@ -232,55 +211,15 @@ export default function RevertedPostPage({
         />
 
         {/* Search and Filters */}
-        <div className="bg-white border-b border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input
-                  placeholder="Search Reverted Posts..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 w-64"
-                />
-              </div>
-
-              <div className="flex gap-2">
-                {filterOptions.map((filter) => (
-                  <Button
-                    key={filter}
-                    variant={activeFilter === filter ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => handleFilterClick(filter)}
-                    className={
-                      activeFilter === filter ? "bg-gray-900 text-white" : ""
-                    }
-                  >
-                    {filter}
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            <div className="hidden items-center gap-2">
-              <Button
-                variant={viewMode === "grid" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setViewMode("grid")}
-              >
-                <Grid3X3 className="w-4 h-4" />
-              </Button>
-              <Button
-                variant={viewMode === "list" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setViewMode("list")}
-              >
-                <List className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
-
+        <SearchFilterTab
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          filterOptions={filterOptions}
+          activeFilter={activeFilter}
+          setActiveFilter={(filter: string) =>
+            setActiveFilter(filter as "All Type" | "Text" | "Audio" | "Video")
+          }
+        />
         {/* Content Area */}
         <div className="flex-1 p-6 bg-gray-50">
           {filteredArticles.length > 0 ? (

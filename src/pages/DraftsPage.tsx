@@ -1,18 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Card as UICard } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Plus,
-  Search,
-  Grid3X3,
-  List,
-  Edit,
-  Trash2,
-  FolderOpen,
-} from "lucide-react";
+import { Plus, Edit, Trash2, FolderOpen } from "lucide-react";
 import ContentHeader from "@/components/ContentHeader";
+import SearchFilterTab from "@/components/SearchFilterTab";
+import SharedCard from "@/components/shared/Card";
 
 interface DraftsPageProps {
   onEditDraft: (article: any) => void;
@@ -28,11 +21,25 @@ export default function DraftsPage({
   onCreateNewVideoArticle,
 }: DraftsPageProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeFilter, setActiveFilter] = useState("All Type");
+  const [activeFilter, setActiveFilter] = useState<
+    "All Type" | "Text" | "Audio" | "Video"
+  >("All Type");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   // Mock draft articles data
-  const draftArticles = [
+  type ArticleType = "Text" | "Audio" | "Video";
+  type ArticleStatus = "Auto-saved" | "Reverted";
+  interface DraftArticle {
+    id: number;
+    title: string;
+    type: ArticleType;
+    status: ArticleStatus;
+    wordCount: number;
+    lastUpdated: string;
+    timeAgo: string;
+  }
+
+  const draftArticles: DraftArticle[] = [
     {
       id: 1,
       title: "Climate Change Report: Impact on Local Communities",
@@ -132,59 +139,19 @@ export default function DraftsPage({
   };
 
   const renderGridView = () => (
-    <div className="grid grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {filteredArticles.map((article) => (
-        <Card
+        <SharedCard
           key={article.id}
-          className="p-4 bg-white hover:shadow-md transition-shadow"
-        >
-          <div className="space-y-3">
-            <div className="flex items-start justify-between">
-              <h3 className="text-sm font-medium leading-tight pr-2">
-                {article.title}
-              </h3>
-            </div>
-
-            <div className="flex gap-2">
-              <Badge className={`text-xs ${getTypeColor(article.type)}`}>
-                {article.type}
-              </Badge>
-              <Badge className={`text-xs ${getStatusColor(article.status)}`}>
-                {article.status}
-              </Badge>
-            </div>
-
-            <div className="text-xs text-gray-500 space-y-1">
-              {article.type === "Text" && (
-                <div>Updated {article.lastUpdated}</div>
-              )}
-              <div>
-                {article.wordCount > 0
-                  ? `${article.wordCount} words`
-                  : "Updated 15/01/2025"}
-              </div>
-              <div className="text-gray-400">{article.timeAgo}</div>
-            </div>
-
-            <div className="flex gap-2 pt-2">
-              <Button
-                size="sm"
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white gap-2"
-                onClick={() => onEditDraft(article)}
-              >
-                <Edit className="w-3 h-3" />
-                Edit
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                className="border-red-200 text-red-600 hover:bg-red-50"
-              >
-                <Trash2 className="w-3 h-3" />
-              </Button>
-            </div>
-          </div>
-        </Card>
+          title={article.title}
+          updatedDate={article.lastUpdated}
+          wordCount={article.wordCount}
+          savedTime={article.timeAgo}
+          type={article.type}
+          status={article.status}
+          remarkMessage={""}
+          contentPreview={article.title}
+        />
       ))}
     </div>
   );
@@ -192,7 +159,7 @@ export default function DraftsPage({
   const renderListView = () => (
     <div className="space-y-3">
       {filteredArticles.map((article) => (
-        <Card
+        <UICard
           key={article.id}
           className="p-4 bg-white hover:shadow-sm transition-shadow"
         >
@@ -239,7 +206,7 @@ export default function DraftsPage({
               </Button>
             </div>
           </div>
-        </Card>
+        </UICard>
       ))}
     </div>
   );
@@ -263,54 +230,16 @@ export default function DraftsPage({
         />
 
         {/* Search and Filters */}
-        <div className="bg-white border-b border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input
-                  placeholder="Search Drafts..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 w-64"
-                />
-              </div>
 
-              <div className="flex gap-2">
-                {filterOptions.map((filter) => (
-                  <Button
-                    key={filter}
-                    variant={activeFilter === filter ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setActiveFilter(filter)}
-                    className={
-                      activeFilter === filter ? "bg-gray-900 text-white" : ""
-                    }
-                  >
-                    {filter}
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            <div className=" hidden items-center gap-2">
-              <Button
-                variant={viewMode === "grid" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setViewMode("grid")}
-              >
-                <Grid3X3 className="w-4 h-4" />
-              </Button>
-              <Button
-                variant={viewMode === "list" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setViewMode("list")}
-              >
-                <List className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
+        <SearchFilterTab
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          filterOptions={filterOptions}
+          activeFilter={activeFilter}
+          setActiveFilter={(filter: string) =>
+            setActiveFilter(filter as "All Type" | "Text" | "Audio" | "Video")
+          }
+        />
 
         {/* Content Area - Show empty state or filtered content */}
         <div className="flex-1 p-6 bg-gray-50">
