@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "./ui/button";
 import {
   FileText,
@@ -6,7 +6,6 @@ import {
   History,
   Mic,
   Plus,
-  Radio,
   RotateCcw,
   Rss,
   Users,
@@ -26,73 +25,112 @@ const SideBar: React.FC<SidebarTypes> = ({
   onNavigateToDashboard,
   currentView,
 }) => {
+  const [multiWindow, setMultiWindow] = useState({
+    newsFeeds: false,
+    createArticle: false,
+    reverted: false,
+    drafts: false,
+    favourites: false,
+  });
+
+  const toggleCheckbox = (key: keyof typeof multiWindow) => {
+    setMultiWindow((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
   const isActive = (view: currentPageType) =>
     currentView === view
-      ? "bg-green-600 text-white hover:bg-green-700"
-      : "hover:bg-accent hover:text-accent-foreground";
+      ? "bg-[#00A652] text-white rounded-md"
+      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900";
+
   return (
-    <div className="w-64 mt-16 py-2 bg-[#F8FAF9] border-r border-border flex flex-col">
-      <div className="flex-1 p-4">
+    <div className="w-60 mt-16 py-4 bg-[#F8FAF9] border-r border-gray-200 flex flex-col">
+      <div className="flex-1 px-4">
+        {/* Top Menu */}
         <div className="space-y-1">
           <Button
             variant="ghost"
             size="sm"
-            className={`w-full justify-start gap-2 ${isActive("newsFeeds")}}`}
+            className={`w-full justify-between px-3 py-2 ${isActive(
+              "newsFeeds"
+            )}`}
             onClick={onNavigateToNewsFeeds}
           >
-            <Radio className="w-4 h-4" />
-            Agency Feeds
+            <span className="flex items-center gap-2">
+              <Rss className="w-4 h-4" />
+              Agency Feeds
+            </span>
           </Button>
+
           <Button
             variant="ghost"
             size="sm"
             onClick={onNavigateToDashboard}
-            className={`w-full justify-start gap-2 ${isActive("dashboard")}}`}
+            className={`w-full justify-start px-3 py-2 ${isActive(
+              "dashboard"
+            )}`}
           >
-            <Users className="w-4 h-4" />
+            <Users className="w-4 h-4 mr-2" />
             Dashboard
           </Button>
+
           <Button
             variant="ghost"
             size="sm"
-            className={`w-full justify-start gap-2 ${isActive("drafts")}}`}
+            className={`w-full justify-between px-3 py-2 ${isActive("drafts")}`}
             onClick={onNavigateToDrafts}
           >
-            <FileText className="w-4 h-4" />
-            Drafts
+            <span className="flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              Drafts
+            </span>
+            <span className="bg-green-600 text-white text-xs font-medium px-2 rounded-full">
+              4
+            </span>
           </Button>
+
           <Button
             variant="ghost"
             size="sm"
-            className={`w-full justify-start gap-2 ${isActive("reverted")}}`}
+            className={`w-full justify-between px-3 py-2 ${isActive(
+              "reverted"
+            )}`}
             onClick={onNavigateToReverted}
           >
-            <RotateCcw className="w-4 h-4" />
-            Reverted Post
+            <span className="flex items-center gap-2">
+              <RotateCcw className="w-4 h-4" />
+              Reverted Post
+            </span>
+            <span className="bg-red-500 text-white text-xs font-medium px-2 rounded-full">
+              4
+            </span>
           </Button>
+
           <Button
             variant="ghost"
             size="sm"
-            className={`w-full justify-start gap-2 ${isActive("history")}}`}
+            className={`w-full justify-start px-3 py-2 ${isActive("history")}`}
             onClick={onNavigateToHistory}
           >
-            <History className="w-4 h-4" />
+            <History className="w-4 h-4 mr-2" />
             History Log
           </Button>
         </div>
 
-        <Separator className="my-4" />
+        <Separator className="my-4 bg-gray-200 h-px" />
 
         {/* Quick Create */}
         <div className="space-y-2">
-          <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+          <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1">
             Quick Create
           </h4>
           <div className="space-y-1">
             <Button
               variant="ghost"
               size="sm"
-              className="w-full justify-start gap-2"
+              className="w-full justify-start gap-2 px-3 py-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
               onClick={onCreateNewTextArticle}
             >
               <FileText className="w-4 h-4" />
@@ -101,9 +139,7 @@ const SideBar: React.FC<SidebarTypes> = ({
             <Button
               variant="ghost"
               size="sm"
-              className={`w-full justify-start gap-2 ${isActive(
-                "audioEditor"
-              )}}`}
+              className="w-full justify-start gap-2 px-3 py-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
               onClick={onCreateNewAudioArticle}
             >
               <Mic className="w-4 h-4" />
@@ -112,9 +148,7 @@ const SideBar: React.FC<SidebarTypes> = ({
             <Button
               variant="ghost"
               size="sm"
-              className={`w-full justify-start gap-2 ${isActive(
-                "videoEditor"
-              )}}`}
+              className="w-full justify-start gap-2 px-3 py-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
               onClick={onCreateNewVideoArticle}
             >
               <Video className="w-4 h-4" />
@@ -123,58 +157,57 @@ const SideBar: React.FC<SidebarTypes> = ({
           </div>
         </div>
 
-        <Separator className="my-4" />
+        <Separator className="my-4 bg-gray-200 h-px" />
 
         {/* Multi Window */}
         <div className="space-y-2">
-          <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+          <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1">
             Multi Window
           </h4>
-          <div className="space-y-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              className={`w-full justify-start gap-2 ${isActive("newsFeeds")}}`}
-              onClick={onNavigateToNewsFeeds}
-            >
-              <Rss className="w-4 h-4" />
-              News Feeds
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className={`w-full justify-start gap-2 ${isActive("drafts")}}`}
-              onClick={onCreateNewTextArticle}
-            >
-              <Plus className="w-4 h-4" />
-              Create Article
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className={`w-full justify-start gap-2 ${isActive("reverted")}}`}
-              onClick={onNavigateToReverted}
-            >
-              <RotateCcw className="w-4 h-4" />
-              Reverted Post
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className={`w-full justify-start gap-2 ${isActive("drafts")}}`}
-              onClick={onNavigateToDrafts}
-            >
-              <FileText className="w-4 h-4" />
-              Drafts
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full justify-start gap-2"
-            >
-              <Heart className="w-4 h-4" />
-              Favourites
-            </Button>
+          <div className="space-y-1 text-sm text-gray-700">
+            {[
+              {
+                key: "newsFeeds",
+                label: "News Feeds",
+                icon: <Rss className="w-4 h-4" />,
+              },
+              {
+                key: "createArticle",
+                label: "Create Article",
+                icon: <Plus className="w-4 h-4" />,
+              },
+              {
+                key: "reverted",
+                label: "Reverted Post",
+                icon: <RotateCcw className="w-4 h-4" />,
+              },
+              {
+                key: "drafts",
+                label: "Drafts",
+                icon: <FileText className="w-4 h-4" />,
+              },
+              {
+                key: "favourites",
+                label: "Favourites",
+                icon: <Heart className="w-4 h-4" />,
+              },
+            ].map((item) => (
+              <label
+                key={item.key}
+                className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md"
+              >
+                <input
+                  type="checkbox"
+                  checked={multiWindow[item.key as keyof typeof multiWindow]}
+                  onChange={() =>
+                    toggleCheckbox(item.key as keyof typeof multiWindow)
+                  }
+                  className="w-4 h-4 accent-green-600"
+                />
+                {item.icon}
+                <span>{item.label}</span>
+              </label>
+            ))}
           </div>
         </div>
       </div>
