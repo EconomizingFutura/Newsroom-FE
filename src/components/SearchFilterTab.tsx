@@ -18,7 +18,7 @@ const SearchFilterTab: React.FC<SearchFilterTabProps> = ({
   setActiveFilter,
 }) => {
   return (
-    <div className="bg-white shadow-md rounded-xl px-4 sm:px-6 py-3 sm:py-4 mb-6">
+    <div className="bg-white shadow-md rounded-xl px-4 sm:px-6 py-3 sm:py-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         {/* Search Box */}
         <div className="relative w-full sm:w-72">
@@ -41,7 +41,7 @@ const SearchFilterTab: React.FC<SearchFilterTabProps> = ({
               onClick={() => setActiveFilter(filter)}
               className={
                 activeFilter === filter
-                  ? "bg-green-600 text-white rounded-md shadow-sm"
+                  ? "bg-[#f9faf9] border border-[#B3E6B3] text-[#006601] rounded-md shadow-sm"
                   : "border border-gray-300 text-gray-700 hover:bg-gray-100 rounded-md"
               }
             >

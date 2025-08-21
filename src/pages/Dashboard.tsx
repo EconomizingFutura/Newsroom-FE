@@ -47,7 +47,7 @@ export default function Dashboard() {
       {/* Left Sidebar */}
 
       {/* Main Content */}
-      <div className=" flex flex-col bg-[#F6FAF6]">
+      <div style={{paddingTop: '32px'}} className="flex flex-col gap-[24px] px-[24px] bg-[#F6FAF6]">
         {/* Top Bar */}
         <ContentHeader
           text="Welcome back, Muthu!"
@@ -55,7 +55,7 @@ export default function Dashboard() {
         />
 
         {/* Stats Section */}
-        <div className="p-6">
+        <div>
           <div className="grid gap-4 mb-8">
             <div className="flex gap-4">
               {stats.map((stat, index) => (

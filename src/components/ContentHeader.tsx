@@ -34,8 +34,8 @@ const ContentHeader: React.FC<ContentHeaderProps> = ({
   return (
     <div className="flex justify-between">
       <div>
-        <h1 className=" font-bold text-2xl flex    items-center gap-2 p-5 text-[#101828]">
-          <div className="space-y-2">
+        <h1 className=" font-bold text-2xl flex items-center gap-2 text-[#101828]">
+          <div className="flex flex-col gap-[12px]">
             <div className="relative items-center flex gap-2">
               {showBackButton && (
                 <Button

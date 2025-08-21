@@ -196,7 +196,7 @@ export default function RevertedPostPage({
   return (
     <div className=" flex-1 py-16 h-screen bg-gray-50">
       {/* Main Content */}
-      <div className=" flex flex-col">
+      <div style={{paddingTop: '32px'}} className=" flex flex-col gap-[24px] px-[24px] bg-[#F6FAF6]">
         <ContentHeader
           text="Reverted Post"
           description="Your saved drafts and work in progress."
@@ -221,7 +221,7 @@ export default function RevertedPostPage({
           }
         />
         {/* Content Area */}
-        <div className="flex-1 p-6 bg-gray-50">
+        <div className="flex-1 bg-gray-50">
           {filteredArticles.length > 0 ? (
             viewMode === "grid" ? (
               renderGridView()

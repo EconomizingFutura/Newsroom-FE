@@ -1,5 +1,5 @@
 import React from "react";
-import { Trash2, MessageSquare, Edit } from "lucide-react";
+import { Trash, MessageSquare, PenLine, Clock } from "lucide-react";
 
 type CardProps = {
   title: string;
@@ -25,7 +25,7 @@ const Card: React.FC<CardProps> = ({
   remarkMessage,
 }) => {
   return (
-    <div className="w-full max-w-sm h-[250px] bg-white rounded-2xl shadow-md border border-gray-200 p-4 flex flex-col justify-between">
+    <div className="w-full max-w-sm bg-white rounded-2xl shadow-md border border-gray-200 p-[24px] flex flex-col justify-between">
       {/* Title */}
       <h2 className="text-base font-semibold text-gray-900">{title}</h2>
 
@@ -34,7 +34,7 @@ const Card: React.FC<CardProps> = ({
         <span
           className={`px-2 py-0.5 text-xs font-medium rounded-md ${
             type === "Text"
-              ? "bg-blue-100 text-blue-700"
+                ? "text-[#193CB8] border border-[#BEDBFF] bg-[#dbe9fe]"
               : type === "Audio"
               ? "bg-purple-100 text-purple-700"
               : "bg-orange-100 text-orange-700"
@@ -42,7 +42,7 @@ const Card: React.FC<CardProps> = ({
         >
           {type}
         </span>
-        <span className="px-2 py-0.5 text-xs font-medium rounded-md bg-green-100 text-green-700">
+        <span className="px-2 py-0.5 text-xs font-medium rounded-md  border border-[#B3E6B3] text-[#006601] bg-[#f0f9f0]">
           Auto-saved
         </span>
       </div>
@@ -57,33 +57,37 @@ const Card: React.FC<CardProps> = ({
       {/* Remark Block */}
       {status === "Reverted" && (
         <div className="mt-3 p-3 border border-red-300 bg-red-50 rounded-lg text-sm text-red-700">
-          <div className="flex items-center font-semibold mb-1">
-            <MessageSquare size={16} className="mr-1" />
-            Editor Remarks
+          <div className="flex gap-[8px]"> 
+            <MessageSquare size={18} />
+            <div>
+              <div className="flex items-center font-semibold">
+                Editor Remarks
+              </div>
+              <p className="text-xs leading-snug">{remarkMessage}</p>
+            </div>
           </div>
-          <p className="text-xs leading-snug">{remarkMessage}</p>
         </div>
       )}
 
       {/* Footer */}
-      <div className="flex items-center justify-between mt-3 text-xs text-gray-500">
+      {savedTime && status === "Auto-saved" && (<div className="flex items-center justify-between mt-3 text-xs text-gray-500">
         <div>
+         <Clock className="w-5 h-5" />
           <p>Updated {updatedDate}</p>
-          {wordCount && <p>{wordCount} words</p>}
         </div>
-        {savedTime && status === "Auto-saved" && (
-          <p className="text-green-600 font-medium">{savedTime}</p>
-        )}
-      </div>
-
+          <div>{wordCount && <p>{wordCount} words</p>}</div>
+          
+            <p className="text-green-600 font-medium">{savedTime}</p>
+        </div>
+      )}
       {/* Actions */}
       <div className="flex items-center gap-3 mt-3">
         <button className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-medium flex items-center justify-center gap-2 transition">
-          <Edit className="w-3 h-3" />
+          <PenLine className="w-5 h-5" />
           Edit
         </button>
         <button className="p-2 border border-red-300 rounded-lg hover:bg-red-100 transition">
-          <Trash2 className="text-red-500" size={18} />
+          <Trash className="text-red-500" size={18} />
         </button>
       </div>
     </div>
