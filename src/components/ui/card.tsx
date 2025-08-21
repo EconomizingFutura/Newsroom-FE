@@ -15,6 +15,13 @@ type NotificationCardProps = {
   onClick: () => void;
 };
 
+interface StatsCardProps {
+  title: string;
+  value: string | number;
+  pillBg?: string;      // Tailwind bg color class for title pill
+  pillText?: string;    // Tailwind text color class for title text
+}
+
 function Card({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -131,6 +138,22 @@ function DashboardListCard ({ title, message, buttonText, onClick }: Notificatio
   );
 }
 
+function HistoryCard ({
+  title,
+  value,
+  pillBg = "bg-gray-100",
+  pillText = "text-gray-600",
+} : StatsCardProps) {
+  return (
+    <div className="bg-white rounded-2xl shadow-md p-6 flex flex-col items-center justify-center">
+      <div className={`text-[14px] font-[600] px-6 py-2 rounded-full ${pillBg} ${pillText}`}>
+        {title}
+      </div>
+      <div className='text-3xl font-bold mt-4'>{value}</div>
+    </div>
+  );
+};
+
 export {
   Card,
   CardHeader,
@@ -140,5 +163,6 @@ export {
   CardDescription,
   CardContent,
   StatCard,
-  DashboardListCard
+  DashboardListCard,
+  HistoryCard
 };
