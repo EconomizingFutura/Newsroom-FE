@@ -9,8 +9,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Eye, Download } from "lucide-react";
-import ContentHeader from "@/components/ContentHeader";
+import { Search, Eye, Download,FileText, Mic, Video, Calendar } from "lucide-react";
+import { HeaderIcon } from "@/utils/HeaderIcons";
+import { HistoryCard } from "@/components/ui/card";
 
 interface HistoryLogPageProps {
   onViewArticle: (article: any) => void;
@@ -27,7 +28,7 @@ export default function HistoryLogPage({ onViewArticle }: HistoryLogPageProps) {
     {
       id: 1,
       title: "Climate Change Report: Impact on Local Communities",
-      type: "Text",
+      type: "Text Article",
       status: "Approved",
       reporter: "Muthul",
       category: "General",
@@ -38,8 +39,8 @@ export default function HistoryLogPage({ onViewArticle }: HistoryLogPageProps) {
     {
       id: 2,
       title: "Climate Change Report: Impact on Local Communities",
-      type: "Text",
-      status: "Submitted",
+      type: "Text Article",
+      status: "In Review",
       reporter: "Muthul",
       category: "General",
       date: "19/01/2025",
@@ -49,7 +50,7 @@ export default function HistoryLogPage({ onViewArticle }: HistoryLogPageProps) {
     {
       id: 3,
       title: "Climate Change Report: Impact on Local Communities",
-      type: "Text",
+      type: "Text Article",
       status: "Reverted",
       reporter: "Muthul",
       category: "General",
@@ -60,7 +61,7 @@ export default function HistoryLogPage({ onViewArticle }: HistoryLogPageProps) {
     {
       id: 4,
       title: "Climate Change Report: Impact on Local Communities",
-      type: "Text",
+      type: "Audio Post",
       status: "Approved",
       reporter: "Muthul",
       category: "General",
@@ -71,7 +72,7 @@ export default function HistoryLogPage({ onViewArticle }: HistoryLogPageProps) {
     {
       id: 5,
       title: "Climate Change Report: Impact on Local Communities",
-      type: "Text",
+      type: "Text Article",
       status: "Draft",
       reporter: "Muthul",
       category: "General",
@@ -82,7 +83,7 @@ export default function HistoryLogPage({ onViewArticle }: HistoryLogPageProps) {
     {
       id: 6,
       title: "Climate Change Report: Impact on Local Communities",
-      type: "Text",
+      type: "Video Post",
       status: "Reverted",
       reporter: "Muthul",
       category: "General",
@@ -105,24 +106,11 @@ export default function HistoryLogPage({ onViewArticle }: HistoryLogPageProps) {
     switch (status) {
       case "Approved":
         return "bg-green-100 text-green-800";
-      case "Submitted":
+      case "In Review":
         return "bg-blue-100 text-blue-800";
       case "Reverted":
         return "bg-red-100 text-red-800";
       case "Draft":
-        return "bg-orange-100 text-orange-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case "Text":
-        return "bg-blue-100 text-blue-800";
-      case "Audio":
-        return "bg-purple-100 text-purple-800";
-      case "Video":
         return "bg-orange-100 text-orange-800";
       default:
         return "bg-gray-100 text-gray-800";
@@ -140,84 +128,110 @@ export default function HistoryLogPage({ onViewArticle }: HistoryLogPageProps) {
     return matchesSearch && matchesStatus && matchesType;
   });
 
+  const stats = [
+    { title: "Total Posts", value: 20, pillBg: "bg-[#F2F4F6]", pillText: "text-[#4A5565]" },
+    { title: "Draft", value: 10, pillBg: "bg-[#F2F4F6]", pillText: "text-gray-600" },
+    { title: "Submitted", value: 10, pillBg: "bg-[#DCE9FE]", pillText: "text-[#206DFD]"},
+    { title: "Approved", value: 10, pillBg: "bg-[#DBF2D9]", pillText: "text-[#008001]"},
+    { title: "Reverted", value: 10, pillBg: "bg-[#FEE2E0]", pillText: "text-[#F41D28]"},
+  ];
+  type PostType = "Text Article" | "Audio Post" | "Video Post";
+  const typeIcons: Record<PostType, JSX.Element> = {
+    "Text Article": <FileText className="w-4 h-4 text-gray-700" />,
+    "Audio Post": <Mic className="w-4 h-4 text-gray-700" />,
+    "Video Post": <Video className="w-4 h-4 text-gray-700" />,
+  };
+
   return (
     <div className=" flex-1 py-16 h-screen bg-gray-50">
       {/* Main Content */}
-      <div className=" flex flex-col">
+      <div style={{paddingTop: '32px'}} className=" flex flex-col gap-[24px] px-[24px] bg-[#F6FAF6]">
         {/* Top Header */}
-        <ContentHeader text="History Log" iconName="History" />
+        <div className="flex items-center gap-[8px]">
+          <HeaderIcon className=" text-[#008001]" name="History" />
+          <p className="font-bold text-2xl text-[#101828]">History Log</p>
+        </div>
+
+        <div className="grid grid-cols-5 gap-6">
+          {stats.map((item, index) => (
+            <HistoryCard
+              key={index}
+              title={item.title}
+              value={item.value}
+              pillBg={item.pillBg}
+              pillText={item.pillText}
+            />
+          ))}
+        </div>
+        
         {/* Search and Filters */}
-        <div className="bg-white border-b border-gray-200 p-6">
+        <div className="bg-white border-b border-gray-200 px-[24px] py-[16px] bg-white rounded-2xl shadow-md">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="relative">
+            <div className="flex items-center gap-4 flex-1 justify-between">
+              <div className="relative w-full">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <Input
                   placeholder="Search Articles..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 w-64"
+                  className="pl-9 w-[70%] bg-[#F6FAF6]"
                 />
               </div>
 
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-40">
-                  <SelectValue placeholder="All Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  {statusOptions.map((status) => (
-                    <SelectItem key={status} value={status}>
-                      {status}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex gap-[24px]">
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger  className="w-40 bg-[#F6FAF6]">
+                      <SelectValue placeholder="All Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {statusOptions.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {status}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
 
-              <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger className="w-40">
-                  <SelectValue placeholder="All Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {typeOptions.map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {type}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                  <Select value={typeFilter} onValueChange={setTypeFilter}>
+                    <SelectTrigger className="w-40 bg-[#F6FAF6]">
+                      <SelectValue placeholder="All Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {typeOptions.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {type}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
 
-              <Select value={dateRange} onValueChange={setDateRange}>
-                <SelectTrigger className="w-40">
-                  <SelectValue placeholder="Date Range" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Date Range">Date Range</SelectItem>
-                  <SelectItem value="Last 7 days">Last 7 days</SelectItem>
-                  <SelectItem value="Last 30 days">Last 30 days</SelectItem>
-                  <SelectItem value="Last 3 months">Last 3 months</SelectItem>
-                </SelectContent>
-              </Select>
+                  <Select value={dateRange} onValueChange={setDateRange}>
+                    <SelectTrigger className="w-40 bg-[#F6FAF6]">
+                      <SelectValue placeholder="Date Range" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Date Range">Date Range</SelectItem>
+                      <SelectItem value="Last 7 days">Last 7 days</SelectItem>
+                      <SelectItem value="Last 30 days">Last 30 days</SelectItem>
+                      <SelectItem value="Last 3 months">Last 3 months</SelectItem>
+                    </SelectContent>
+                  </Select>
+              </div>
             </div>
-
-            <Button variant="outline" size="sm" className="gap-2">
-              <Download className="w-4 h-4" />
-              Export
-            </Button>
           </div>
         </div>
 
         {/* Article Table */}
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-auto bg-white rounded-2xl shadow-md">
           <div className="bg-white">
             {/* Table Header */}
             <div className="grid grid-cols-12 gap-4 p-6 border-b border-gray-200 text-xs font-medium text-gray-500 uppercase tracking-wide">
-              <div className="col-span-4">Article Title</div>
-              <div className="col-span-1">Type</div>
-              <div className="col-span-1">Status</div>
-              <div className="col-span-2">Reporter</div>
-              <div className="col-span-2">Category</div>
-              <div className="col-span-1">Date</div>
-              <div className="col-span-1">Actions</div>
+              <div className="col-span-3 font-bold text-sm text-gray-500">Title</div>
+              <div className="col-span-2 font-bold text-sm text-gray-500">Type</div>
+              <div className="col-span-2 font-bold text-sm text-gray-500">Status</div>
+              <div className="col-span-2 font-bold text-sm text-gray-500">Category</div>
+              <div className="col-span-2 font-bold text-sm text-gray-500">Last Updated</div>
+              <div className="col-span-1 font-bold text-sm text-gray-500">Action</div>
             </div>
 
             {/* Table Rows */}
@@ -225,35 +239,27 @@ export default function HistoryLogPage({ onViewArticle }: HistoryLogPageProps) {
               {filteredArticles.map((article) => (
                 <div
                   key={article.id}
-                  className="grid grid-cols-12 gap-4 p-6 hover:bg-gray-50 transition-colors"
+                  className="grid grid-cols-12 gap-4 p-6 hover:bg-gray-50 transition-colors items-center"
                 >
-                  <div className="col-span-4">
-                    <h3 className="text-sm font-medium text-gray-900 mb-1">
+                  <div className="col-span-3 truncate">
+                    <h3 className="text-sm font-normal text-[#1E2939] truncate">
                       {article.title}
                     </h3>
-                    <div className="text-xs text-gray-500">
-                      {article.wordCount} words • {article.time}
-                    </div>
-                  </div>
-
-                  <div className="col-span-1">
-                    <Badge className={`text-xs ${getTypeColor(article.type)}`}>
-                      {article.type}
-                    </Badge>
-                  </div>
-
-                  <div className="col-span-1">
-                    <Badge
-                      className={`text-xs ${getStatusColor(article.status)}`}
-                    >
-                      {article.status}
-                    </Badge>
                   </div>
 
                   <div className="col-span-2">
-                    <div className="text-sm text-gray-900">
-                      {article.reporter}
+                    <div className='text-xs flex gap-[8px]'>
+                    {typeIcons[article.type as PostType]}
+                    <span>{article.type}</span>
                     </div>
+                  </div>
+
+                  <div className="col-span-2">
+                    <Badge
+                      className={`px-[16px] py-[6px] text-xs ${getStatusColor(article.status)}`}
+                    >
+                      <span>{article.status}</span>
+                    </Badge>
                   </div>
 
                   <div className="col-span-2">
@@ -262,7 +268,8 @@ export default function HistoryLogPage({ onViewArticle }: HistoryLogPageProps) {
                     </div>
                   </div>
 
-                  <div className="col-span-1">
+                  <div className="col-span-2 flex items-center gap-[8px]">
+                    <Calendar className="w-4 h-4" />
                     <div className="text-sm text-gray-900">{article.date}</div>
                   </div>
 
@@ -274,7 +281,6 @@ export default function HistoryLogPage({ onViewArticle }: HistoryLogPageProps) {
                       onClick={() => onViewArticle(article)}
                     >
                       <Eye className="w-3 h-3" />
-                      View
                     </Button>
                   </div>
                 </div>
