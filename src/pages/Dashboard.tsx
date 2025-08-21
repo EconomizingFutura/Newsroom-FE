@@ -9,23 +9,12 @@ type StatCardProps = {
   color: string;
 };
 
-interface DashboardProps {
-  onEditStory: (article: any) => void;
-  onNavigateToDrafts: () => void;
-  onNavigateToReverted: () => void;
-  onNavigateToHistory: () => void;
-  onNavigateToNewsFeeds: () => void;
-  onCreateNewTextArticle: () => void;
-  onCreateNewAudioArticle: () => void;
-  onCreateNewVideoArticle: () => void;
-}
-
-export default function Dashboard({ onEditStory }: DashboardProps) {
+export default function Dashboard() {
   // Mock data for demonstration
   const stats: StatCardProps[] = [
     { title: "Total Posts", count: 7, icon: FilePen, color: "#155DFC" }, // blue
-    { title: "Draft", count: 5, icon: FilePen, color: "#4A5565" },       // gray
-    { title: "Submitted", count: 1, icon: Clock, color: "#2B7FFF" },    // blue
+    { title: "Draft", count: 5, icon: FilePen, color: "#4A5565" }, // gray
+    { title: "Submitted", count: 1, icon: Clock, color: "#2B7FFF" }, // blue
     { title: "Approved", count: 10, icon: CheckCircle, color: "#008001" }, // green
     { title: "Need Revision", count: 5, icon: RotateCcw, color: "#E7000B" }, // red
   ];
@@ -33,7 +22,8 @@ export default function Dashboard({ onEditStory }: DashboardProps) {
   const notificationList = [
     {
       title: "Article Approved",
-      message: 'Your article "Tech Conference Interview" has been approved and published',
+      message:
+        'Your article "Tech Conference Interview" has been approved and published',
       buttonText: "Edit Story",
       onClick: () => alert("Editing story..."),
     },
@@ -45,10 +35,11 @@ export default function Dashboard({ onEditStory }: DashboardProps) {
     },
     {
       title: "Article Approved",
-      message: 'Your article "Blockchain Future" has been approved and published',
+      message:
+        'Your article "Blockchain Future" has been approved and published',
       buttonText: "Edit Story",
       onClick: () => alert("Editing blockchain article..."),
-    }
+    },
   ];
 
   return (
@@ -66,21 +57,24 @@ export default function Dashboard({ onEditStory }: DashboardProps) {
         {/* Stats Section */}
         <div className="p-6">
           <div className="grid gap-4 mb-8">
-          <div className="flex gap-4">
-            {stats.map((stat, index) => (
-              <StatCard
-                key={index}
-                title={stat.title}
-                count={stat.count}
-                icon={stat.icon}
-                color={stat.color}
-              />
-            ))}
+            <div className="flex gap-4">
+              {stats.map((stat, index) => (
+                <StatCard
+                  key={index}
+                  title={stat.title}
+                  count={stat.count}
+                  icon={stat.icon}
+                  color={stat.color}
+                />
+              ))}
             </div>
           </div>
           <div>
             <div className="space-y-3">
-            <div style={{ borderLeftWidth: "2px"}} className="border-red-500 bg-white rounded-2xl px-[24px] py-[16px] shadow-md">
+              <div
+                style={{ borderLeftWidth: "2px" }}
+                className="border-red-500 bg-white rounded-2xl px-[24px] py-[16px] shadow-md"
+              >
                 <div className="flex flex-col gap-[16px]">
                   <div className="flex flex-col gap-[24px]">
                     {/* Header */}
@@ -94,8 +88,8 @@ export default function Dashboard({ onEditStory }: DashboardProps) {
                       </div>
                     </div>
 
-                      {/* Divider */}
-                      <hr className="border-t border-gray-200" />
+                    {/* Divider */}
+                    <hr className="border-t border-gray-200" />
                   </div>
                   <div className="flex flex-col gap-[12px]">
                     {/* Notifications */}

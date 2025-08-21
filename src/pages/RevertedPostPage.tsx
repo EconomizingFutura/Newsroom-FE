@@ -16,14 +16,14 @@ import SearchFilterTab from "@/components/SearchFilterTab";
 import SharedCard from "@/components/shared/Card";
 
 interface RevertedPostPageProps {
-  onEditReverted: (article: any) => void;
-  onNavigateToDashboard: () => void;
-  onNavigateToDrafts: () => void;
-  onNavigateToHistory: () => void;
-  onNavigateToFilteredContent: (contentType: string) => void;
-  onCreateNewTextArticle: () => void;
-  onCreateNewAudioArticle: () => void;
-  onCreateNewVideoArticle: () => void;
+  onEditReverted?: (article: any) => void;
+  onNavigateToDashboard?: () => void;
+  onNavigateToDrafts?: () => void;
+  onNavigateToHistory?: () => void;
+  onNavigateToFilteredContent?: (contentType: string) => void;
+  onCreateNewTextArticle?: () => void;
+  onCreateNewAudioArticle?: () => void;
+  onCreateNewVideoArticle?: () => void;
 }
 
 export default function RevertedPostPage({

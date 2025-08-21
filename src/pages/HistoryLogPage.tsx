@@ -13,7 +13,7 @@ import { Search, Eye, Download } from "lucide-react";
 import ContentHeader from "@/components/ContentHeader";
 
 interface HistoryLogPageProps {
-  onViewArticle: (article: any) => void;
+  onViewArticle?: (article: any) => void;
 }
 
 export default function HistoryLogPage({ onViewArticle }: HistoryLogPageProps) {

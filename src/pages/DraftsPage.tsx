@@ -8,10 +8,10 @@ import SearchFilterTab from "@/components/SearchFilterTab";
 import SharedCard from "@/components/shared/Card";
 
 interface DraftsPageProps {
-  onEditDraft: (article: any) => void;
-  onCreateNewTextArticle: () => void;
-  onCreateNewAudioArticle: () => void;
-  onCreateNewVideoArticle: () => void;
+  onEditDraft?: (article: any) => void;
+  onCreateNewTextArticle?: () => void;
+  onCreateNewAudioArticle?: () => void;
+  onCreateNewVideoArticle?: () => void;
 }
 
 export default function DraftsPage({

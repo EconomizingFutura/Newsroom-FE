@@ -9,8 +9,8 @@ import ContentHeader from "@/components/ContentHeader";
 
 interface TextArticleEditorProps {
   article?: any;
-  onBack: () => void;
-  onNavigateToNewsFeeds: () => void;
+  onBack?: () => void;
+  onNavigateToNewsFeeds?: () => void;
 }
 
 export default function TextArticleEditor({

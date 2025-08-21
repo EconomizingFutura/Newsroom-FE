@@ -15,6 +15,8 @@ import LoginPage from "./pages/LoginPage";
 import cijlogo from "./assets/cijlogo.png";
 import { Bell } from "lucide-react";
 import Navigation from "./components/Navigation";
+import { BrowserRouter, Router } from "react-router";
+import Layout from "./Router/Routes";
 
 export default function App() {
   const [currentView, setCurrentView] = useState<currentPageType>("dashboard");
@@ -94,6 +96,12 @@ export default function App() {
     setCurrentView("filtered");
     setSelectedArticle(null);
   };
+
+  return (
+    <BrowserRouter>
+      <Layout />
+    </BrowserRouter>
+  );
 
   return (
     <div>

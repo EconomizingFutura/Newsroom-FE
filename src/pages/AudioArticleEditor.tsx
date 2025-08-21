@@ -7,8 +7,8 @@ import { ArrowLeft, Mic, Save, Send, Play, X, Plus, Bell } from "lucide-react";
 
 interface AudioArticleEditorProps {
   article?: any;
-  onBack: () => void;
-  onNavigateToNewsFeeds: () => void;
+  onBack?: () => void;
+  onNavigateToNewsFeeds?: () => void;
 }
 
 export default function AudioArticleEditor({

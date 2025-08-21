@@ -17,13 +17,11 @@ import {
 } from "lucide-react";
 
 interface FilteredContentPageProps {
-  contentType: string;
-  onViewArticle: (article: any) => void;
-  onNavigateToDashboard: () => void;
-  onNavigateToDrafts: () => void;
-  onNavigateToReverted: () => void;
-  onNavigateToHistory: () => void;
-  onCreateNewVideoArticle?: () => void;
+  contentType?: string;
+  onViewArticle?: (article: any) => void;
+  onNavigateToDashboard?: () => void;
+  onNavigateToDrafts?: () => void;
+  onNavigateToReverted?: () => void;
 }
 
 export default function FilteredContentPage({
