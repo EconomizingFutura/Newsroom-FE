@@ -12,19 +12,102 @@ import {
   Video,
 } from "lucide-react";
 import { Separator } from "@radix-ui/react-separator";
-import type { currentPageType, SidebarTypes } from "../types/sidebarTypes";
+import type { currentPageType } from "../types/sidebarTypes";
 
-const SideBar: React.FC<SidebarTypes> = ({
-  onNavigateToNewsFeeds,
-  onNavigateToDrafts,
-  onNavigateToReverted,
-  onNavigateToHistory,
-  onCreateNewTextArticle,
-  onCreateNewAudioArticle,
-  onCreateNewVideoArticle,
-  onNavigateToDashboard,
-  currentView,
-}) => {
+export type UserRole = "reporter" | "editor";
+
+export interface SidebarTypes {
+  role: UserRole;
+  onNavigateToNewsFeeds: () => void;
+  onNavigateToDrafts: () => void;
+  onNavigateToReverted: () => void;
+  onNavigateToHistory: () => void;
+  onCreateNewTextArticle: () => void;
+  onCreateNewAudioArticle: () => void;
+  onCreateNewVideoArticle: () => void;
+  onNavigateToDashboard: () => void;
+  currentView: currentPageType;
+}
+
+const menuConfig = {
+  reporter: [
+    {
+      key: "newsFeeds",
+      label: "Agency Feeds",
+      icon: <Rss className="w-4 h-4" />,
+      action: "onNavigateToNewsFeeds",
+    },
+    {
+      key: "dashboard",
+      label: "Dashboard",
+      icon: <Users className="w-4 h-4" />,
+      action: "onNavigateToDashboard",
+    },
+    {
+      key: "drafts",
+      label: "Drafts",
+      icon: <FileText className="w-4 h-4" />,
+      action: "onNavigateToDrafts",
+      badge: 4,
+    },
+    {
+      key: "reverted",
+      label: "Reverted Post",
+      icon: <RotateCcw className="w-4 h-4" />,
+      action: "onNavigateToReverted",
+      badge: 4,
+    },
+    {
+      key: "history",
+      label: "History Log",
+      icon: <History className="w-4 h-4" />,
+      action: "onNavigateToHistory",
+    },
+  ],
+  editor: [
+    {
+      key: "newsFeeds",
+      label: "Agency Feeds",
+      icon: <Rss className="w-4 h-4" />,
+      action: "onNavigateToNewsFeeds",
+    },
+    {
+      key: "review",
+      label: "In Review",
+      icon: <FileText className="w-4 h-4" />,
+      action: "onNavigateToDrafts",
+      badge: 4,
+    },
+    {
+      key: "publish",
+      label: "Publish Center",
+      icon: <RotateCcw className="w-4 h-4" />,
+      action: "onNavigateToReverted",
+      badge: 4,
+    },
+    {
+      key: "calendar",
+      label: "Calendar",
+      icon: <Users className="w-4 h-4" />,
+      action: "onNavigateToDashboard",
+    },
+    {
+      key: "history",
+      label: "History Log",
+      icon: <History className="w-4 h-4" />,
+      action: "onNavigateToHistory",
+    },
+  ],
+};
+
+const SideBar: React.FC<SidebarTypes> = (props) => {
+  const {
+    onCreateNewTextArticle,
+    onCreateNewAudioArticle,
+    onCreateNewVideoArticle,
+    currentView,
+  } = props;
+  const currentRole: UserRole = "editor";
   const [multiWindow, setMultiWindow] = useState({
     newsFeeds: false,
     createArticle: false,
@@ -50,112 +133,70 @@ const SideBar: React.FC<SidebarTypes> = ({
       <div className="flex-1 px-4">
         {/* Top Menu */}
         <div className="space-y-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            className={`w-full justify-between px-3 py-2 ${isActive(
-              "newsFeeds"
-            )}`}
-            onClick={onNavigateToNewsFeeds}
-          >
-            <span className="flex items-center gap-2">
-              <Rss className="w-4 h-4" />
-              Agency Feeds
-            </span>
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onNavigateToDashboard}
-            className={`w-full justify-start px-3 py-2 ${isActive(
-              "dashboard"
-            )}`}
-          >
-            <Users className="w-4 h-4 mr-2" />
-            Dashboard
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            className={`w-full justify-between px-3 py-2 ${isActive("drafts")}`}
-            onClick={onNavigateToDrafts}
-          >
-            <span className="flex items-center gap-2">
-              <FileText className="w-4 h-4" />
-              Drafts
-            </span>
-            <span className="bg-green-600 text-white text-xs font-medium px-2 rounded-full">
-              4
-            </span>
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            className={`w-full justify-between px-3 py-2 ${isActive(
-              "reverted"
-            )}`}
-            onClick={onNavigateToReverted}
-          >
-            <span className="flex items-center gap-2">
-              <RotateCcw className="w-4 h-4" />
-              Reverted Post
-            </span>
-            <span className="bg-red-500 text-white text-xs font-medium px-2 rounded-full">
-              4
-            </span>
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            className={`w-full justify-start px-3 py-2 ${isActive("history")}`}
-            onClick={onNavigateToHistory}
-          >
-            <History className="w-4 h-4 mr-2" />
-            History Log
-          </Button>
+          {menuConfig[currentRole].map((item) => {
+            return (
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`w-full justify-between px-3 py-2 ${isActive(
+                  item.key as currentPageType
+                )}`}
+                onClick={props[item.action as keyof SidebarTypes] as () => void}
+              >
+                <span className="flex items-center gap-2">
+                  {item.icon}
+                  {item.label}
+                </span>
+                {item.badge && (
+                  <span className="bg-green-600 text-white text-xs font-medium px-2 rounded-full">
+                    4
+                  </span>
+                )}
+              </Button>
+            );
+          })}
         </div>
-
-        <Separator className="my-4 bg-gray-200 h-px" />
 
         {/* Quick Create */}
-        <div className="space-y-2">
-          <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1">
-            Quick Create
-          </h4>
-          <div className="space-y-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full justify-start gap-2 px-3 py-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-              onClick={onCreateNewTextArticle}
-            >
-              <FileText className="w-4 h-4" />
-              Text Article
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full justify-start gap-2 px-3 py-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-              onClick={onCreateNewAudioArticle}
-            >
-              <Mic className="w-4 h-4" />
-              Audio Post
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full justify-start gap-2 px-3 py-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-              onClick={onCreateNewVideoArticle}
-            >
-              <Video className="w-4 h-4" />
-              Video Post
-            </Button>
-          </div>
-        </div>
+        {currentRole === "reporter" && (
+          <>
+            <Separator className="my-4 bg-gray-200 h-px" />
+            <div className="space-y-2">
+              <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1">
+                Quick Create
+              </h4>
+              <div className="space-y-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start gap-2 px-3 py-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  onClick={onCreateNewTextArticle}
+                >
+                  <FileText className="w-4 h-4" />
+                  Text Article
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start gap-2 px-3 py-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  onClick={onCreateNewAudioArticle}
+                >
+                  <Mic className="w-4 h-4" />
+                  Audio Post
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start gap-2 px-3 py-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  onClick={onCreateNewVideoArticle}
+                >
+                  <Video className="w-4 h-4" />
+                  Video Post
+                </Button>
+              </div>
+            </div>
+          </>
+        )}
 
         <Separator className="my-4 bg-gray-200 h-px" />
 
