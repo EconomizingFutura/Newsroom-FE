@@ -17,7 +17,6 @@ import type { currentPageType } from "../types/sidebarTypes";
 export type UserRole = "reporter" | "editor";
 
 export interface SidebarTypes {
-  role: UserRole;
   onNavigateToNewsFeeds: () => void;
   onNavigateToDrafts: () => void;
   onNavigateToReverted: () => void;
@@ -26,6 +25,11 @@ export interface SidebarTypes {
   onCreateNewAudioArticle: () => void;
   onCreateNewVideoArticle: () => void;
   onNavigateToDashboard: () => void;
+  onNavigateEditorDashboard: () => void;
+  onNavigateEditorCalendarView: () => void;
+  onNavigateEditorPublishCenter: () => void;
+  onNavigateEditorReviewQueue: () => void;
+  onNavigateEditorHistory: () => void;
   currentView: currentPageType;
 }
 
@@ -72,30 +76,36 @@ const menuConfig = {
       action: "onNavigateToNewsFeeds",
     },
     {
-      key: "review",
-      label: "In Review",
+      key: "editor-dashboard",
+      label: "Dashboard",
+      icon: <Users className="w-4 h-4" />,
+      action: "onNavigateEditorDashboard",
+    },
+    {
+      key: "review-queue",
+      label: "Review Queue",
       icon: <FileText className="w-4 h-4" />,
-      action: "onNavigateToDrafts",
+      action: "onNavigateEditorReviewQueue",
       badge: 4,
     },
     {
-      key: "publish",
+      key: "publish-center",
       label: "Publish Center",
       icon: <RotateCcw className="w-4 h-4" />,
-      action: "onNavigateToReverted",
+      action: "onNavigateEditorPublishCenter",
       badge: 4,
     },
     {
       key: "calendar",
       label: "Calendar",
       icon: <Users className="w-4 h-4" />,
-      action: "onNavigateToDashboard",
+      action: "onNavigateEditorCalendarView",
     },
     {
-      key: "history",
+      key: "editor-history",
       label: "History Log",
       icon: <History className="w-4 h-4" />,
-      action: "onNavigateToHistory",
+      action: "onNavigateEditorHistory",
     },
   ],
 };

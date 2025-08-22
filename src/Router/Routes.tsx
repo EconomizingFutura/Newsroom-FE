@@ -18,13 +18,12 @@ import FilteredContentPage from "@/pages/FilteredContentPage";
 import NewsFeedsPage from "@/pages/NewsFeedsPage";
 import SideBar from "@/components/SideBar";
 import Navigation from "@/components/Navigation";
-
-export type currentPageType =
-  | "dashboard"
-  | "newsFeeds"
-  | "drafts"
-  | "reverted"
-  | "history";
+import { CalendarView } from "@/pages/Editor/CalendarView";
+import { HistoryLog } from "@/pages/Editor/HistoryLog";
+import { PublishCenter } from "@/pages/Editor/PublishCenter";
+import { ReviewQueue } from "@/pages/Editor/ReviewQueue";
+import { Dashboard as EditorDashboard } from "@/pages/Editor/Dashboard";
+import type { currentPageType } from "@/types/sidebarTypes";
 
 export default function Layout() {
   const navigate = useNavigate();
@@ -35,8 +34,23 @@ export default function Layout() {
     if (location.pathname.startsWith("/drafts")) return "drafts";
     if (location.pathname.startsWith("/reverted")) return "reverted";
     if (location.pathname.startsWith("/history")) return "history";
+    if (location.pathname.startsWith("/editor/dashboard"))
+      return "editor-dashboard";
+    if (location.pathname.startsWith("/editor/calendarView")) return "calendar";
+    if (location.pathname.startsWith("/editor/publishCenter"))
+      return "publish-center";
+    if (location.pathname.startsWith("/editor/reviewQueue"))
+      return "review-queue";
+    if (location.pathname.startsWith("/editor/history"))
+      return "editor-history";
     return "newsFeeds"; // default fallback
   };
+
+  const currentViewMemo = React.useMemo(
+    () => getCurrentView(),
+    [location.pathname]
+  );
+
   return (
     <div>
       <Navigation />
@@ -46,23 +60,37 @@ export default function Layout() {
           onNavigateToReverted={() => navigate("/reverted")}
           onNavigateToHistory={() => navigate("/history")}
           onNavigateToNewsFeeds={() => navigate("/news-feeds")}
-          onCreateNewTextArticle={() => navigate("/editor")}
-          onCreateNewAudioArticle={() => navigate("/editor/audio")}
-          onCreateNewVideoArticle={() => navigate("/editor/video")}
+          onCreateNewTextArticle={() => navigate("/textArticle")}
+          onCreateNewAudioArticle={() => navigate("/audio")}
+          onCreateNewVideoArticle={() => navigate("/video")}
           onNavigateToDashboard={() => navigate("/dashboard")}
-          currentView={getCurrentView()} // optional, can highlight active based on location
+          onNavigateEditorDashboard={() => navigate("/editor/dashboard")}
+          onNavigateEditorCalendarView={() => navigate("/editor/calendarView")}
+          onNavigateEditorPublishCenter={() =>
+            navigate("/editor/publishCenter")
+          }
+          onNavigateEditorReviewQueue={() => navigate("/editor/reviewQueue")}
+          onNavigateEditorHistory={() => navigate("/editor/history")}
+          currentView={currentViewMemo} // optional, can highlight active based on location
         />
         <div className="flex-1 w-full h-screen overflow-y-auto">
           <Routes>
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/editor" element={<TextArticleEditor />} />
-            <Route path="/editor/audio" element={<AudioArticleEditor />} />
-            <Route path="/editor/video" element={<VideoArticleEditor />} />
+            <Route path="/textArticle" element={<TextArticleEditor />} />
+            <Route path="/audio" element={<AudioArticleEditor />} />
+            <Route path="/video" element={<VideoArticleEditor />} />
             <Route path="/drafts" element={<DraftsPage />} />
             <Route path="/reverted" element={<RevertedPostPage />} />
             <Route path="/history" element={<HistoryLogPage />} />
             <Route path="/filtered/:type" element={<FilteredContentPage />} />
             <Route path="/news-feeds" element={<NewsFeedsPage />} />
+
+            {/* Editor */}
+            <Route path="/editor/dashboard" element={<EditorDashboard />} />
+            <Route path="/editor/calendarView" element={<CalendarView />} />
+            <Route path="/editor/history" element={<HistoryLog />} />
+            <Route path="/editor/publishCenter" element={<PublishCenter />} />
+            <Route path="/editor/reviewQueue" element={<ReviewQueue />} />
           </Routes>
         </div>
       </div>

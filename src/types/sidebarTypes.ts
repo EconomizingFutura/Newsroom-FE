@@ -7,7 +7,12 @@ export type currentPageType =
   | "reverted"
   | "history"
   | "filtered"
-  | "newsFeeds";
+  | "newsFeeds"
+  | "review-queue"
+  | "publish-center"
+  | "editor-history"
+  | "editor-dashboard"
+  | "calendar";
 
 export interface SidebarTypes {
   onNavigateToNewsFeeds: () => void;
