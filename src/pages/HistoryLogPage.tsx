@@ -9,9 +9,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Eye, Download,FileText, Mic, Video, Calendar } from "lucide-react";
+import {
+  Search,
+  Eye,
+  Download,
+  FileText,
+  Mic,
+  Video,
+  Calendar,
+} from "lucide-react";
 import { HeaderIcon } from "@/utils/HeaderIcons";
 import { HistoryCard } from "@/components/ui/card";
+import { historyStats } from "@/utils/HistoryUtils";
 
 interface HistoryLogPageProps {
   onViewArticle?: (article: any) => void;
@@ -128,13 +137,6 @@ export default function HistoryLogPage({ onViewArticle }: HistoryLogPageProps) {
     return matchesSearch && matchesStatus && matchesType;
   });
 
-  const stats = [
-    { title: "Total Posts", value: 20, pillBg: "bg-[#F2F4F6]", pillText: "text-[#4A5565]" },
-    { title: "Draft", value: 10, pillBg: "bg-[#F2F4F6]", pillText: "text-gray-600" },
-    { title: "Submitted", value: 10, pillBg: "bg-[#DCE9FE]", pillText: "text-[#206DFD]"},
-    { title: "Approved", value: 10, pillBg: "bg-[#DBF2D9]", pillText: "text-[#008001]"},
-    { title: "Reverted", value: 10, pillBg: "bg-[#FEE2E0]", pillText: "text-[#F41D28]"},
-  ];
   type PostType = "Text Article" | "Audio Post" | "Video Post";
   const typeIcons: Record<PostType, JSX.Element> = {
     "Text Article": <FileText className="w-4 h-4 text-gray-700" />,
@@ -145,7 +147,10 @@ export default function HistoryLogPage({ onViewArticle }: HistoryLogPageProps) {
   return (
     <div className=" flex-1 py-16 h-screen bg-gray-50">
       {/* Main Content */}
-      <div style={{paddingTop: '32px'}} className=" flex flex-col gap-[24px] px-[24px] bg-[#F6FAF6]">
+      <div
+        style={{ paddingTop: "32px" }}
+        className=" flex flex-col gap-[24px] px-[24px] bg-[#F6FAF6]"
+      >
         {/* Top Header */}
         <div className="flex items-center gap-[8px]">
           <HeaderIcon className=" text-[#008001]" name="History" />
@@ -153,7 +158,7 @@ export default function HistoryLogPage({ onViewArticle }: HistoryLogPageProps) {
         </div>
 
         <div className="grid grid-cols-5 gap-6">
-          {stats.map((item, index) => (
+          {historyStats.stats.map((item, index) => (
             <HistoryCard
               key={index}
               title={item.title}
@@ -163,9 +168,9 @@ export default function HistoryLogPage({ onViewArticle }: HistoryLogPageProps) {
             />
           ))}
         </div>
-        
+
         {/* Search and Filters */}
-        <div className="bg-white border-b border-gray-200 px-[24px] py-[16px] bg-white rounded-2xl shadow-md">
+        <div className="bg-white border-b border-gray-200 px-[24px] py-[16px] rounded-2xl shadow-md">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4 flex-1 justify-between">
               <div className="relative w-full">
@@ -179,43 +184,43 @@ export default function HistoryLogPage({ onViewArticle }: HistoryLogPageProps) {
               </div>
 
               <div className="flex gap-[24px]">
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger  className="w-40 bg-[#F6FAF6]">
-                      <SelectValue placeholder="All Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {statusOptions.map((status) => (
-                        <SelectItem key={status} value={status}>
-                          {status}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-40 bg-[#F6FAF6]">
+                    <SelectValue placeholder="All Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {statusOptions.map((status) => (
+                      <SelectItem key={status} value={status}>
+                        {status}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-                  <Select value={typeFilter} onValueChange={setTypeFilter}>
-                    <SelectTrigger className="w-40 bg-[#F6FAF6]">
-                      <SelectValue placeholder="All Type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {typeOptions.map((type) => (
-                        <SelectItem key={type} value={type}>
-                          {type}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <Select value={typeFilter} onValueChange={setTypeFilter}>
+                  <SelectTrigger className="w-40 bg-[#F6FAF6]">
+                    <SelectValue placeholder="All Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {typeOptions.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-                  <Select value={dateRange} onValueChange={setDateRange}>
-                    <SelectTrigger className="w-40 bg-[#F6FAF6]">
-                      <SelectValue placeholder="Date Range" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Date Range">Date Range</SelectItem>
-                      <SelectItem value="Last 7 days">Last 7 days</SelectItem>
-                      <SelectItem value="Last 30 days">Last 30 days</SelectItem>
-                      <SelectItem value="Last 3 months">Last 3 months</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <Select value={dateRange} onValueChange={setDateRange}>
+                  <SelectTrigger className="w-40 bg-[#F6FAF6]">
+                    <SelectValue placeholder="Date Range" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Date Range">Date Range</SelectItem>
+                    <SelectItem value="Last 7 days">Last 7 days</SelectItem>
+                    <SelectItem value="Last 30 days">Last 30 days</SelectItem>
+                    <SelectItem value="Last 3 months">Last 3 months</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>
@@ -226,12 +231,24 @@ export default function HistoryLogPage({ onViewArticle }: HistoryLogPageProps) {
           <div className="bg-white">
             {/* Table Header */}
             <div className="grid grid-cols-12 gap-4 p-6 border-b border-gray-200 text-xs font-medium text-gray-500 uppercase tracking-wide">
-              <div className="col-span-3 font-bold text-sm text-gray-500">Title</div>
-              <div className="col-span-2 font-bold text-sm text-gray-500">Type</div>
-              <div className="col-span-2 font-bold text-sm text-gray-500">Status</div>
-              <div className="col-span-2 font-bold text-sm text-gray-500">Category</div>
-              <div className="col-span-2 font-bold text-sm text-gray-500">Last Updated</div>
-              <div className="col-span-1 font-bold text-sm text-gray-500">Action</div>
+              <div className="col-span-3 font-bold text-sm text-gray-500">
+                Title
+              </div>
+              <div className="col-span-2 font-bold text-sm text-gray-500">
+                Type
+              </div>
+              <div className="col-span-2 font-bold text-sm text-gray-500">
+                Status
+              </div>
+              <div className="col-span-2 font-bold text-sm text-gray-500">
+                Category
+              </div>
+              <div className="col-span-2 font-bold text-sm text-gray-500">
+                Last Updated
+              </div>
+              <div className="col-span-1 font-bold text-sm text-gray-500">
+                Action
+              </div>
             </div>
 
             {/* Table Rows */}
@@ -248,15 +265,17 @@ export default function HistoryLogPage({ onViewArticle }: HistoryLogPageProps) {
                   </div>
 
                   <div className="col-span-2">
-                    <div className='text-xs flex gap-[8px]'>
-                    {typeIcons[article.type as PostType]}
-                    <span>{article.type}</span>
+                    <div className="text-xs flex gap-[8px]">
+                      {typeIcons[article.type as PostType]}
+                      <span>{article.type}</span>
                     </div>
                   </div>
 
                   <div className="col-span-2">
                     <Badge
-                      className={`px-[16px] py-[6px] text-xs ${getStatusColor(article.status)}`}
+                      className={`px-[16px] py-[6px] text-xs ${getStatusColor(
+                        article.status
+                      )}`}
                     >
                       <span>{article.status}</span>
                     </Badge>
