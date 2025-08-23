@@ -191,3 +191,20 @@ html {
 .warning-color {
   color:#C10007 !important;
 }
+
+.ql-toolbar {
+  position: absolute;
+  bottom: 0 !important;
+  z-index: 100;
+  width: 100%;
+  border: none !important;
+  border-top: 1px solid #ECECEC !important;
+}
+
+.ql-container {
+  border: 0 !important;
+}
+
+.ql-editor {
+  height: calc(100% - 53px) !important;
+}

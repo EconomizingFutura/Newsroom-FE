@@ -7,10 +7,7 @@ import {
   useLocation,
 } from "react-router-dom";
 
-import Dashboard from "@/pages/Dashboard";
-import TextArticleEditor from "@/pages/TextArticleEditor";
-import AudioArticleEditor from "@/pages/AudioArticleEditor";
-import VideoArticleEditor from "@/pages/VideoArticleEditor";
+import Dashboard from "@/pages/Dashboard";import ContentUploader from "@/pages/ContentUploader";
 import DraftsPage from "@/pages/DraftsPage";
 import RevertedPostPage from "@/pages/RevertedPostPage";
 import HistoryLogPage from "@/pages/HistoryLogPage";
@@ -76,9 +73,9 @@ export default function Layout() {
         <div className="flex-1 w-full h-screen overflow-y-auto">
           <Routes>
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/textArticle" element={<TextArticleEditor />} />
-            <Route path="/audio" element={<AudioArticleEditor />} />
-            <Route path="/video" element={<VideoArticleEditor />} />
+            <Route path="/textArticle" element={<ContentUploader />} />
+        <Route path="/audio" element={<ContentUploader />} />
+        <Route path="/video" element={<ContentUploader />} />
             <Route path="/drafts" element={<DraftsPage />} />
             <Route path="/reverted" element={<RevertedPostPage />} />
             <Route path="/history" element={<HistoryLogPage />} />

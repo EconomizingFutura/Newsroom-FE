@@ -117,7 +117,7 @@ const SideBar: React.FC<SidebarTypes> = (props) => {
     onCreateNewVideoArticle,
     currentView,
   } = props;
-  const currentRole: UserRole = "editor";
+  const currentRole: UserRole = "reporter";
   const [multiWindow, setMultiWindow] = useState({
     newsFeeds: false,
     createArticle: false,
@@ -148,6 +148,7 @@ const SideBar: React.FC<SidebarTypes> = (props) => {
               <Button
                 variant="ghost"
                 size="sm"
+                key={item.key}
                 className={`w-full justify-between px-3 py-2 ${isActive(
                   item.key as currentPageType
                 )}`}
