@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 import {
   Clock,
@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { SocialMediaPublishCard } from "./TextEditor/SocialMediaPublishCard";
 
 export type Story = {
   id: string;
@@ -38,10 +39,49 @@ const StoryCard: React.FC<StoryCardProps> = ({
   handlePublishNow,
   handleSchedulePublish,
 }) => {
+  const [showPublishCard, setShowPublishCard] = useState(false);
+  const publishCardRef = useRef<HTMLDivElement>(null);
+  const publishButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        publishCardRef.current &&
+        !publishCardRef.current.contains(event.target as Node) &&
+        publishButtonRef.current &&
+        !publishButtonRef.current.contains(event.target as Node)
+      ) {
+        setShowPublishCard(false);
+      }
+    };
+
+    if (showPublishCard) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showPublishCard]);
+
+  const handlePublishNowClick = () => {
+    setShowPublishCard(!showPublishCard);
+  };
+
+  const handlePublishCardClose = () => {
+    setShowPublishCard(false);
+  };
+
+  const handlePublishCardPublish = (selectedPlatforms: string[]) => {
+    handlePublishNow(story.id);
+    console.log('Publishing to platforms:', selectedPlatforms);
+    setShowPublishCard(false);
+  };
+
   return (
     <div
       key={story.id}
-      className="bg-white rounded-lg border border-gray-200 p-6"
+      className="bg-white rounded-lg border border-gray-200 p-6 relative"
     >
       <div className="flex items-start justify-between">
         <div className="flex-1">
@@ -102,13 +142,30 @@ const StoryCard: React.FC<StoryCardProps> = ({
 
           {story.status === "ready" && (
             <>
-              <Button
-                onClick={() => handlePublishNow(story.id)}
-                className="bg-[#008001] hover:bg-green-700 text-white"
-              >
-                <Send className="w-4 h-4 mr-2" />
-                Publish Now
-              </Button>
+              <div className="relative">
+                <Button
+                  ref={publishButtonRef}
+                  onClick={handlePublishNowClick}
+                  className="bg-[#008001] hover:bg-green-700 text-white"
+                >
+                  <Send className="w-4 h-4 mr-2" />
+                  Publish Now
+                </Button>
+                
+                {showPublishCard && (
+                  <div 
+                    ref={publishCardRef}
+                    className="absolute bottom-full right-0 mb-2 z-10"
+                  >
+                    <SocialMediaPublishCard 
+                      isOpen={showPublishCard} 
+                      onClose={handlePublishCardClose} 
+                      onPublish={handlePublishCardPublish} 
+                    />
+                  </div>
+                )}
+              </div>
+              
               <Button
                 variant="outline"
                 onClick={() => handleSchedulePublish(story)}

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
@@ -22,10 +21,104 @@ import { BookOpen, Clock, X, Search } from "lucide-react";
 import { getPriorityColor } from "@/utils/PublishCenter";
 import ContentHeader from "@/components/ContentHeader";
 import StoryCard, { type Story } from "@/components/StoryCard";
-// import { cn } from "@/components/ui/utils";
+
+const FILTER_TABS = Object.freeze([
+  {
+    name: "Politics",
+  },
+  {
+    name: "Business",
+  },
+  {
+    name: "Entertainment",
+  },
+  {
+    name: "Sports",
+  },
+  {
+    name: "Environment",
+  },
+]);
+
+const CONTENT_TABS = Object.freeze([
+  {
+    name: "All",
+  },
+  {
+    name: "Scheduled",
+  },
+]);
+
+const ALL_STORIES: Story[] = ([
+  {
+    id: "1",
+    title: "Breaking: City Council Votes on New Housing Development",
+    author: "Sarah Chen",
+    category: "Politics",
+    approvedDate: "15/01/2025 at 16:00:00",
+    priority: "High",
+    content:
+      "The city council convened today to discuss the controversial housing development proposal...",
+    status: "ready",
+  },
+  {
+    id: "2",
+    title: "Local Sports Team Wins Championship Match",
+    author: "Mike Rodriguez",
+    category: "Sports",
+    approvedDate: "15/01/2025 at 14:30:00",
+    priority: "Medium",
+    content:
+      "In a thrilling match that went into overtime, the local team secured their championship...",
+    status: "scheduled",
+  },
+  {
+    id: "3",
+    title: "New Technology Center Opens Downtown",
+    author: "Lisa Wang",
+    category: "Technology",
+    approvedDate: "15/01/2025 at 12:15:00",
+    priority: "Low",
+    content:
+      "The much-anticipated technology innovation center opened its doors to the public...",
+    status: "scheduled",
+  },
+  {
+    id: "4",
+    title: "Weekend Weather Forecast Update",
+    author: "John Smith",
+    category: "Weather",
+    scheduledDate: "16/01/2025 at 08:00:00",
+    priority: "Medium",
+    content:
+      "Weekend weather patterns show a chance of rain with temperatures...",
+    status: "scheduled",
+  },
+  {
+    id: "5",
+    title: "Community Event Planning Meeting",
+    author: "Emma Johnson",
+    category: "Community",
+    scheduledDate: "17/01/2025 at 10:00:00",
+    priority: "Low",
+    content:
+      "Local community leaders will meet to discuss upcoming events...",
+    status: "scheduled",
+  },
+  {
+    id: "6",
+    title: "Mayor Announces New Infrastructure Plan",
+    author: "David Brown",
+    category: "Politics",
+    publishedDate: "14/1/2025 at 09:00:00",
+    priority: "High",
+    status: "published",
+  },
+]);
 
 export function PublishCenter() {
-  const [activeTab, setActiveTab] = useState("Ready to Publish");
+  const [activeTab, setActiveTab] = useState("All");
+  const [activeFilterTab, setActiveFilterTab] = useState("Politics");
   const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
   const [selectedStoryForScheduling, setSelectedStoryForScheduling] =
     useState<any>(null);
@@ -35,105 +128,15 @@ export function PublishCenter() {
   const [notifySubscribers, setNotifySubscribers] = useState(true);
   const [priorityPublish, setPriorityPublish] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const tabs = [
-    { name: "Ready to Publish", count: 3 },
-    { name: "Scheduled", count: 2 },
-    { name: "Published", count: 15 },
-  ];
-
-  const contentTab = [
-    {
-      name: "All",
-    },
-    {
-      name: "Scheduled",
-    },
-  ];
-
-  const readyToPublishStories: Story[] = [
-    {
-      id: "1",
-      title: "Breaking: City Council Votes on New Housing Development",
-      author: "Sarah Chen",
-      category: "Politics",
-      approvedDate: "15/01/2025 at 16:00:00",
-      priority: "High",
-      content:
-        "The city council convened today to discuss the controversial housing development proposal...",
-      status: "ready",
-    },
-    {
-      id: "2",
-      title: "Local Sports Team Wins Championship Match",
-      author: "Mike Rodriguez",
-      category: "Sports",
-      approvedDate: "15/01/2025 at 14:30:00",
-      priority: "Medium",
-      content:
-        "In a thrilling match that went into overtime, the local team secured their championship...",
-      status: "ready",
-    },
-    {
-      id: "3",
-      title: "New Technology Center Opens Downtown",
-      author: "Lisa Wang",
-      category: "Technology",
-      approvedDate: "15/01/2025 at 12:15:00",
-      priority: "Low",
-      content:
-        "The much-anticipated technology innovation center opened its doors to the public...",
-      status: "ready",
-    },
-  ];
-
-  const scheduledStories: Story[] = [
-    {
-      id: "4",
-      title: "Weekend Weather Forecast Update",
-      author: "John Smith",
-      category: "Weather",
-      scheduledDate: "16/01/2025 at 08:00:00",
-      priority: "Medium",
-      content:
-        "Weekend weather patterns show a chance of rain with temperatures...",
-      status: "scheduled",
-    },
-    {
-      id: "5",
-      title: "Community Event Planning Meeting",
-      author: "Emma Johnson",
-      category: "Community",
-      scheduledDate: "17/01/2025 at 10:00:00",
-      priority: "Low",
-      content:
-        "Local community leaders will meet to discuss upcoming events...",
-      status: "scheduled",
-    },
-  ];
-
-  const publishedStories: Story[] = [
-    {
-      id: "6",
-      title: "Mayor Announces New Infrastructure Plan",
-      author: "David Brown",
-      category: "Politics",
-      publishedDate: "14/01/2025 at 09:00:00",
-      priority: "High",
-      status: "published",
-    },
-  ];
 
   const getCurrentStories = () => {
-    switch (activeTab) {
-      case "Ready to Publish":
-        return readyToPublishStories;
-      case "Scheduled":
-        return scheduledStories;
-      case "Published":
-        return publishedStories;
-      default:
-        return readyToPublishStories;
+    const result = ALL_STORIES.filter(story => story.category === activeFilterTab);
+    if (activeTab === "All") {
+      return result;
+    } else if (activeTab === "Scheduled") {
+      return result.filter(story => story.status.toLowerCase() === "scheduled");
     }
+    return result;
   };
 
   const handlePublishNow = (storyId: string) => {
@@ -177,10 +180,10 @@ export function PublishCenter() {
           {/* <section
             className={cn("mt-8 max-h-[calc(100vh-25rem)] overflow-y-scroll")}
           > */}
-          <section className=" sticky top-10 bg-gray-50 pt-6 z-10">
-            <div className="my-6 flex items-center justify-between">
+          <section className=" sticky top-10 bg-gray-50 pt-3 z-10">
+            <div className="my-6 flex items-center justify-between bg-white py-2 px-6 rounded-lg">
               <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
-                {contentTab.map((tab) => (
+                {CONTENT_TABS.map((tab) => (
                   <button
                     key={tab.name}
                     onClick={() => setActiveTab(tab.name)}
@@ -205,28 +208,19 @@ export function PublishCenter() {
               </div>
             </div>
 
-            <div className="my-6">
+            <div className="my-6 bg-white py-2 px-6 rounded-lg">
               <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
-                {tabs.map((tab) => (
+                {FILTER_TABS.map((tab) => (
                   <button
                     key={tab.name}
-                    onClick={() => setActiveTab(tab.name)}
+                    onClick={() => setActiveFilterTab(tab.name)}
                     className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center space-x-2 ${
-                      activeTab === tab.name
+                      activeFilterTab === tab.name
                         ? "bg-white text-gray-900 shadow-sm"
                         : "text-gray-500 hover:text-gray-700"
                     }`}
                   >
                     <span>{tab.name}</span>
-                    <Badge
-                      className={`text-xs px-2 py-1 ${
-                        activeTab === tab.name
-                          ? "bg-green-600 text-white"
-                          : "bg-gray-300 text-gray-700"
-                      }`}
-                    >
-                      {tab.count}
-                    </Badge>
                   </button>
                 ))}
               </div>
@@ -244,7 +238,6 @@ export function PublishCenter() {
               />
             ))}
           </div>
-
           {getCurrentStories().length === 0 && (
             <div className="text-center py-12">
               <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />

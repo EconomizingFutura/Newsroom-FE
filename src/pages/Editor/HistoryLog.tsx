@@ -255,7 +255,7 @@ export function HistoryLog() {
           >
             <div className="overflow-x-auto px-3">
               <table className="w-full p-2">
-                <thead className="bg-gray-50 border-b  border-gray-200">
+                <thead className=" border-b  border-gray-200">
                   <tr>
                     {Object.values(TABLE_HEADERS).map((header) => (
                       <th
