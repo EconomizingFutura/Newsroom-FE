@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Separator } from "@radix-ui/react-separator";
 import type { currentPageType } from "../types/sidebarTypes";
+import { cn } from "./ui/utils";
 
 export type UserRole = "reporter" | "editor";
 
@@ -135,7 +136,7 @@ const SideBar: React.FC<SidebarTypes> = (props) => {
 
   const isActive = (view: currentPageType) =>
     currentView === view
-      ? "bg-[#00A652] text-white rounded-md"
+      ? "bg-[#00A652] hover:bg-[#00A652] hover:text-white text-white rounded-md"
       : "text-gray-600 hover:bg-gray-100 hover:text-gray-900";
 
   return (
@@ -159,7 +160,14 @@ const SideBar: React.FC<SidebarTypes> = (props) => {
                   {item.label}
                 </span>
                 {item.badge && (
-                  <span className="bg-green-600 text-white text-xs font-medium px-2 rounded-full">
+                  <span
+                    className={cn(
+                      "bg-green-600 text-white text-xs font-medium px-2 rounded-full",
+                      item.key === "reverted"
+                        ? "border border-[#FFC9C9] bg-[#ffe2e2] text-red-500"
+                        : "bg-[#D9F2D9] border border-[#B3E6B3] text-[#006601]"
+                    )}
+                  >
                     4
                   </span>
                 )}
@@ -180,7 +188,10 @@ const SideBar: React.FC<SidebarTypes> = (props) => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="w-full justify-start gap-2 px-3 py-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  className={cn(
+                    "w-full justify-start gap-2 px-3 py-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900",
+                    isActive("textArticle")
+                  )}
                   onClick={onCreateNewTextArticle}
                 >
                   <FileText className="w-4 h-4" />
@@ -189,7 +200,10 @@ const SideBar: React.FC<SidebarTypes> = (props) => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="w-full justify-start gap-2 px-3 py-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  className={cn(
+                    "w-full justify-start gap-2 px-3 py-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900",
+                    isActive("audio")
+                  )}
                   onClick={onCreateNewAudioArticle}
                 >
                   <Mic className="w-4 h-4" />
@@ -198,7 +212,10 @@ const SideBar: React.FC<SidebarTypes> = (props) => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="w-full justify-start gap-2 px-3 py-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  className={cn(
+                    "w-full justify-start gap-2 px-3 py-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900",
+                    isActive("video")
+                  )}
                   onClick={onCreateNewVideoArticle}
                 >
                   <Video className="w-4 h-4" />

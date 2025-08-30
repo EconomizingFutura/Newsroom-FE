@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -7,7 +7,8 @@ import {
   useLocation,
 } from "react-router-dom";
 
-import Dashboard from "@/pages/Dashboard";import ContentUploader from "@/pages/ContentUploader";
+import Dashboard from "@/pages/Dashboard";
+import ContentUploader from "@/pages/ContentUploader";
 import DraftsPage from "@/pages/DraftsPage";
 import RevertedPostPage from "@/pages/RevertedPostPage";
 import HistoryLogPage from "@/pages/HistoryLogPage";
@@ -31,6 +32,9 @@ export default function Layout() {
     if (location.pathname.startsWith("/drafts")) return "drafts";
     if (location.pathname.startsWith("/reverted")) return "reverted";
     if (location.pathname.startsWith("/history")) return "history";
+    if (location.pathname.startsWith("/textArticle")) return "textArticle";
+    if (location.pathname.startsWith("/audio")) return "audio";
+    if (location.pathname.startsWith("/video")) return "video";
     if (location.pathname.startsWith("/editor/dashboard"))
       return "editor-dashboard";
     if (location.pathname.startsWith("/editor/calendarView")) return "calendar";
@@ -40,13 +44,10 @@ export default function Layout() {
       return "review-queue";
     if (location.pathname.startsWith("/editor/history"))
       return "editor-history";
-    return "newsFeeds"; // default fallback
+    return "newsFeeds";
   };
 
-  const currentViewMemo = React.useMemo(
-    () => getCurrentView(),
-    [location.pathname]
-  );
+  const currentViewMemo = useMemo(() => getCurrentView(), [location.pathname]);
 
   return (
     <div>
@@ -68,14 +69,14 @@ export default function Layout() {
           }
           onNavigateEditorReviewQueue={() => navigate("/editor/reviewQueue")}
           onNavigateEditorHistory={() => navigate("/editor/history")}
-          currentView={currentViewMemo} // optional, can highlight active based on location
+          currentView={currentViewMemo}
         />
         <div className="flex-1 w-full h-screen overflow-y-auto">
           <Routes>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/textArticle" element={<ContentUploader />} />
-        <Route path="/audio" element={<ContentUploader />} />
-        <Route path="/video" element={<ContentUploader />} />
+            <Route path="/audio" element={<ContentUploader />} />
+            <Route path="/video" element={<ContentUploader />} />
             <Route path="/drafts" element={<DraftsPage />} />
             <Route path="/reverted" element={<RevertedPostPage />} />
             <Route path="/history" element={<HistoryLogPage />} />

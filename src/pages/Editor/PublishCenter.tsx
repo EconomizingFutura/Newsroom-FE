@@ -29,8 +29,6 @@ import {
   X,
 } from "lucide-react";
 
-interface PublishCenterProps {}
-
 export function PublishCenter() {
   const [activeTab, setActiveTab] = useState("Ready to Publish");
   const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
