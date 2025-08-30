@@ -60,7 +60,7 @@ export default function DraftsPage() {
 
   const handleEdit = (id: string) => {
     const articleType = EDIT_DRAFT_NAVIGATE(id, draftArticles);
-    navigate(`/${articleType}`, { state: { draftId: id } });
+    navigate(`/${articleType}/${id}?from=drafts`);
   };
 
   const renderGridView = () => (

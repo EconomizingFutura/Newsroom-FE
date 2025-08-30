@@ -1,6 +1,7 @@
 import ContentHeader from "@/components/ContentHeader";
 import { StatCard, DashboardListCard } from "@/components/ui/card";
 import { Clock, CheckCircle, RotateCcw, FilePen } from "lucide-react";
+import { useNavigate } from "react-router";
 
 type StatCardProps = {
   title: string;
@@ -10,7 +11,7 @@ type StatCardProps = {
 };
 
 export default function Dashboard() {
-  // Mock data for demonstration
+  const navigate = useNavigate();
   const stats: StatCardProps[] = [
     { title: "Total Posts", count: 7, icon: FilePen, color: "#155DFC" }, // blue
     { title: "Draft", count: 5, icon: FilePen, color: "#4A5565" }, // gray
@@ -21,33 +22,40 @@ export default function Dashboard() {
 
   const notificationList = [
     {
+      id: "1",
       title: "Article Approved",
       message:
         'Your article "Tech Conference Interview" has been approved and published',
       buttonText: "Edit Story",
-      onClick: () => alert("Editing story..."),
     },
     {
+      id: "2",
       title: "Article Approved",
       message: 'Your article "AI in 2025" has been approved and published',
       buttonText: "Edit Story",
-      onClick: () => alert("Editing AI article..."),
     },
     {
+      id: "3",
       title: "Article Approved",
       message:
         'Your article "Blockchain Future" has been approved and published',
       buttonText: "Edit Story",
-      onClick: () => alert("Editing blockchain article..."),
     },
   ];
+
+  const handleNavigate = (id: string) => {
+    navigate(`/textArticle/${id}?from=dashboard`);
+  };
 
   return (
     <div className="flex-1 py-16 h-screen bg-background">
       {/* Left Sidebar */}
 
       {/* Main Content */}
-      <div style={{paddingTop: '32px'}} className="flex flex-col gap-[24px] px-[24px] bg-[#F6FAF6]">
+      <div
+        style={{ paddingTop: "32px" }}
+        className="flex flex-col gap-[24px] px-[24px] bg-[#F6FAF6]"
+      >
         {/* Top Bar */}
         <ContentHeader
           text="Welcome back, Muthu!"
@@ -94,7 +102,11 @@ export default function Dashboard() {
                   <div className="flex flex-col gap-[12px]">
                     {/* Notifications */}
                     {notificationList.map((note, index) => (
-                      <DashboardListCard key={index} {...note} />
+                      <DashboardListCard
+                        key={index}
+                        {...note}
+                        onClick={handleNavigate}
+                      />
                     ))}
                   </div>
                 </div>

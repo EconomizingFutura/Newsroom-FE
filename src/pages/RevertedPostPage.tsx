@@ -26,7 +26,7 @@ const RevertedPostPage: React.FC = () => {
 
   const filterOptions = ["All Type", "Text", "Audio", "Video"];
   const navigate = useNavigate();
-  // Filter articles based on active filter
+
   const filteredArticles = data.filter((article) => {
     const matchesSearch = article.title
       .toLowerCase()
@@ -62,7 +62,7 @@ const RevertedPostPage: React.FC = () => {
 
   const handleEdit = (id: string) => {
     const articleType = EDIT_DRAFT_NAVIGATE(id, filteredArticles);
-    navigate(`/${articleType}`, { state: { draftId: id } });
+    navigate(`/${articleType}/${id}?from=reverted`);
   };
 
   const renderGridView = () => (

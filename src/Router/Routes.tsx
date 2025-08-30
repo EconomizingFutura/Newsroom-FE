@@ -1,11 +1,5 @@
 import React, { useMemo } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  useNavigate,
-  useLocation,
-} from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 
 import Dashboard from "@/pages/Dashboard";
 import ContentUploader from "@/pages/ContentUploader";
@@ -21,34 +15,13 @@ import { HistoryLog } from "@/pages/Editor/HistoryLog";
 import { PublishCenter } from "@/pages/Editor/PublishCenter";
 import { ReviewQueue } from "@/pages/Editor/ReviewQueue";
 import { Dashboard as EditorDashboard } from "@/pages/Editor/Dashboard";
-import type { currentPageType } from "@/types/sidebarTypes";
-
-export default function Layout() {
+import LoginPage from "@/pages/LoginPage";
+import { useCurrentView } from "@/hooks/useCurrentView";
+import EditArticle from "@/pages/EditArticle";
+const Layout = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-
-  const getCurrentView = (): currentPageType => {
-    if (location.pathname.startsWith("/dashboard")) return "dashboard";
-    if (location.pathname.startsWith("/drafts")) return "drafts";
-    if (location.pathname.startsWith("/reverted")) return "reverted";
-    if (location.pathname.startsWith("/history")) return "history";
-    if (location.pathname.startsWith("/textArticle")) return "textArticle";
-    if (location.pathname.startsWith("/audio")) return "audio";
-    if (location.pathname.startsWith("/video")) return "video";
-    if (location.pathname.startsWith("/editor/dashboard"))
-      return "editor-dashboard";
-    if (location.pathname.startsWith("/editor/calendarView")) return "calendar";
-    if (location.pathname.startsWith("/editor/publishCenter"))
-      return "publish-center";
-    if (location.pathname.startsWith("/editor/reviewQueue"))
-      return "review-queue";
-    if (location.pathname.startsWith("/editor/history"))
-      return "editor-history";
-    return "newsFeeds";
-  };
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const currentViewMemo = useMemo(() => getCurrentView(), [location.pathname]);
+  const getCurrentView = useCurrentView();
+  const currentViewMemo = useMemo(() => getCurrentView, [getCurrentView]);
 
   return (
     <div>
@@ -83,6 +56,7 @@ export default function Layout() {
             <Route path="/history" element={<HistoryLogPage />} />
             <Route path="/filtered/:type" element={<FilteredContentPage />} />
             <Route path="/news-feeds" element={<NewsFeedsPage />} />
+            <Route path="/:textArticle/:id" element={<EditArticle />} />
 
             {/* Editor */}
             <Route path="/editor/dashboard" element={<EditorDashboard />} />
@@ -94,5 +68,14 @@ export default function Layout() {
         </div>
       </div>
     </div>
+  );
+};
+
+export default function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/*" element={<Layout />} />
+    </Routes>
   );
 }

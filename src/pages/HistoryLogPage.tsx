@@ -22,6 +22,7 @@ import { HeaderIcon } from "@/utils/HeaderIcons";
 import { HistoryCard } from "@/components/ui/card";
 import { HISTORY_STATUS } from "@/utils/draftUtils";
 import { useNavigate } from "react-router";
+import { returnType } from "@/utils/utils";
 
 export default function HistoryLogPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -172,24 +173,8 @@ export default function HistoryLogPage() {
   const handleEdit = (id: string) => {
     const articleType =
       filteredArticles.find((article) => article.id === id)?.type || "Text";
-
-    let route: string;
-
-    switch (articleType) {
-      case "Text":
-      case "Text Article":
-        route = "textArticle";
-        break;
-      case "Audio Post":
-        route = "audio";
-        break;
-      case "Video Post":
-        route = "video";
-        break;
-      default:
-        route = "textArticle";
-    }
-    navigate(`/${route}`, { state: { draftId: id } });
+    const route = returnType(articleType);
+    navigate(`/${route}/${id}?from=history`);
   };
 
   return (
