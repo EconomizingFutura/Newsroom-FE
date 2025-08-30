@@ -8,12 +8,15 @@ import TextAlign from "@tiptap/extension-text-align";
 import Highlight from "@tiptap/extension-highlight";
 import "./TextArticleTest.css";
 import TextEditor from "@/components/TextEditor";
+import { useLocation } from "react-router";
 
 const ArticleEditor: React.FC = () => {
   const [title, setTitle] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
-
+  const location = useLocation();
+  const draftId = location.state?.draftId as string | undefined;
+  console.log("Draft ID:", draftId);
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -35,13 +38,14 @@ const ArticleEditor: React.FC = () => {
     }
   };
 
-
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center p-6">
       <div className="w-full max-w-4xl bg-white shadow-lg rounded-2xl p-6">
         {/* Header */}
         <div className="flex justify-between items-center border-b pb-3 mb-4">
-          <h2 className="text-2xl font-semibold text-gray-700">Create Text Article</h2>
+          <h2 className="text-2xl font-semibold text-gray-700">
+            Create Text Article
+          </h2>
           <div className="space-x-2">
             <button className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg">
               Save Draft
@@ -54,7 +58,13 @@ const ArticleEditor: React.FC = () => {
 
         {/* Category Tabs */}
         <div className="flex gap-2 mb-4">
-          {["Politics", "Business", "Entertainment", "Sports", "Environment"].map((cat) => (
+          {[
+            "Politics",
+            "Business",
+            "Entertainment",
+            "Sports",
+            "Environment",
+          ].map((cat) => (
             <button
               key={cat}
               className="px-4 py-2 rounded-lg text-sm font-medium border hover:bg-green-100"
@@ -76,20 +86,100 @@ const ArticleEditor: React.FC = () => {
         {/* Toolbar */}
         {editor && (
           <div className="flex flex-wrap gap-2 mb-3 border-b pb-2">
-            <button onClick={() => editor.chain().focus().toggleBold().run()} className="btn">B</button>
-            <button onClick={() => editor.chain().focus().toggleItalic().run()} className="btn italic">I</button>
-            <button onClick={() => editor.chain().focus().toggleUnderline().run()} className="btn underline">U</button>
-            <button onClick={() => editor.chain().focus().toggleStrike().run()} className="btn line-through">S</button>
-            <button onClick={() => editor.chain().focus().setParagraph().run()} className="btn">P</button>
-            <button onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} className="btn">H2</button>
-            <button onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} className="btn">H3</button>
-            <button onClick={() => editor.chain().focus().toggleBulletList().run()} className="btn">• List</button>
-            <button onClick={() => editor.chain().focus().toggleOrderedList().run()} className="btn">1. List</button>
-            <button onClick={() => editor.chain().focus().toggleBlockquote().run()} className="btn">❝</button>
-            <button onClick={() => editor.chain().focus().setHorizontalRule().run()} className="btn">─</button>
-            <button onClick={() => editor.chain().focus().setImage({ src: prompt("Image URL") || "" }).run()} className="btn">🖼</button>
-            <button onClick={() => editor.chain().focus().undo().run()} className="btn">↶</button>
-            <button onClick={() => editor.chain().focus().redo().run()} className="btn">↷</button>
+            <button
+              onClick={() => editor.chain().focus().toggleBold().run()}
+              className="btn"
+            >
+              B
+            </button>
+            <button
+              onClick={() => editor.chain().focus().toggleItalic().run()}
+              className="btn italic"
+            >
+              I
+            </button>
+            <button
+              onClick={() => editor.chain().focus().toggleUnderline().run()}
+              className="btn underline"
+            >
+              U
+            </button>
+            <button
+              onClick={() => editor.chain().focus().toggleStrike().run()}
+              className="btn line-through"
+            >
+              S
+            </button>
+            <button
+              onClick={() => editor.chain().focus().setParagraph().run()}
+              className="btn"
+            >
+              P
+            </button>
+            <button
+              onClick={() =>
+                editor.chain().focus().toggleHeading({ level: 2 }).run()
+              }
+              className="btn"
+            >
+              H2
+            </button>
+            <button
+              onClick={() =>
+                editor.chain().focus().toggleHeading({ level: 3 }).run()
+              }
+              className="btn"
+            >
+              H3
+            </button>
+            <button
+              onClick={() => editor.chain().focus().toggleBulletList().run()}
+              className="btn"
+            >
+              • List
+            </button>
+            <button
+              onClick={() => editor.chain().focus().toggleOrderedList().run()}
+              className="btn"
+            >
+              1. List
+            </button>
+            <button
+              onClick={() => editor.chain().focus().toggleBlockquote().run()}
+              className="btn"
+            >
+              ❝
+            </button>
+            <button
+              onClick={() => editor.chain().focus().setHorizontalRule().run()}
+              className="btn"
+            >
+              ─
+            </button>
+            <button
+              onClick={() =>
+                editor
+                  .chain()
+                  .focus()
+                  .setImage({ src: prompt("Image URL") || "" })
+                  .run()
+              }
+              className="btn"
+            >
+              🖼
+            </button>
+            <button
+              onClick={() => editor.chain().focus().undo().run()}
+              className="btn"
+            >
+              ↶
+            </button>
+            <button
+              onClick={() => editor.chain().focus().redo().run()}
+              className="btn"
+            >
+              ↷
+            </button>
           </div>
         )}
 
@@ -108,7 +198,10 @@ const ArticleEditor: React.FC = () => {
               onChange={(e) => setTagInput(e.target.value)}
               className="border px-3 py-2 rounded-lg flex-1"
             />
-            <button onClick={addTag} className="bg-green-600 text-white px-4 py-2 rounded-lg">
+            <button
+              onClick={addTag}
+              className="bg-green-600 text-white px-4 py-2 rounded-lg"
+            >
               + Add
             </button>
           </div>

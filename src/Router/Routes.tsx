@@ -47,6 +47,7 @@ export default function Layout() {
     return "newsFeeds";
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const currentViewMemo = useMemo(() => getCurrentView(), [location.pathname]);
 
   return (
