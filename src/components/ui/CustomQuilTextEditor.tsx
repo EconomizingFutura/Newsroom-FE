@@ -5,13 +5,15 @@ import "react-quill-new/dist/quill.snow.css";
 type CustomQuilTextEditorProps = {
     placeholder?: string;
     onChange?: (json: any) => void;
+    selectedValue?: string
   };
 
 const CustomQuilTextEditor: React.FC<CustomQuilTextEditorProps> = ({
     placeholder = "Start typing...",
     onChange,
+    selectedValue
   }) => {
-  const [content, setContent] = useState<any>(null);
+  const [content, setContent] = useState<any>(selectedValue);
 
   // Minimal toolbar
   const modules = {
@@ -33,12 +35,13 @@ const CustomQuilTextEditor: React.FC<CustomQuilTextEditorProps> = ({
     <div className="w-full">
       <div className="relative border rounded-lg bg-[#f9fdfa] overflow-hidden">
         <ReactQuill
+          value={content}
           modules={modules}
           formats={formats}
           placeholder={placeholder}
           className="h-40"
           onChange={(_, __, ___, editor) => {
-            const delta = editor.getContents(); // Delta JSON
+            const delta = editor.getHTML(); // Delta JSON
           setContent(delta);
           onChange?.(delta); // ✅ emit JSON to parent
           }}
