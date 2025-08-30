@@ -189,8 +189,6 @@ export default function HistoryLogPage() {
       default:
         route = "textArticle";
     }
-    // console.log("Navigating to:", `/${route}`, "with ID:", id, articleType);
-
     navigate(`/${route}`, { state: { draftId: id } });
   };
 

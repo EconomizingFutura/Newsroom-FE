@@ -3,8 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { FileStack, User, Eye, Check, X, Clock } from "lucide-react";
 
-interface ReviewQueueProps {}
-
 export function ReviewQueue() {
   const [activeCategory, setActiveCategory] = useState("Politics");
 
