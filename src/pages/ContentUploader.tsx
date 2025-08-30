@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Mic, Plus, Save, Send, Upload, Video, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import CustomQuilTextEditor from "@/components/ui/CustomQuilTextEditor";
 import AudioPlayer from "@/components/ui/AudioPlayer";
+import axios from "axios";
+import { API_LIST } from "@/api/endpoints";
+import VideoPlayer from "@/components/ui/VideoPlayer";
 
 interface TextArticleEditorProps {
   article?: any;
@@ -47,15 +50,18 @@ const ContentUploader = ({}: TextArticleEditorProps) => {
     "Environment",
   ];
 
-  const getInitialState = (path: string, article?: any) => {
+  const getInitialState = () => {
     return {
-      title: article?.title || "",
+      title: "",
       category: "Politics",
       tags: [],
       newTag: "",
-      editorContent: path === "textArticle" ? article?.content || null : null,
-      audioFile: null,
-      videoFile: null,
+      content: '',
+      audio: null,
+      video: null,
+      status: '',
+      reporterId: null,
+      thumbnail: ''
     };
   };
   
@@ -81,15 +87,7 @@ const ContentUploader = ({}: TextArticleEditorProps) => {
     }
   };
   
-  const [formData, setFormData] = useState({
-    category: 'Politics',
-    name: "",
-    content: "",
-    tags: [],
-    video: null,
-    audio: null,
-    status: null,
-  });
+  const [formData, setFormData] = useState(getInitialState());
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>|any, fromEvent=true) => {
     if(fromEvent){
@@ -122,8 +120,8 @@ const ContentUploader = ({}: TextArticleEditorProps) => {
       newErrors.category = "Category is required";
     }
 
-    if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
+    if (!formData.title.trim()) {
+      newErrors.title = "Title is required";
     }
 
     if (path === "textArticle" && !formData.content.replace(/<p><br><\/p>/g, "").trim()) {
@@ -152,14 +150,83 @@ const ContentUploader = ({}: TextArticleEditorProps) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const submitForReview = (e: React.FormEvent, status: boolean) => {
+  const submitForReview = async (e: React.FormEvent, actionName: string) => {
     e.preventDefault();
     if (validate()) {
-      handleChange({status : status}, false)
-      console.log("✅ statuss:", status);
-      console.log("✅ Form submitted:", formData);
+      try {
+        const token = localStorage.getItem("token");
+        localStorage.setItem("token", token??'');
+        let apiUrl;
+
+        if (actionName.toLowerCase() === "draft") {
+          if (formData.reporterId) {
+            // fetch existing draft
+            apiUrl = `${API_LIST.DRAFT_BY_ARTICLE}${formData.reporterId}`;
+            const res = await axios.patch(API_LIST.BASE_URL + apiUrl, formData, {
+              headers: {
+                Authorization: `Bearer ${token}`, // attach JWT
+              },
+            });
+            if (res.data) {
+              const data = res.data;
+              setFormData({
+                category: data.category,
+                content: data.content,
+                title: data.title,
+                tags: data.tags,
+                video: data.videoUrl,
+                audio: data.audioUrl,
+                status: data.status,
+                reporterId: data.id,
+                newTag: newTag,
+                thumbnail: data.thumbnailUrl
+              });
+            }
+          } else {
+            // create new draft
+            apiUrl = API_LIST.DRAFT_ARTICLE;
+            const res = await axios.post(API_LIST.BASE_URL + apiUrl, formData, {
+              headers: {
+                Authorization: `Bearer ${token}`, // attach JWT
+              },
+            });
+            if (res.data) {
+              const data = res.data;
+              setFormData({
+                category: data.category,
+                content: data.content,
+                title: data.title,
+                tags: data.tags,
+                video: data.videoUrl,
+                audio: data.audioUrl,
+                status: data.status,
+                reporterId: data.id,
+                newTag: newTag,
+                thumbnail: data.thumbnailUrl
+              });
+            }
+          }
+        } else if (actionName.toLowerCase() === "save") {
+          apiUrl = API_LIST.SUBMIT_ARTICLE;
+          await axios.post(API_LIST.BASE_URL + apiUrl, formData, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+        }
+
+        console.log("✅ Success:", formData);
+      } catch (err) {
+        console.error("❌ Error:", err);
+      }
     }
   };
+
+  useEffect(() => {
+    setFormData(getInitialState());
+    setNewTag("");  // also reset tag input
+    setErrors({});
+  }, [path]);
 
   return (
     <div className="min-h-screen bg-[#f6faf6]">
@@ -227,18 +294,14 @@ const ContentUploader = ({}: TextArticleEditorProps) => {
           {/* Form  */}
           <form id="myForm" onSubmit={(e) => {
             const action = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement;
-            if (action?.name === "draft") {
-              submitForReview(e, false);
-            } else if (action?.name === "save"){
-              submitForReview(e, true);
-            }
+              submitForReview(e, action?.name);
           }} >
           <div className="bg-white border-b border-gray-200 px-6 py-4 rounded-2xl shadow-md">
             <div className="flex items-center justify-between pt-[8px] pb-[32px]">
               <h2 className="text-lg font-medium">Content Editor</h2>
               <div className="flex gap-[12px]"> 
-                {formData.status == 0 && <span className="px-[12px] py-[4px] text-sm text-[#6A7282] rounded-lg bg-[#F8FAF9] border-1 border-[#E5E7EB]">Draft</span>}
-                {formData.status == 1 && <span className="px-[12px] py-[4px] text-sm text-[#006601] rounded-lg bg-[#f8faf9] border-1 border-[#B3E6B3]">Auto-saved</span>}
+                {formData.status.toLowerCase() == 'draft' && <span className="px-[12px] py-[4px] text-sm text-[#6A7282] rounded-lg bg-[#F8FAF9] border-1 border-[#E5E7EB]">Draft</span>}
+                {formData.status.toLowerCase() == 'submitted' && <span className="px-[12px] py-[4px] text-sm text-[#006601] rounded-lg bg-[#f8faf9] border-1 border-[#B3E6B3]">Auto-saved</span>}
               </div>
             </div>
 
@@ -279,9 +342,9 @@ const ContentUploader = ({}: TextArticleEditorProps) => {
                 </div>
 
                 <Input
-                  name="name"
+                  name="title"
                   placeholder="Name"
-                  value={formData.name}
+                  value={formData.title}
                   onChange={handleChange}
                   className="bg-[#f7fbf8] border-[#ECECEC] border-1"
                 />
@@ -321,7 +384,7 @@ const ContentUploader = ({}: TextArticleEditorProps) => {
                 </div>}
                 {formData.audio && 
                   <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl text-center">
-                    <AudioPlayer src={formData.audio} fileName={formData.audio?.fileName} />
+                    <AudioPlayer src={formData.audio} fileName={formData.audio?.['fileName']} />
                   </div>
                 }
                 </>
@@ -329,7 +392,7 @@ const ContentUploader = ({}: TextArticleEditorProps) => {
               
                 {/**Video */}
                 {path === "video" && ( <>
-                  <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl p-10 text-center">
+                  {!formData.video &&<div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl p-10 text-center">
                     <div className="mx-auto w-16 h-16 rounded-full bg-orange-100 text-[#9f2e00] flex items-center justify-center">
                       <Video className="h-6 w-6" />
                     </div>
@@ -342,13 +405,30 @@ const ContentUploader = ({}: TextArticleEditorProps) => {
                       <input type="file" accept=".mp4,.mov,.avi" hidden onChange={(e)=>handleChange({video: e.target.files?.[0]}, false)}/>
                     </label>
                     {/* {videoFile && <p className="mt-3 text-sm text-gray-700">Selected: {videoFile.name}</p>} */}
-                  </div>
+                  </div>}
+                  {formData.video && 
+                  <VideoPlayer src={formData.video}  onThumbnailGenerated={(thumbnail)=>{
+                      handleChange({thumbnail: thumbnail}, false)
+                  }}
+                  onDelete={()=>{
+                    formData.video= null;
+                    formData.thumbnail= '';
+                  }}/>
+                  }
                 </>)}
 
                 {path === "video" && ( <>      
               <div>
                 <label className="block text-sm font-medium">Thumbnail Preview</label>
-                <div className="mt-2 h-28 w-full bg-gray-100 rounded-xl" />
+                <div className="mt-2 h-28 w-full bg-gray-100 rounded-xl">
+                {formData.thumbnail && (
+                    <img
+                      src={formData.thumbnail}
+                      alt="Generated Thumbnail"
+                      className="h-full w-full object-cover"
+                    />
+                  )}
+                </div>
               </div>
       </>)}
 
@@ -398,7 +478,6 @@ const ContentUploader = ({}: TextArticleEditorProps) => {
                       ))}
                     </div>
                   </div>
-
             </div>
 
           </div>
