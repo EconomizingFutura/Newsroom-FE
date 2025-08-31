@@ -1,4 +1,4 @@
-import React, { useState, type JSX } from "react";
+import React, { useState, type JSX, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +25,8 @@ import { useNavigate } from "react-router";
 import { returnType } from "@/utils/utils";
 import { usePagination } from "@/hooks/usePagination";
 import Pagination from "@/components/Pagination";
+import axios from "axios";
+import { API_LIST } from "@/api/endpoints";
 
 const HistoryLogPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -159,34 +161,34 @@ const HistoryLogPage: React.FC = () => {
   const paginatedArticles = filteredArticles.slice(startIndex, endIndex);
   // const pageCount = Math.ceil(filteredArticles.length / pageSize) || 1;
 
-  const stats = [
+  const initialStats = [
     {
       title: "Total Posts",
-      value: 20,
+      value: 0,
       pillBg: "bg-[#F2F4F6]",
       pillText: "text-[#4A5565]",
     },
     {
       title: "Draft",
-      value: 10,
+      value: 0,
       pillBg: "bg-[#F2F4F6]",
       pillText: "text-gray-600",
     },
     {
       title: "Submitted",
-      value: 10,
+      value: 0,
       pillBg: "bg-[#DCE9FE]",
       pillText: "text-[#206DFD]",
     },
     {
       title: "Approved",
-      value: 10,
+      value: 0,
       pillBg: "bg-[#DBF2D9]",
       pillText: "text-[#008001]",
     },
     {
       title: "Reverted",
-      value: 10,
+      value: 0,
       pillBg: "bg-[#FEE2E0]",
       pillText: "text-[#F41D28]",
     },
@@ -204,6 +206,60 @@ const HistoryLogPage: React.FC = () => {
     const route = returnType(articleType);
     navigate(`/${route}/${id}?from=history`);
   };
+
+  const [stats, setStats] = useState(initialStats);
+  useEffect(() => {
+    const getStatsData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        localStorage.setItem("token", token??'');
+
+        const response: any = await axios.get(API_LIST.BASE_URL + API_LIST.STATS, {
+          headers: {
+            Authorization: `Bearer ${token}`, // attach JWT
+          }
+        });
+
+        const updatedStats = stats.map((item) => {
+          let key = item.title.toUpperCase();
+          return {
+            ...item,
+            value: response.data[key] ?? 0,
+          };
+        })
+        setStats(updatedStats);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    const getHistoryList = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        localStorage.setItem("token", token??'');
+
+        const response: any = await axios.get(API_LIST.BASE_URL + API_LIST.HISTORY, {
+          headers: {
+            Authorization: `Bearer ${token}`, // attach JWT
+          }
+        });
+
+        const updatedStats = stats.map((item) => {
+          let key = item.title.toUpperCase();
+          return {
+            ...item,
+            value: response.data[key] ?? 0,
+          };
+        })
+        setStats(updatedStats);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    getHistoryList();
+    getStatsData();
+  }, []);
 
   return (
     <div className=" flex-1 py-16 h-screen bg-gray-50">
