@@ -86,7 +86,7 @@ export default function VideoPreview({
   };
 
   return (
-    <div className="relative w-full max-w-4xl mx-auto rounded-xl overflow-hidden group bg-black">
+    <div className="relative w-full mx-auto rounded-xl overflow-hidden group bg-black">
       {srcBlob ? (
         <>
           <video

@@ -39,7 +39,7 @@ const handleResponseError = (error: unknown): never => {
 };
 
 const request = async <T>(
-  method: "get" | "post" | "put" | "delete",
+  method: "get" | "post" | "put" | "delete" | "patch",
   url: string,
   dataOrParams?: unknown,
   config: AxiosRequestConfig = {}
@@ -94,3 +94,8 @@ export const DELETE = <T>(
   url: string,
   config?: AxiosRequestConfig
 ): Promise<T> => request<T>("delete", url, undefined, config);
+
+export const PATCH = <T>(
+  url: string,
+  config?: AxiosRequestConfig
+): Promise<T> => request<T>("patch", url, undefined, config);

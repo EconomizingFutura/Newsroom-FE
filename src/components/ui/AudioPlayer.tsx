@@ -51,7 +51,7 @@ const AudioPlayer = ({ src, fileName }: { src: any; fileName: string }) => {
   };
 
   return (
-    <div className="flex items-center justify-between bg-[#f7faf7] p-4 rounded-lg shadow w-full max-w-3xl">
+    <div className="flex items-center justify-between bg-[#f7faf7] p-4 rounded-lg shadow w-full">
       {/* Left: Icon + Name */}
       <div className="flex items-center gap-3">
         <div className="w-12 h-12 flex items-center justify-center rounded-full bg-purple-100">

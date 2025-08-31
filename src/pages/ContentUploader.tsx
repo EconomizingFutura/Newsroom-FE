@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Mic, Plus, Save, Send, Upload, Video, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,15 +6,30 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import CustomQuilTextEditor from "@/components/ui/CustomQuilTextEditor";
 import AudioPlayer from "@/components/ui/AudioPlayer";
-import axios from "axios";
-import { API_LIST } from "@/api/endpoints";
 import VideoPlayer from "@/components/ui/VideoPlayer";
+import { Controller, useForm } from "react-hook-form";
+import { API_LIST } from "@/api/endpoints";
+import { GET, PATCH, POST } from "@/api/apiMethods";
+import { useEffect } from "react";
 
 interface TextArticleEditorProps {
   article?: any;
   onBack?: () => void;
   onNavigateToNewsFeeds?: () => void;
 }
+
+type FormData = {
+  title: string;
+  category: string;
+  tags: string[];
+  newTag: string;
+  content: string;
+  audio: File | null;
+  video: File | null;
+  status: string;
+  reporterId: string | number | null;
+  thumbnail: string;
+};
 
 const ContentUploader = ({}: TextArticleEditorProps) => {
   const location = useLocation();
@@ -50,184 +64,76 @@ const ContentUploader = ({}: TextArticleEditorProps) => {
     "Environment",
   ];
 
-  const getInitialState = () => {
-    return {
-      title: "",
-      category: "Politics",
-      tags: [],
-      newTag: "",
-      content: '',
-      audio: null,
-      video: null,
-      status: '',
-      reporterId: null,
-      thumbnail: ''
-    };
+  const submitForReview = async (data: FormData, e: any) => {
+    const actionName = e.nativeEvent.submitter.name; // "draft" | "save"
+    try {
+      if (actionName.toLowerCase() === "draft") {
+        if(reporterId){
+          const response: any = await PATCH(API_LIST.BASE_URL + API_LIST.STATS);
+          console.log(response, 'patch')
+        }else {
+          const response: any = await POST(API_LIST.DRAFT_ARTICLE, data);
+          console.log(response, 'POST')
+        }
+      }
+      else if (actionName.toLowerCase() === "save") {
+        const response: any = await POST(API_LIST.SUBMIT_ARTICLE, data);
+        console.log(response, 'POST1');
+      }
+
+      console.log("✅ Submitted:", data);
+    } catch (err) {
+      console.error("❌ Error:", err);
+    }
   };
-  
-  const [newTag, setNewTag] = useState("");
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  const { register, handleSubmit,  reset, setValue, control, watch, formState: { errors }, } = useForm<FormData>({
+    defaultValues: {
+    title: "",
+    category: "Politics",
+    tags: [],
+    newTag: "",
+    content: "",
+    audio: null,
+    video: null,
+    status: "",
+    reporterId: null,
+    thumbnail: "",
+  }});
+
+  const tags = watch("tags");
+  const newTag = watch("newTag");
+  const audio = watch("audio");
+  const video = watch("video");
+  const thumbnail = watch("thumbnail");
+  const reporterId = watch("reporterId");
 
   const handleAddTag = () => {
-    if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
-      setNewTag("");
-      handleChange({tags: [...formData.tags, newTag.trim()]}, false)
+    if (newTag.trim() && !tags.includes(newTag.trim())) {
+      setValue("tags", [...tags, newTag.trim()]);
+      setValue("newTag", "");
     }
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
-    formData.tags = formData.tags.filter((tag) => tag !== tagToRemove)
-    handleChange({tags: formData.tags}, false)
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleAddTag();
-    }
-  };
-  
-  const [formData, setFormData] = useState(getInitialState());
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>|any, fromEvent=true) => {
-    if(fromEvent){
-      setFormData({ ...formData, [e.target.name]: e.target.value });
-    }
-    else{
-      const key = Object.keys(e)[0]; 
-      const value = e[key];      
-      setFormData({ ...formData, [key]:value });
-    }
-  };
-
-  const validate = () => {
-    const validateFile = (file: any, allowedExts: Array<string>, size: number) => {
-      if (!file) return "File is required";
-      const ext = file.name.substring(file.name.lastIndexOf(".")).toLowerCase();
-      const maxSize = size * 1024 * 1024;
-  
-      if (!allowedExts.includes(ext)) {
-       return "Invalid format";
-      }
-  
-      if (file.size > maxSize) {
-        return "File must be less than 100 MB";
-      }
-    }
-    let newErrors: { [key: string]: string } = {};
-
-    if (!formData.category.trim()) {
-      newErrors.category = "Category is required";
-    }
-
-    if (!formData.title.trim()) {
-      newErrors.title = "Title is required";
-    }
-
-    if (path === "textArticle" && !formData.content.replace(/<p><br><\/p>/g, "").trim()) {
-      newErrors.content = "Content is required";
-    }
-
-    if (path === "audio") {
-      const audioError = validateFile(formData.audio, [".mp3", ".wav", ".m4a"], 100);
-      
-      if(audioError)
-        newErrors.audio = audioError;
-    }
-
-    if (path === "video") {
-      const videoError = validateFile(formData.video, [".mp3", ".wav", ".m4a"], 500);
-      
-      if(videoError)
-        newErrors.audio = videoError;
-    }
-
-    if (!formData.tags.length) {
-      newErrors.tags = "Tags is required";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const submitForReview = async (e: React.FormEvent, actionName: string) => {
-    e.preventDefault();
-    if (validate()) {
-      try {
-        const token = localStorage.getItem("token");
-        localStorage.setItem("token", token??'');
-        let apiUrl;
-
-        if (actionName.toLowerCase() === "draft") {
-          if (formData.reporterId) {
-            // fetch existing draft
-            apiUrl = `${API_LIST.DRAFT_BY_ARTICLE}${formData.reporterId}`;
-            const res = await axios.patch(API_LIST.BASE_URL + apiUrl, formData, {
-              headers: {
-                Authorization: `Bearer ${token}`, // attach JWT
-              },
-            });
-            if (res.data) {
-              const data = res.data;
-              setFormData({
-                category: data.category,
-                content: data.content,
-                title: data.title,
-                tags: data.tags,
-                video: data.videoUrl,
-                audio: data.audioUrl,
-                status: data.status,
-                reporterId: data.id,
-                newTag: newTag,
-                thumbnail: data.thumbnailUrl
-              });
-            }
-          } else {
-            // create new draft
-            apiUrl = API_LIST.DRAFT_ARTICLE;
-            const res = await axios.post(API_LIST.BASE_URL + apiUrl, formData, {
-              headers: {
-                Authorization: `Bearer ${token}`, // attach JWT
-              },
-            });
-            if (res.data) {
-              const data = res.data;
-              setFormData({
-                category: data.category,
-                content: data.content,
-                title: data.title,
-                tags: data.tags,
-                video: data.videoUrl,
-                audio: data.audioUrl,
-                status: data.status,
-                reporterId: data.id,
-                newTag: newTag,
-                thumbnail: data.thumbnailUrl
-              });
-            }
-          }
-        } else if (actionName.toLowerCase() === "save") {
-          apiUrl = API_LIST.SUBMIT_ARTICLE;
-          await axios.post(API_LIST.BASE_URL + apiUrl, formData, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-        }
-
-        console.log("✅ Success:", formData);
-      } catch (err) {
-        console.error("❌ Error:", err);
-      }
-    }
+    setValue( "tags", tags.filter((tag) => tag !== tagToRemove) );
   };
 
   useEffect(() => {
-    setFormData(getInitialState());
-    setNewTag("");  // also reset tag input
-    setErrors({});
-  }, [path]);
-
+    reset({
+      title: "",
+      category: "Politics",
+      tags: [],
+      newTag: "",
+      content: "",
+      audio: null,
+      video: null,
+      status: "",
+      reporterId: null,
+      thumbnail: "",
+    });
+  }, [path, reset]);
+  
   return (
     <div className="min-h-screen bg-[#f6faf6]">
       {/* Header */}
@@ -292,16 +198,13 @@ const ContentUploader = ({}: TextArticleEditorProps) => {
           </div>
 
           {/* Form  */}
-          <form id="myForm" onSubmit={(e) => {
-            const action = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement;
-              submitForReview(e, action?.name);
-          }} >
+          <form id="myForm" onSubmit={handleSubmit(submitForReview)} >
           <div className="bg-white border-b border-gray-200 px-6 py-4 rounded-2xl shadow-md">
             <div className="flex items-center justify-between pt-[8px] pb-[32px]">
               <h2 className="text-lg font-medium">Content Editor</h2>
               <div className="flex gap-[12px]"> 
-                {formData.status.toLowerCase() == 'draft' && <span className="px-[12px] py-[4px] text-sm text-[#6A7282] rounded-lg bg-[#F8FAF9] border-1 border-[#E5E7EB]">Draft</span>}
-                {formData.status.toLowerCase() == 'submitted' && <span className="px-[12px] py-[4px] text-sm text-[#006601] rounded-lg bg-[#f8faf9] border-1 border-[#B3E6B3]">Auto-saved</span>}
+                {/* {formData.status.toLowerCase() == 'draft' && <span className="px-[12px] py-[4px] text-sm text-[#6A7282] rounded-lg bg-[#F8FAF9] border-1 border-[#E5E7EB]">Draft</span>}
+                {formData.status.toLowerCase() == 'submitted' && <span className="px-[12px] py-[4px] text-sm text-[#006601] rounded-lg bg-[#f8faf9] border-1 border-[#B3E6B3]">Auto-saved</span>} */}
               </div>
             </div>
 
@@ -317,13 +220,11 @@ const ContentUploader = ({}: TextArticleEditorProps) => {
                   <Button
                     type="button"
                     key={category}
-                    variant={
-                      formData.category === category ? "default" : "outline"
-                    }
+                    variant= {watch("category") === category ? "default" : "outline"}
                     size="sm"
-                    onClick={() => handleChange({category:category}, false)}
+                    onClick={() => setValue("category", category)}
                     className={`px-[24px] py-[6px] ${
-                      formData.category === category
+                      watch("category") === category
                         ? " bg-[#008001] hover:bg-green-700"
                         : "bg-[#F8FAF9]"}
                     `}
@@ -342,11 +243,9 @@ const ContentUploader = ({}: TextArticleEditorProps) => {
                 </div>
 
                 <Input
-                  name="title"
-                  placeholder="Name"
-                  value={formData.title}
-                  onChange={handleChange}
-                  className="bg-[#f7fbf8] border-[#ECECEC] border-1"
+                  placeholder="Title"
+                  {...register("title", { required: "Title is required" })}
+                  className={`bg-[#f7fbf8] border-[#ECECEC] border-1 ${errors.title?'border-red-500':''}`}
                 />
               </div>
             
@@ -358,17 +257,30 @@ const ContentUploader = ({}: TextArticleEditorProps) => {
                   <span className="text-600">*</span>
                 </div>
 
-                <CustomQuilTextEditor
-                    selectedValue={formData.content}
-                    placeholder="Write something..."
-                    onChange={(json) => handleChange({content:json}, false)}
-                  />
+                <Controller
+                  control={control}
+                  name="content"
+                  rules={{
+                    validate: (value) => {
+                      if (path === "textArticle" && !value || value.trim() === "<p><br></p>") {
+                        return "Content is required";
+                      }
+                    }
+                  }}
+                  render={({ field }) => (
+                    <CustomQuilTextEditor
+                      selectedValue={field.value}
+                      onChange={field.onChange}
+                      placeholder="Write something..."
+                    />
+                  )}
+                />
               </div>
             </>)}
 
               {/** Audio */}
               {path === "audio" && ( <>
-                {!formData.audio && <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl p-10 text-center">
+                {!audio && <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl p-10 text-center">
                   <div className="mx-auto w-16 h-16 rounded-full bg-purple-100 text-[#a32fff] flex items-center justify-center">
                     <Mic className="h-6 w-6" />
                   </div>
@@ -378,13 +290,20 @@ const ContentUploader = ({}: TextArticleEditorProps) => {
                     <Upload className="h-4 w-4" />
                     <span>Choose File</span>
                     <input type="file" accept=".mp3,.wav,.m4a" hidden 
-                    onChange={(e)=>handleChange({audio: e.target.files?.[0]}, false)}/>
+                    {...register("audio", {
+                      validate: (file) => {
+                        if (path === "audio" && !file) {
+                          return "Audio is required";
+                        }
+                        return true;
+                      },
+                    })}
+                    onChange={(e) => setValue("audio", e.target.files?.[0] || null)}/>
                   </label>
-                  {/* {audioFile && <p className="mt-3 text-sm text-gray-700">Selected: {audioFile.name}</p>} */}
                 </div>}
-                {formData.audio && 
+                {audio && 
                   <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl text-center">
-                    <AudioPlayer src={formData.audio} fileName={formData.audio?.['fileName']} />
+                    <AudioPlayer src={audio} fileName='' />
                   </div>
                 }
                 </>
@@ -392,7 +311,7 @@ const ContentUploader = ({}: TextArticleEditorProps) => {
               
                 {/**Video */}
                 {path === "video" && ( <>
-                  {!formData.video &&<div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl p-10 text-center">
+                  {!video &&<div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl p-10 text-center">
                     <div className="mx-auto w-16 h-16 rounded-full bg-orange-100 text-[#9f2e00] flex items-center justify-center">
                       <Video className="h-6 w-6" />
                     </div>
@@ -402,18 +321,27 @@ const ContentUploader = ({}: TextArticleEditorProps) => {
                     <label className="inline-flex items-center gap-2 mt-6 bg-orange-700 text-white px-4 py-2 rounded-xl cursor-pointer">
                       <Upload className="h-4 w-4" />
                       <span>Choose File</span>
-                      <input type="file" accept=".mp4,.mov,.avi" hidden onChange={(e)=>handleChange({video: e.target.files?.[0]}, false)}/>
+                      <input type="file" accept=".mp4,.mov,.avi" hidden 
+                      {...register("video", {
+                        validate: (file) => {
+                          if (path === "video" && !file) {
+                            return "Video is required";
+                          }
+                          return true;
+                        },
+                      })}
+                      onChange={(e) => setValue("video", e.target.files?.[0] || null)}/>
                     </label>
-                    {/* {videoFile && <p className="mt-3 text-sm text-gray-700">Selected: {videoFile.name}</p>} */}
                   </div>}
-                  {formData.video && 
-                  <VideoPlayer src={formData.video}  onThumbnailGenerated={(thumbnail)=>{
-                      handleChange({thumbnail: thumbnail}, false)
-                  }}
-                  onDelete={()=>{
-                    formData.video= null;
-                    formData.thumbnail= '';
-                  }}/>
+                  {video && 
+                  <VideoPlayer 
+                    src={video}
+                    onThumbnailGenerated={(thumb) => setValue("thumbnail", thumb)}
+                    onDelete={() => {
+                      setValue("video", null);
+                      setValue("thumbnail", "");
+                    }}
+                  />
                   }
                 </>)}
 
@@ -421,9 +349,9 @@ const ContentUploader = ({}: TextArticleEditorProps) => {
               <div>
                 <label className="block text-sm font-medium">Thumbnail Preview</label>
                 <div className="mt-2 h-28 w-full bg-gray-100 rounded-xl">
-                {formData.thumbnail && (
+                {thumbnail && (
                     <img
-                      src={formData.thumbnail}
+                      src={thumbnail}
                       alt="Generated Thumbnail"
                       className="h-full w-full object-cover"
                     />
@@ -440,42 +368,57 @@ const ContentUploader = ({}: TextArticleEditorProps) => {
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <div className="relative w-full">
-                        <Input
-                          placeholder="Add tag"
-                          value={newTag}
-                          onChange={(e) => setNewTag(e.target.value)}
-                          onKeyPress={handleKeyPress}
-                          className="py-[19px] border-[#ECECEC] border-1 bg-[#f7fbf8]"
-                        />
-                        <Button
-                          type="button"
-                          size="sm"
-                          onClick={handleAddTag}
-                          className="absolute top-[6px] right-[12px] bg-[#006601] hover:bg-[#006601] px-[16px] py-[6px] gap-1"
-                        >
-                          <Plus className="w-3 h-3" />
-                          Add
-                        </Button>
-                      </div>
+                    <div className="relative w-full">
+                      <Input
+                        {...register("newTag")}
+                        placeholder="Add tag"
+                        onKeyPress={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            handleAddTag();
+                          }
+                        }}
+                        className="py-[19px] border-[#ECECEC] border-1 bg-[#f7fbf8]"
+                      />
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={handleAddTag}
+                        className="absolute top-[6px] right-[12px] bg-[#006601] hover:bg-[#006601] px-[16px] py-[6px] gap-1"
+                      >
+                        <Plus className="w-3 h-3" />
+                        Add
+                      </Button>
                     </div>
+                  </div>
 
                     <div className="flex gap-2 flex-wrap">
-                      {formData.tags.map((tag, index) => (
-                        <Badge
-                          key={index}
-                          variant="secondary"
-                          className="gap-2 px-3 py-1 text-[#008001] bg-[#f8faf9] border-[#B3E6B3]"
-                        >
-                          {tag}
-                          <button
-                            onClick={() => handleRemoveTag(tag)}
-                            className="hover:text-red-600"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </Badge>
-                      ))}
+                      <Controller
+                        name="tags"
+                        control={control}
+                        rules={{
+                          validate: (tags) => tags.length > 0 || "At least one tag is required",
+                        }}
+                        render={({ field }) => (
+                          <>
+                            {field.value.map((tag: string, index: number) => (
+                              <Badge
+                              key={index}
+                              variant="secondary"
+                              className="gap-2 px-3 py-1 text-[#008001] bg-[#f8faf9] border-[#B3E6B3]"
+                            >
+                              {tag}
+                              <button
+                                onClick={() => handleRemoveTag(tag)}
+                                className="hover:text-red-600"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </Badge>
+                            ))}
+                          </>
+                        )}
+                      />
                     </div>
                   </div>
             </div>

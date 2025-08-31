@@ -27,6 +27,8 @@ import { usePagination } from "@/hooks/usePagination";
 import Pagination from "@/components/Pagination";
 import axios from "axios";
 import { API_LIST } from "@/api/endpoints";
+import { GET } from "@/api/apiMethods";
+import moment from "moment";
 
 const HistoryLogPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -40,87 +42,7 @@ const HistoryLogPage: React.FC = () => {
     console.log(size, val);
     setPageSize(Number(size));
   };
-  const historyArticles = [
-    {
-      id: "1",
-      title: "Climate Change Report: Impact on Local Communities",
-      type: "Text Article",
-      status: "Approved",
-      reporter: "Muthul",
-      category: "General",
-      date: "20/01/2025",
-      time: "10:30 AM",
-      wordCount: 1247,
-      lastUpdated: "2025-01-20T10:30:00",
-      timeAgo: "2 hours ago",
-    },
-    {
-      id: "2",
-      title: "Climate Change Report: Impact on Local Communities",
-      type: "Text Article",
-      status: "In Review",
-      reporter: "Muthul",
-      category: "General",
-      date: "19/01/2025",
-      time: "02:15 PM",
-      wordCount: 1089,
-      lastUpdated: "2025-01-19T14:15:00",
-      timeAgo: "1 day ago",
-    },
-    {
-      id: "3",
-      title: "Climate Change Report: Impact on Local Communities",
-      type: "Text Article",
-      status: "Reverted",
-      reporter: "Muthul",
-      category: "General",
-      date: "18/01/2025",
-      time: "04:45 PM",
-      wordCount: 956,
-      lastUpdated: "2025-01-18T16:45:00",
-      timeAgo: "2 days ago",
-    },
-    {
-      id: "4",
-      title: "Climate Change Report: Impact on Local Communities",
-      type: "Audio Post",
-      status: "Approved",
-      reporter: "Muthul",
-      category: "General",
-      date: "17/01/2025",
-      time: "11:20 AM",
-      wordCount: 1156,
-      lastUpdated: "2025-01-17T11:20:00",
-      timeAgo: "3 days ago",
-    },
-    {
-      id: "5",
-      title: "Climate Change Report: Impact on Local Communities",
-      type: "Text Article",
-      status: "Draft",
-      reporter: "Muthul",
-      category: "General",
-      date: "16/01/2025",
-      time: "03:30 PM",
-      wordCount: 834,
-      lastUpdated: "2025-01-16T15:30:00",
-      timeAgo: "4 days ago",
-    },
-    {
-      id: "6",
-      title: "Climate Change Report: Impact on Local Communities",
-      type: "Video Post",
-      status: "Reverted",
-      reporter: "Muthul",
-      category: "General",
-      date: "15/01/2025",
-      time: "09:15 AM",
-      wordCount: 1203,
-      lastUpdated: "2025-01-15T09:15:00",
-      timeAgo: "5 days ago",
-    },
-  ];
-
+  const [historyArticles, setHistoryArticles] = useState([]);
   const statusOptions = [
     "All Status",
     "Approved",
@@ -130,7 +52,7 @@ const HistoryLogPage: React.FC = () => {
   ];
   const typeOptions = ["All Type", "Text", "Audio", "Video"];
 
-  const filteredArticles = historyArticles.filter((article) => {
+  const filteredArticles = historyArticles?.filter((article: any) => {
     const matchesSearch = article.title
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
@@ -193,16 +115,16 @@ const HistoryLogPage: React.FC = () => {
       pillText: "text-[#F41D28]",
     },
   ];
-  type PostType = "Text Article" | "Audio Post" | "Video Post";
+  type PostType = "text" | "audio" | "video";
   const typeIcons: Record<PostType, JSX.Element> = {
-    "Text Article": <FileText className="w-5 h-5 text-gray-700" />,
-    "Audio Post": <Mic className="w-5 h-5 text-gray-700" />,
-    "Video Post": <Video className="w-5 h-5 text-gray-700" />,
+    "text": <FileText className="w-5 h-5 text-gray-700" />,
+    "audio": <Mic className="w-5 h-5 text-gray-700" />,
+    "video": <Video className="w-5 h-5 text-gray-700" />,
   };
 
   const handleEdit = (id: string) => {
     const articleType =
-      paginatedArticles.find((article) => article.id === id)?.type || "Text";
+      paginatedArticles.find((article: any) => article.id === id)?.type || "Text";
     const route = returnType(articleType);
     navigate(`/${route}/${id}?from=history`);
   };
@@ -211,20 +133,12 @@ const HistoryLogPage: React.FC = () => {
   useEffect(() => {
     const getStatsData = async () => {
       try {
-        const token = localStorage.getItem("token");
-        localStorage.setItem("token", token??'');
-
-        const response: any = await axios.get(API_LIST.BASE_URL + API_LIST.STATS, {
-          headers: {
-            Authorization: `Bearer ${token}`, // attach JWT
-          }
-        });
-
+        const response: any = await GET (API_LIST.BASE_URL + API_LIST.STATS);
         const updatedStats = stats.map((item) => {
           let key = item.title.toUpperCase();
           return {
             ...item,
-            value: response.data[key] ?? 0,
+            value: response[key] ?? 0,
           };
         })
         setStats(updatedStats);
@@ -235,23 +149,8 @@ const HistoryLogPage: React.FC = () => {
 
     const getHistoryList = async () => {
       try {
-        const token = localStorage.getItem("token");
-        localStorage.setItem("token", token??'');
-
-        const response: any = await axios.get(API_LIST.BASE_URL + API_LIST.HISTORY, {
-          headers: {
-            Authorization: `Bearer ${token}`, // attach JWT
-          }
-        });
-
-        const updatedStats = stats.map((item) => {
-          let key = item.title.toUpperCase();
-          return {
-            ...item,
-            value: response.data[key] ?? 0,
-          };
-        })
-        setStats(updatedStats);
+        const response: any = await GET (API_LIST.BASE_URL + API_LIST.HISTORY);
+        setHistoryArticles(response.data ?? []);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -260,6 +159,19 @@ const HistoryLogPage: React.FC = () => {
     getHistoryList();
     getStatsData();
   }, []);
+
+  function getArticleType(article: any): "text" | "audio" | "video" {
+    if (article.content && article.content !== "") {
+      return "text";
+    }
+    if (article.audioUrl && article.audioUrl.trim() !== "") {
+      return "audio";
+    }
+    if (article.videoUrl && article.videoUrl.trim() !== "") {
+      return "video";
+    }
+    return "text"; // default fallback
+  }
 
   return (
     <div className=" flex-1 py-16 h-screen bg-gray-50">
@@ -375,7 +287,8 @@ const HistoryLogPage: React.FC = () => {
 
             {/* Table Rows */}
             <div className="divide-y divide-gray-200">
-              {paginatedArticles.map((article) => (
+            {paginatedArticles.length > 0 ? (
+              paginatedArticles.map((article: any) => (
                 <div
                   key={article.id}
                   className="grid grid-cols-12 gap-4 p-6 hover:bg-gray-50 transition-colors items-center"
@@ -387,9 +300,9 @@ const HistoryLogPage: React.FC = () => {
                   </div>
 
                   <div className="col-span-2">
-                    <div className="text-[14px] flex  items-center gap-[8px]">
-                      {typeIcons[article.type as PostType]}
-                      <span>{article.type}</span>
+                    <div className="text-[14px] flex items-center gap-[8px]">
+                      {typeIcons[getArticleType(article) as PostType]}
+                      <span>{getArticleType(article)}</span>
                     </div>
                   </div>
 
@@ -404,15 +317,13 @@ const HistoryLogPage: React.FC = () => {
                   </div>
 
                   <div className="col-span-1">
-                    <div className="text-[14px] text-gray-900">
-                      {article.category}
-                    </div>
+                    <div className="text-[14px] text-gray-900">{article.category}</div>
                   </div>
 
                   <div className="col-span-2 flex items-center gap-[8px]">
                     <Calendar className="w-4 h-4" />
                     <div className="text-[14px] text-gray-900">
-                      {article.date}
+                      {moment(article.updatedAt).format("DD MMM YYYY hh:mm A")}
                     </div>
                   </div>
 
@@ -427,7 +338,13 @@ const HistoryLogPage: React.FC = () => {
                     </Button>
                   </div>
                 </div>
-              ))}
+              ))
+              ) : (
+                <div className="p-6 text-center text-gray-500 text-[14px]">
+                  No log available
+                </div>
+              )}
+
             </div>
           </div>
         </div>
