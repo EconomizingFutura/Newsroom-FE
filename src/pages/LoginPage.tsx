@@ -6,6 +6,10 @@ import { Input } from "@/components/ui/input";
 import tnlogo from "../assets/tngovtlogo.png";
 import cijlogo from "../assets/cijlogo.png";
 import mkstalin from "../assets/mkstalin.png";
+import { useNavigate } from "react-router";
+import type { LoginResponse } from "@/types/apitypes";
+import { POST } from "@/api/apiMethods";
+import { API_LIST } from "@/api/endpoints";
 
 type FormData = {
   email: string;
@@ -14,16 +18,24 @@ type FormData = {
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
-
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>();
 
-  const onSubmit = (data: FormData) => {
+  const onSubmit = async (data: FormData) => {
     console.log("Form Data:", data);
-    // API call goes here
+    const response = await POST<LoginResponse>(API_LIST.LOGIN, {
+      email: data.email,
+      password: data.password,
+    });
+    if (response.accessToken) {
+      navigate("/news-feeds");
+      localStorage.setItem("token", response.accessToken);
+      localStorage.setItem("role", "reporter");
+    }
   };
 
   return (

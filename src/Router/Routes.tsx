@@ -18,7 +18,10 @@ import { Dashboard as EditorDashboard } from "@/pages/Editor/Dashboard";
 import LoginPage from "@/pages/LoginPage";
 import { useCurrentView } from "@/hooks/useCurrentView";
 import EditArticle from "@/pages/EditArticle";
-const Layout = () => {
+import AuthRoute from "./AuthRoutes";
+import ProtectedRoutes from "./ProtectedRoutes";
+import PublicRoute from "./PublicRoutes";
+const Layout: React.FC = () => {
   const navigate = useNavigate();
   const getCurrentView = useCurrentView();
   const currentViewMemo = useMemo(() => getCurrentView, [getCurrentView]);
@@ -47,23 +50,167 @@ const Layout = () => {
         />
         <div className="flex-1 w-full h-screen overflow-y-auto">
           <Routes>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/textArticle" element={<ContentUploader />} />
-            <Route path="/audio" element={<ContentUploader />} />
-            <Route path="/video" element={<ContentUploader />} />
-            <Route path="/drafts" element={<DraftsPage />} />
-            <Route path="/reverted" element={<RevertedPostPage />} />
-            <Route path="/history" element={<HistoryLogPage />} />
-            <Route path="/filtered/:type" element={<FilteredContentPage />} />
-            <Route path="/news-feeds" element={<NewsFeedsPage />} />
-            <Route path="/:textArticle/:id" element={<EditArticle />} />
+            <Route
+              path="/dashboard"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="reporter">
+                    <Dashboard />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
+            <Route
+              path="/textArticle"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="reporter">
+                    <ContentUploader />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
+            <Route
+              path="/audio"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="reporter">
+                    <ContentUploader />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
+            <Route
+              path="/video"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="reporter">
+                    <ContentUploader />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
+            <Route
+              path="/drafts"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="reporter">
+                    <DraftsPage />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
+
+            <Route
+              path="/reverted"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="reporter">
+                    <RevertedPostPage />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
+
+            <Route
+              path="/history"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="reporter">
+                    <HistoryLogPage />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
+
+            <Route
+              path="/filtered/:type"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="reporter">
+                    <FilteredContentPage />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
+
+            <Route
+              path="/news-feeds"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="reporter">
+                    <NewsFeedsPage />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
+
+            <Route
+              path="/:textArticle/:id"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="reporter">
+                    <EditArticle />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
 
             {/* Editor */}
-            <Route path="/editor/dashboard" element={<EditorDashboard />} />
-            <Route path="/editor/calendarView" element={<CalendarView />} />
-            <Route path="/editor/history" element={<HistoryLog />} />
-            <Route path="/editor/publishCenter" element={<PublishCenter />} />
-            <Route path="/editor/reviewQueue" element={<ReviewQueue />} />
+            <Route
+              path="/editor/dashboard"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="editor">
+                    <EditorDashboard />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
+
+            <Route
+              path="/editor/calendarView"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="editor">
+                    <CalendarView />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
+
+            <Route
+              path="/editor/history"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="editor">
+                    <HistoryLog />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
+
+            <Route
+              path="/editor/publishCenter"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="editor">
+                    <PublishCenter />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
+
+            <Route
+              path="/editor/reviewQueue"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="editor">
+                    <ReviewQueue />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
           </Routes>
         </div>
       </div>
@@ -74,7 +221,14 @@ const Layout = () => {
 export default function AppRoutes() {
   return (
     <Routes>
-      <Route path="/login" element={<LoginPage />} />
+      <Route
+        path="/login"
+        element={
+          <PublicRoute>
+            <LoginPage />
+          </PublicRoute>
+        }
+      />
       <Route path="/*" element={<Layout />} />
     </Routes>
   );

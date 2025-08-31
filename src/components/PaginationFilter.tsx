@@ -7,6 +7,7 @@ interface PaginationFilterProps {
 
 const PaginationFilter: React.FC<PaginationFilterProps> = ({ onClick }) => {
   const OPTIONS = [
+    "1 per page",
     "10 per page",
     "30 per page",
     "70 per page",
@@ -34,7 +35,7 @@ const PaginationFilter: React.FC<PaginationFilterProps> = ({ onClick }) => {
       </div>
 
       {isOpen && (
-        <div className="absolute -top-40 font-circular-500 w-[123px] bg-white border border-[#03101F33] rounded-md mt-1 shadow-md z-10">
+        <div className="absolute -top-44 font-circular-500 w-[123px] bg-white border border-[#03101F33] rounded-md mt-1 shadow-md z-10">
           {OPTIONS.map((option, index) => (
             <div
               key={index}

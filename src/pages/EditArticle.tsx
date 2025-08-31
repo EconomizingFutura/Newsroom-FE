@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import CustomQuilTextEditor from "@/components/ui/CustomQuilTextEditor";
 import AudioPlayer from "@/components/ui/AudioPlayer";
 import EditorRemarks from "@/components/EditorRemarks";
+import { StatusBadge } from "@/components/StatusBadge";
 
 // ---------- Types ----------
 type FormData = {
@@ -237,14 +238,20 @@ const EditArticle = () => {
             <div className="bg-white  border-gray-200 px-8 py-6  shadow-md">
               <div className="flex items-center justify-between ">
                 <h2 className="text-[20px] font-semibold">Content Editor</h2>
-                <div className="flex gap-[12px]">
-                  <span className="px-[12px] py-[4px] text-sm text-[#6A7282] rounded-lg bg-[#F8FAF9] border border-[#E5E7EB]">
-                    Draft
-                  </span>
+                <div className="flex gap-2">
+                  <StatusBadge
+                    label="Draft"
+                    active={formData.status === true}
+                    activeClass="text-[#6A7282] bg-[#F8FAF9] border-[#E5E7EB]"
+                    inactiveClass="text-[#6A7282] opacity-50 border border-transparent"
+                  />
 
-                  <span className="px-[12px] py-[4px] text-sm text-[#006601] rounded-lg bg-[#f8faf9] border border-[#B3E6B3]">
-                    Auto-saved
-                  </span>
+                  <StatusBadge
+                    label="Auto-saved"
+                    active={formData.status === false}
+                    activeClass="text-[#006601] bg-[#F8FAF9] border-[#B3E6B3]"
+                    inactiveClass="text-[#006601] opacity-50 border border-transparent"
+                  />
                 </div>
               </div>
               <EditorRemarks />

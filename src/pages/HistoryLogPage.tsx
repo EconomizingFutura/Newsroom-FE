@@ -23,13 +23,21 @@ import { HistoryCard } from "@/components/ui/card";
 import { HISTORY_STATUS } from "@/utils/draftUtils";
 import { useNavigate } from "react-router";
 import { returnType } from "@/utils/utils";
+import { usePagination } from "@/hooks/usePagination";
+import Pagination from "@/components/Pagination";
 
-export default function HistoryLogPage() {
+const HistoryLogPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All Status");
   const [typeFilter, setTypeFilter] = useState("All Type");
   const [dateRange, setDateRange] = useState("Date Range");
   const navigate = useNavigate();
+
+  const handlePageSize = (val: string) => {
+    const size = val.split(" ")[0];
+    console.log(size, val);
+    setPageSize(Number(size));
+  };
   const historyArticles = [
     {
       id: "1",
@@ -131,6 +139,26 @@ export default function HistoryLogPage() {
     return matchesSearch && matchesStatus && matchesType;
   });
 
+  const {
+    pageCount,
+    currentPage,
+    setPageSize,
+    setCurrentPage,
+    handlePageChange,
+    pageSize,
+  } = usePagination({
+    initialPage: 1,
+    totalPages: filteredArticles.length,
+    initialPageSize: 10,
+  });
+
+  console.log(pageSize);
+
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const paginatedArticles = filteredArticles.slice(startIndex, endIndex);
+  // const pageCount = Math.ceil(filteredArticles.length / pageSize) || 1;
+
   const stats = [
     {
       title: "Total Posts",
@@ -172,7 +200,7 @@ export default function HistoryLogPage() {
 
   const handleEdit = (id: string) => {
     const articleType =
-      filteredArticles.find((article) => article.id === id)?.type || "Text";
+      paginatedArticles.find((article) => article.id === id)?.type || "Text";
     const route = returnType(articleType);
     navigate(`/${route}/${id}?from=history`);
   };
@@ -182,7 +210,7 @@ export default function HistoryLogPage() {
       {/* Main Content */}
       <div
         style={{ paddingTop: "32px" }}
-        className=" flex flex-col gap-[24px] px-[24px] bg-[#F6FAF6]"
+        className=" flex flex-col gap-[24px] p-[24px] bg-[#F6FAF6]"
       >
         {/* Top Header */}
         <div className="flex items-center gap-[8px]">
@@ -265,7 +293,6 @@ export default function HistoryLogPage() {
           </div>
         </div>
 
-        {/* Article Table */}
         <div className="flex-1 px-4 overflow-auto bg-white rounded-2xl shadow-md">
           <div className="bg-white">
             {/* Table Header */}
@@ -292,7 +319,7 @@ export default function HistoryLogPage() {
 
             {/* Table Rows */}
             <div className="divide-y divide-gray-200">
-              {filteredArticles.map((article) => (
+              {paginatedArticles.map((article) => (
                 <div
                   key={article.id}
                   className="grid grid-cols-12 gap-4 p-6 hover:bg-gray-50 transition-colors items-center"
@@ -348,7 +375,16 @@ export default function HistoryLogPage() {
             </div>
           </div>
         </div>
+        <Pagination
+          currentPage={currentPage}
+          pageCount={pageCount}
+          onPageChange={handlePageChange}
+          setCurrentPage={setCurrentPage}
+          setSortConfig={handlePageSize}
+        />
       </div>
     </div>
   );
-}
+};
+
+export default HistoryLogPage;

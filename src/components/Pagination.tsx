@@ -23,7 +23,7 @@ const Pagination: React.FC<PaginationProps> = ({
         disabled ? "opacity-0 pointer-events-none" : ""
       }`}
     >
-      {setSortConfig && <PaginationFilter onClick={setSortConfig} />}
+      <PaginationFilter onClick={setSortConfig} />
       <div className="pagination-container h-8 flex items-center gap-2">
         <button
           className="pagination-prev h-8 w-8 hover:border-[#03101F] border border-[#ECECEC] rounded-md px-2"

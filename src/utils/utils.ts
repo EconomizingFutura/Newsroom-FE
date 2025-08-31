@@ -17,3 +17,11 @@ export const returnType = (type: string) => {
   }
   return route;
 };
+
+export const TOKEN = () => {
+  return localStorage.getItem("token");
+};
+
+export const USER_ROLE = () => {
+  return localStorage.getItem("role");
+};
