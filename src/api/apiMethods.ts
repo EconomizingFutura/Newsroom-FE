@@ -97,5 +97,6 @@ export const DELETE = <T>(
 
 export const PATCH = <T>(
   url: string,
+  data?: unknown,
   config?: AxiosRequestConfig
-): Promise<T> => request<T>("patch", url, undefined, config);
+): Promise<T> => request<T>("patch", url, data, config);
