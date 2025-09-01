@@ -1,6 +1,9 @@
+import { GET } from "@/api/apiMethods";
+import { API_LIST } from "@/api/endpoints";
 import ContentHeader from "@/components/ContentHeader";
 import { StatCard, DashboardListCard } from "@/components/ui/card";
 import { Clock, CheckCircle, RotateCcw, FilePen } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
 type StatCardProps = {
@@ -11,14 +14,16 @@ type StatCardProps = {
 };
 
 export default function Dashboard() {
+  const username = localStorage.getItem('username');
   const navigate = useNavigate();
-  const stats: StatCardProps[] = [
-    { title: "Total Posts", count: 7, icon: FilePen, color: "#155DFC" }, // blue
-    { title: "Draft", count: 5, icon: FilePen, color: "#4A5565" }, // gray
-    { title: "Submitted", count: 1, icon: Clock, color: "#2B7FFF" }, // blue
-    { title: "Approved", count: 10, icon: CheckCircle, color: "#008001" }, // green
-    { title: "Need Revision", count: 5, icon: RotateCcw, color: "#E7000B" }, // red
+  const initialStats: StatCardProps[] = [
+    { title: "Total Posts", count: 0, icon: FilePen, color: "#155DFC" }, // blue
+    { title: "Draft", count: 0, icon: FilePen, color: "#4A5565" }, // gray
+    { title: "Submitted", count: 0, icon: Clock, color: "#2B7FFF" }, // blue
+    { title: "Approved", count: 0, icon: CheckCircle, color: "#008001" }, // green
+    { title: "Need Revision", count: 0, icon: RotateCcw, color: "#E7000B" }, // red
   ];
+  const [stats, setStats] = useState(initialStats);
 
   const notificationList = [
     {
@@ -47,6 +52,26 @@ export default function Dashboard() {
     navigate(`/textArticle/${id}?from=dashboard`);
   };
 
+  useEffect(() => {
+    const getStatsData = async () => {
+      try {
+        const response: any = await GET (API_LIST.BASE_URL + API_LIST.STATS);
+        const updatedStats = stats.map((item) => {
+          let key = item.title.toUpperCase();
+          return {
+            ...item,
+            count: response[key] ?? 0,
+          };
+        })
+        setStats(updatedStats);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    
+    getStatsData();
+  }, []);
+
   return (
     <div className="flex-1 py-16 h-screen bg-background">
       {/* Left Sidebar */}
@@ -58,7 +83,7 @@ export default function Dashboard() {
       >
         {/* Top Bar */}
         <ContentHeader
-          text="Welcome back, Muthu!"
+          text={`Welcome back, ${username}!`}
           description="Here's what's happening in your newsroom today."
         />
 

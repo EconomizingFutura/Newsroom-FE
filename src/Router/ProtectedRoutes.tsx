@@ -6,7 +6,7 @@ interface ProtectedRouteProps {
   children: React.ReactElement;
   allowedRoles: "editor" | "reporter";
 }
-
+document.title = "CIJ NewsRoom - Login";
 const ProtectedRoutes: React.FC<ProtectedRouteProps> = ({
   children,
   allowedRoles,

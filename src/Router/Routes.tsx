@@ -1,5 +1,5 @@
-import React, { useMemo } from "react";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import React, { useEffect, useMemo } from "react";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 
 import Dashboard from "@/pages/Dashboard";
 import ContentUploader from "@/pages/ContentUploader";
@@ -25,7 +25,31 @@ const Layout: React.FC = () => {
   const navigate = useNavigate();
   const getCurrentView = useCurrentView();
   const currentViewMemo = useMemo(() => getCurrentView, [getCurrentView]);
-
+  const location = useLocation();
+  const routeTitles: Record<string, string> = {
+    "/news-feeds": "Agency Feeds",
+    "/dashboard": "Dashboard",
+    "/drafts": "Drafts",
+    "/reverted": "Reverted Post",
+    "/history": "History Log",
+    "/textArticle": "Text Article",
+    "/audio": "Audio",
+    "/video": "Video",
+    "/login": "Login",
+  };
+  
+  useEffect(() => {
+    function getTitle(pathname: string, fallback = "CIJ NewsRoom") {
+      const path = pathname.toLowerCase();
+      const match = Object.entries(routeTitles).find(([key]) => {
+        const k = key.toLowerCase();
+        return path === k || path.startsWith(k + "/");
+      });
+      return match?.[1] ?? fallback;
+    }
+    const title = "CIJ NewsRoom - "+getTitle(location.pathname);
+    document.title = title;
+  }, [location]);
   return (
     <div>
       <Navigation />

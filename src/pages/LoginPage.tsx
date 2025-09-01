@@ -35,6 +35,13 @@ export default function LoginPage() {
       navigate("/news-feeds");
       localStorage.setItem("token", response.accessToken);
       localStorage.setItem("role", "reporter");
+      const [, payload] = response.accessToken.split(".");
+      const decoded = JSON.parse(
+        atob(payload.replace(/-/g, "+").replace(/_/g, "/"))
+      );
+      if (decoded?.username) {
+        localStorage.setItem("username", decoded.username);
+      }
     }
   };
 

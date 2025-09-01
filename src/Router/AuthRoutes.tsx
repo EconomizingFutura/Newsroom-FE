@@ -8,7 +8,7 @@ interface AuthRouteProps {
 
 const AuthRoute: React.FC<AuthRouteProps> = ({ children }) => {
   const token = TOKEN();
-
+  document.title = "CIJ NewsRoom - Login";
   if (!token) {
     return <Navigate to="/login" replace />;
   }

@@ -70,10 +70,16 @@ const ContentUploader = ({}: TextArticleEditorProps) => {
       if (actionName.toLowerCase() === "draft") {
         if(reporterId){
           const response: any = await PATCH(API_LIST.BASE_URL + API_LIST.DRAFT_BY_ARTICLE + reporterId, data);
-          setValue('reporterId', response.id);
+          if(response.id){
+            setValue('reporterId', response.id);
+            navigate("/drafts")
+          }
         }else {
           const response: any = await POST(API_LIST.BASE_URL + API_LIST.DRAFT_ARTICLE, data);
-          setValue('reporterId', response.id);
+          if(response.id){
+            setValue('reporterId', response.id);
+            navigate("/drafts")
+          }
         }
       }
       else if (actionName.toLowerCase() === "save") {
