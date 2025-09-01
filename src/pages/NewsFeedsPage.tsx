@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
 import { Circle } from "lucide-react";
 import ContentHeader from "@/components/ContentHeader";
+import AgencyFeedsPage from "./Shared/agency-feeds";
 
 export default function NewsFeedsPage() {
   const [activeSource, setActiveSource] = useState("BBC");
@@ -125,6 +126,8 @@ export default function NewsFeedsPage() {
 
   const currentArticles =
     newsArticles[activeSource as keyof typeof newsArticles] || [];
+
+  return <AgencyFeedsPage />;
 
   return (
     <div className=" flex-1 w-full h-screen mt-16 ">
