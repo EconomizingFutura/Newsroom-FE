@@ -1,0 +1,87 @@
+/* editor.css */
+
+/* Base editor container */
+.editor-container {
+    @apply border border-gray-300 rounded-2xl shadow-sm p-4 bg-white;
+    @apply focus-within:ring-2 focus-within:ring-blue-500 transition;
+  }
+  
+  /* Toolbar */
+  .editor-toolbar {
+    @apply flex flex-wrap items-center gap-2 mb-3 p-2 border-b border-gray-200 bg-gray-50 rounded-t-xl;
+  }
+  
+  .editor-toolbar button {
+    @apply px-3 py-1 text-sm rounded-lg border border-gray-300 bg-white text-gray-700;
+    @apply hover:bg-gray-100 hover:border-gray-400 active:bg-gray-200;
+  }
+  
+  /* Active button state */
+  .editor-toolbar button.is-active {
+    @apply bg-blue-100 text-blue-700 border-blue-400;
+  }
+  
+  /* ProseMirror content area */
+  .ProseMirror {
+    @apply min-h-[300px] p-3 text-gray-800 leading-relaxed;
+    @apply focus:outline-none prose prose-lg max-w-none;
+  }
+  
+  /* Headings */
+  .ProseMirror h1 {
+    @apply text-3xl font-bold mb-4;
+  }
+  
+  .ProseMirror h2 {
+    @apply text-2xl font-semibold mb-3;
+  }
+  
+  .ProseMirror h3 {
+    @apply text-xl font-medium mb-2;
+  }
+  
+  /* Paragraph */
+  .ProseMirror p {
+    @apply mb-3;
+  }
+  
+  /* Lists */
+  .ProseMirror ul {
+    @apply list-disc pl-6 mb-3;
+  }
+  
+  .ProseMirror ol {
+    @apply list-decimal pl-6 mb-3;
+  }
+  
+  /* Blockquote */
+  .ProseMirror blockquote {
+    @apply border-l-4 border-blue-500 pl-4 italic text-gray-600 mb-3;
+  }
+  
+  /* Code block */
+  .ProseMirror pre {
+    @apply bg-gray-900 text-gray-100 rounded-lg p-3 overflow-x-auto mb-3;
+    font-family: "Fira Code", monospace;
+  }
+  
+  /* Images */
+  .ProseMirror img {
+    @apply max-w-full rounded-xl shadow-md my-3;
+  }
+  
+  /* Table */
+  .ProseMirror table {
+    @apply border border-gray-300 rounded-lg overflow-hidden my-4 w-full;
+    border-collapse: collapse;
+  }
+  
+  .ProseMirror th,
+  .ProseMirror td {
+    @apply border border-gray-300 px-3 py-2 text-left;
+  }
+  
+  .ProseMirror th {
+    @apply bg-gray-100 font-semibold;
+  }
+  
