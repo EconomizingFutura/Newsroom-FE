@@ -147,6 +147,7 @@ const SideBar: React.FC<SidebarTypes> = (props) => {
           {menuConfig[currentRole].map((item) => {
             return (
               <Button
+                key={item.key}
                 variant="ghost"
                 size="sm"
                 key={item.key}

@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { FileStack, User, Eye, Check, X, Clock } from "lucide-react";
+import {  User,  Clock, PenLine, CircleCheckBig, ShieldAlert } from "lucide-react";
+import ContentHeader from "@/components/ContentHeader";
+
 
 export function ReviewQueue() {
   const [activeCategory, setActiveCategory] = useState("Politics");
@@ -53,27 +54,15 @@ export function ReviewQueue() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen pt-16 bg-[#F6FAF6]">
       <div className="flex">
         {/* Main Content */}
-        <main className="flex-1 p-8 max-w-5xl">
-          {/* Header Section */}
-          <div className="mb-8">
-            <div className="flex items-center space-x-3 mb-2">
-              <FileStack className="w-6 h-6 text-green-600" />
-              <h1 className="text-2xl font-bold text-gray-900">Review Queue</h1>
-              <Badge className="bg-green-600 text-white px-2 py-1 text-sm">
-                4
-              </Badge>
-            </div>
-            <p className="text-gray-600">
-              Review and approve content submissions from reporters.
-            </p>
-          </div>
-
+        <main className="flex-1 p-8">
+          {/* Header */}
+          <ContentHeader text="Review Queue" iconName="Drafts" description="Review and approve content submissions from reporters." />
           {/* Category Tabs */}
-          <div className="mb-6">
-            <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
+          <div className="my-6 flex items-center justify-between bg-white py-2 px-6 rounded-lg">
+          <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
               {categories.map((category) => (
                 <button
                   key={category.name}
@@ -122,25 +111,24 @@ export function ReviewQueue() {
                     onClick={() => {}}
                     className="text-gray-700 border-gray-300 hover:bg-gray-50"
                   >
-                    <Eye className="w-4 h-4 mr-2" />
-                    View Story
+            <PenLine className="w-4 h-4 mr-2" />
+            View Story
                   </Button>
 
                   <Button
                     onClick={() => handleApprove(story.id)}
                     className="bg-green-600 hover:bg-green-700 text-white"
                   >
-                    <Check className="w-4 h-4 mr-2" />
-                    Approve & Move to publish
-                  </Button>
+                    <CircleCheckBig className="w-4 h-4 mr-2" />
+                    Approve & Move to publish                  </Button>
 
                   <Button
                     variant="outline"
                     onClick={() => handleReject(story.id)}
-                    className="text-red-600 border-red-300 hover:bg-red-50"
+                    className="text-white bg-[#FB2C36] border-red-300 "
                   >
-                    <X className="w-4 h-4 mr-2" />
-                    Reject
+                    <ShieldAlert  className="w-4 h-4 mr-2" />
+                    Reverted
                   </Button>
                 </div>
               </div>

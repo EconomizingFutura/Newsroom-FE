@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
@@ -18,19 +17,109 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  BookOpen,
-  Calendar,
-  User,
-  Eye,
-  Clock,
-  Globe,
-  Printer,
-  X,
-} from "lucide-react";
+import { BookOpen, Clock, X, Search } from "lucide-react";
+import { getPriorityColor } from "@/utils/PublishCenter";
+import ContentHeader from "@/components/ContentHeader";
+import StoryCard, { type Story } from "@/components/StoryCard";
+
+const FILTER_TABS = Object.freeze([
+  {
+    name: "Politics",
+  },
+  {
+    name: "Business",
+  },
+  {
+    name: "Entertainment",
+  },
+  {
+    name: "Sports",
+  },
+  {
+    name: "Environment",
+  },
+]);
+
+const CONTENT_TABS = Object.freeze([
+  {
+    name: "All",
+  },
+  {
+    name: "Scheduled",
+  },
+]);
+
+const ALL_STORIES: Story[] = ([
+  {
+    id: "1",
+    title: "Breaking: City Council Votes on New Housing Development",
+    author: "Sarah Chen",
+    category: "Politics",
+    approvedDate: "15/01/2025 at 16:00:00",
+    priority: "High",
+    content:
+      "The city council convened today to discuss the controversial housing development proposal...",
+    status: "ready",
+  },
+  {
+    id: "2",
+    title: "Local Sports Team Wins Championship Match",
+    author: "Mike Rodriguez",
+    category: "Sports",
+    approvedDate: "15/01/2025 at 14:30:00",
+    priority: "Medium",
+    content:
+      "In a thrilling match that went into overtime, the local team secured their championship...",
+    status: "scheduled",
+  },
+  {
+    id: "3",
+    title: "New Technology Center Opens Downtown",
+    author: "Lisa Wang",
+    category: "Technology",
+    approvedDate: "15/01/2025 at 12:15:00",
+    priority: "Low",
+    content:
+      "The much-anticipated technology innovation center opened its doors to the public...",
+    status: "scheduled",
+  },
+  {
+    id: "4",
+    title: "Weekend Weather Forecast Update",
+    author: "John Smith",
+    category: "Weather",
+    scheduledDate: "16/01/2025 at 08:00:00",
+    priority: "Medium",
+    content:
+      "Weekend weather patterns show a chance of rain with temperatures...",
+    status: "scheduled",
+  },
+  {
+    id: "5",
+    title: "Community Event Planning Meeting",
+    author: "Emma Johnson",
+    category: "Community",
+    scheduledDate: "17/01/2025 at 10:00:00",
+    priority: "Low",
+    content:
+      "Local community leaders will meet to discuss upcoming events...",
+    status: "scheduled",
+  },
+  {
+    id: "6",
+    title: "Mayor Announces New Infrastructure Plan",
+    author: "David Brown",
+    category: "Politics",
+    publishedDate: "14/1/2025 at 09:00:00",
+    priority: "High",
+    status: "published",
+  },
+]);
+
 
 export function PublishCenter() {
-  const [activeTab, setActiveTab] = useState("Ready to Publish");
+  const [activeTab, setActiveTab] = useState("All");
+  const [activeFilterTab, setActiveFilterTab] = useState("Politics");
   const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
   const [selectedStoryForScheduling, setSelectedStoryForScheduling] =
     useState<any>(null);
@@ -39,101 +128,19 @@ export function PublishCenter() {
   const [scheduleRepeat, setScheduleRepeat] = useState("");
   const [notifySubscribers, setNotifySubscribers] = useState(true);
   const [priorityPublish, setPriorityPublish] = useState(false);
-
-  const tabs = [
-    { name: "Ready to Publish", count: 3 },
-    { name: "Scheduled", count: 2 },
-    { name: "Published", count: 15 },
-  ];
-
-  const readyToPublishStories = [
-    {
-      id: 1,
-      title: "Breaking: City Council Votes on New Housing Development",
-      author: "Sarah Chen",
-      category: "Politics",
-      approvedDate: "15/01/2025 at 16:00:00",
-      priority: "High",
-      content:
-        "The city council convened today to discuss the controversial housing development proposal...",
-      status: "ready",
-    },
-    {
-      id: 2,
-      title: "Local Sports Team Wins Championship Match",
-      author: "Mike Rodriguez",
-      category: "Sports",
-      approvedDate: "15/01/2025 at 14:30:00",
-      priority: "Medium",
-      content:
-        "In a thrilling match that went into overtime, the local team secured their championship...",
-      status: "ready",
-    },
-    {
-      id: 3,
-      title: "New Technology Center Opens Downtown",
-      author: "Lisa Wang",
-      category: "Technology",
-      approvedDate: "15/01/2025 at 12:15:00",
-      priority: "Low",
-      content:
-        "The much-anticipated technology innovation center opened its doors to the public...",
-      status: "ready",
-    },
-  ];
-
-  const scheduledStories = [
-    {
-      id: 4,
-      title: "Weekend Weather Forecast Update",
-      author: "John Smith",
-      category: "Weather",
-      scheduledDate: "16/01/2025 at 08:00:00",
-      priority: "Medium",
-      content:
-        "Weekend weather patterns show a chance of rain with temperatures...",
-      status: "scheduled",
-    },
-    {
-      id: 5,
-      title: "Community Event Planning Meeting",
-      author: "Emma Johnson",
-      category: "Community",
-      scheduledDate: "17/01/2025 at 10:00:00",
-      priority: "Low",
-      content:
-        "Local community leaders will meet to discuss upcoming events...",
-      status: "scheduled",
-    },
-  ];
-
-  const publishedStories = [
-    {
-      id: 6,
-      title: "Mayor Announces New Infrastructure Plan",
-      author: "David Brown",
-      category: "Politics",
-      publishedDate: "14/01/2025 at 09:00:00",
-      priority: "High",
-      views: "2,450",
-      status: "published",
-    },
-  ];
+  const [searchQuery, setSearchQuery] = useState("");
 
   const getCurrentStories = () => {
-    switch (activeTab) {
-      case "Ready to Publish":
-        return readyToPublishStories;
-      case "Scheduled":
-        return scheduledStories;
-      case "Published":
-        return publishedStories;
-      default:
-        return readyToPublishStories;
+    const result = ALL_STORIES.filter(story => story.category === activeFilterTab);
+    if (activeTab === "All") {
+      return result;
+    } else if (activeTab === "Scheduled") {
+      return result.filter(story => story.status.toLowerCase() === "scheduled");
     }
+    return result;
   };
 
-  const handlePublishNow = (storyId: number) => {
+  const handlePublishNow = (storyId: string) => {
     console.log("Publishing story immediately:", storyId);
   };
 
@@ -152,7 +159,6 @@ export function PublishCenter() {
     });
     setScheduleModalOpen(false);
     setSelectedStoryForScheduling(null);
-    // Reset form
     setScheduledDate("");
     setScheduledTime("");
     setScheduleRepeat("");
@@ -160,169 +166,79 @@ export function PublishCenter() {
     setPriorityPublish(false);
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "High":
-        return "bg-red-100 text-red-800 border-red-200";
-      case "Medium":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case "Low":
-        return "bg-green-100 text-green-800 border-green-200";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen py-16 bg-gray-50">
       <div className="flex">
         {/* Main Content */}
-        <main className="flex-1 p-8 max-w-6xl">
-          {/* Header Section */}
-          <div className="mb-8">
-            <div className="flex items-center space-x-3 mb-2">
-              <BookOpen className="w-6 h-6 text-green-600" />
-              <h1 className="text-2xl font-bold text-gray-900">
-                Publish Center
-              </h1>
-            </div>
-            <p className="text-gray-600">
-              Manage and publish approved articles to your news platform.
-            </p>
-          </div>
 
-          {/* Tabs */}
-          <div className="mb-6">
-            <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.name}
-                  onClick={() => setActiveTab(tab.name)}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center space-x-2 ${
-                    activeTab === tab.name
-                      ? "bg-white text-gray-900 shadow-sm"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
-                >
-                  <span>{tab.name}</span>
-                  <Badge
-                    className={`text-xs px-2 py-1 ${
+        <main className="flex-1   p-8 ">
+          {/* Header Section */}
+          <ContentHeader
+            text="Publish Center"
+            description="Review and approved content submissions from reporters."
+            iconName="Publish Center"
+          />
+          {/* <section
+            className={cn("mt-8 max-h-[calc(100vh-25rem)] overflow-y-scroll")}
+          > */}
+          <section className=" sticky top-10 bg-gray-50 pt-3 z-10">
+            <div className="my-6 flex items-center justify-between bg-white py-2 px-6 rounded-lg">
+              <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
+                {CONTENT_TABS.map((tab) => (
+                  <button
+                    key={tab.name}
+                    onClick={() => setActiveTab(tab.name)}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center space-x-2 ${
                       activeTab === tab.name
-                        ? "bg-green-600 text-white"
-                        : "bg-gray-300 text-gray-700"
+                        ? "bg-white text-gray-900 shadow-sm"
+                        : "text-gray-500 hover:text-gray-700"
                     }`}
                   >
-                    {tab.count}
-                  </Badge>
-                </button>
-              ))}
+                    <span>{tab.name}</span>
+                  </button>
+                ))}
+              </div>
+              <div className="relative border border-history-select-border bg-[#F7FBF7] rounded-[8px] flex-1 max-w-sm">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 "
+                />
+              </div>
             </div>
-          </div>
+
+            <div className="my-6 bg-white py-2 px-6 rounded-lg">
+              <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
+                {FILTER_TABS.map((tab) => (
+                  <button
+                    key={tab.name}
+                    onClick={() => setActiveFilterTab(tab.name)}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center space-x-2 ${
+                      activeFilterTab === tab.name
+                        ? "bg-white text-gray-900 shadow-sm"
+                        : "text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    <span>{tab.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </section>
 
           {/* Stories List */}
           <div className="space-y-4">
             {getCurrentStories().map((story) => (
-              <div
-                key={story.id}
-                className="bg-white rounded-lg border border-gray-200 p-6"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-3 mb-2">
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        {story.title}
-                      </h3>
-                      <Badge
-                        className={`text-xs px-2 py-1 ${getPriorityColor(
-                          story.priority
-                        )}`}
-                      >
-                        {story.priority}
-                      </Badge>
-                    </div>
-
-                    <div className="flex items-center space-x-4 text-sm text-gray-500 mb-3">
-                      <div className="flex items-center space-x-1">
-                        <User className="w-4 h-4" />
-                        <span>{story.author}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Clock className="w-4 h-4" />
-                        <span>
-                          {story.status === "published"
-                            ? `Published: ${story.publishedDate}`
-                            : story.status === "scheduled"
-                            ? `Scheduled: ${story.scheduledDate}`
-                            : `Approved: ${story.approvedDate}`}
-                        </span>
-                      </div>
-                      {story.views && (
-                        <div className="flex items-center space-x-1">
-                          <Eye className="w-4 h-4" />
-                          <span>{story.views} views</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <p className="text-gray-700 leading-relaxed mb-4">
-                      {story.content}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <Badge
-                    variant="outline"
-                    className="text-xs px-2 py-1 text-blue-600 border-blue-200 bg-blue-50"
-                  >
-                    {story.category}
-                  </Badge>
-
-                  <div className="flex items-center space-x-3">
-                    <Button
-                      variant="outline"
-                      onClick={() => {}}
-                      className="text-gray-700 border-gray-300 hover:bg-gray-50"
-                    >
-                      <Eye className="w-4 h-4 mr-2" />
-                      View
-                    </Button>
-
-                    {story.status === "ready" && (
-                      <>
-                        <Button
-                          variant="outline"
-                          onClick={() => handleSchedulePublish(story)}
-                          className="text-blue-600 border-blue-300 hover:bg-blue-50"
-                        >
-                          <Calendar className="w-4 h-4 mr-2" />
-                          Schedule
-                        </Button>
-                        <Button
-                          onClick={() => handlePublishNow(story.id)}
-                          className="bg-green-600 hover:bg-green-700 text-white"
-                        >
-                          <Globe className="w-4 h-4 mr-2" />
-                          Publish Now
-                        </Button>
-                      </>
-                    )}
-
-                    {story.status === "published" && (
-                      <Button
-                        variant="outline"
-                        className="text-gray-600 border-gray-300 hover:bg-gray-50"
-                      >
-                        <Printer className="w-4 h-4 mr-2" />
-                        Print Version
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
+              <StoryCard
+                story={story}
+                getPriorityColor={getPriorityColor}
+                handlePublishNow={handlePublishNow}
+                handleSchedulePublish={handleSchedulePublish}
+              />
             ))}
           </div>
-
           {getCurrentStories().length === 0 && (
             <div className="text-center py-12">
               <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
@@ -428,12 +344,12 @@ export function PublishCenter() {
             </div>
 
             {/* Notification Options */}
-            <div className="space-y-3">
+            <div className="space-y-3 ">
               <div className="flex items-center space-x-3">
                 <Checkbox
                   id="notify-subscribers"
                   checked={notifySubscribers}
-                  onCheckedChange={setNotifySubscribers}
+                  onCheckedChange={(c) => setNotifySubscribers(c === true)}
                 />
                 <Label
                   htmlFor="notify-subscribers"
@@ -447,7 +363,7 @@ export function PublishCenter() {
                 <Checkbox
                   id="priority-publish"
                   checked={priorityPublish}
-                  onCheckedChange={setPriorityPublish}
+                  onCheckedChange={(c) => setPriorityPublish(c === true)}
                 />
                 <Label
                   htmlFor="priority-publish"

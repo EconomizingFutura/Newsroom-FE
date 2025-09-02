@@ -12,14 +12,15 @@ import {
 import {
   Search,
   Eye,
+  Download,
   FileText,
   Mic,
   Video,
   Calendar,
-  // ChevronDown,
 } from "lucide-react";
 import { HeaderIcon } from "@/utils/HeaderIcons";
 import { HistoryCard } from "@/components/ui/card";
+import { historyStats } from "@/utils/HistoryUtils";
 import { HISTORY_STATUS } from "@/utils/draftUtils";
 import { useNavigate } from "react-router";
 import { returnType } from "@/utils/utils";
@@ -187,7 +188,7 @@ const HistoryLogPage: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-5 gap-6">
-          {stats.map((item, index) => (
+          {historyStats.stats.map((item, index) => (
             <HistoryCard
               key={index}
               title={item.title}
