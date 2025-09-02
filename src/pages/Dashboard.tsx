@@ -1,6 +1,10 @@
+import { GET } from "@/api/apiMethods";
+import { API_LIST } from "@/api/endpoints";
 import ContentHeader from "@/components/ContentHeader";
 import { StatCard, DashboardListCard } from "@/components/ui/card";
 import { Clock, CheckCircle, RotateCcw, FilePen } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 
 type StatCardProps = {
   title: string;
@@ -10,47 +14,76 @@ type StatCardProps = {
 };
 
 export default function Dashboard() {
-  // Mock data for demonstration
-  const stats: StatCardProps[] = [
-    { title: "Total Posts", count: 7, icon: FilePen, color: "#155DFC" }, // blue
-    { title: "Draft", count: 5, icon: FilePen, color: "#4A5565" }, // gray
-    { title: "Submitted", count: 1, icon: Clock, color: "#2B7FFF" }, // blue
-    { title: "Approved", count: 10, icon: CheckCircle, color: "#008001" }, // green
-    { title: "Need Revision", count: 5, icon: RotateCcw, color: "#E7000B" }, // red
+  const username = localStorage.getItem('username');
+  const navigate = useNavigate();
+  const initialStats: StatCardProps[] = [
+    { title: "Total Posts", count: 0, icon: FilePen, color: "#155DFC" }, // blue
+    { title: "Draft", count: 0, icon: FilePen, color: "#4A5565" }, // gray
+    { title: "Submitted", count: 0, icon: Clock, color: "#2B7FFF" }, // blue
+    { title: "Approved", count: 0, icon: CheckCircle, color: "#008001" }, // green
+    { title: "Need Revision", count: 0, icon: RotateCcw, color: "#E7000B" }, // red
   ];
+  const [stats, setStats] = useState(initialStats);
 
   const notificationList = [
     {
+      id: "1",
       title: "Article Approved",
       message:
         'Your article "Tech Conference Interview" has been approved and published',
       buttonText: "Edit Story",
-      onClick: () => alert("Editing story..."),
     },
     {
+      id: "2",
       title: "Article Approved",
       message: 'Your article "AI in 2025" has been approved and published',
       buttonText: "Edit Story",
-      onClick: () => alert("Editing AI article..."),
     },
     {
+      id: "3",
       title: "Article Approved",
       message:
         'Your article "Blockchain Future" has been approved and published',
       buttonText: "Edit Story",
-      onClick: () => alert("Editing blockchain article..."),
     },
   ];
+
+  const handleNavigate = (id: string) => {
+    navigate(`/textArticle/${id}?from=dashboard`);
+  };
+
+  useEffect(() => {
+    const getStatsData = async () => {
+      try {
+        const response: any = await GET (API_LIST.BASE_URL + API_LIST.STATS);
+        const updatedStats = stats.map((item) => {
+          let key = item.title.toUpperCase();
+          return {
+            ...item,
+            count: response[key] ?? 0,
+          };
+        })
+        setStats(updatedStats);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    
+    getStatsData();
+  }, []);
 
   return (
     <div className="flex-1 py-16 h-screen bg-background">
       {/* Left Sidebar */}
 
       {/* Main Content */}
-      <div style={{paddingTop: '32px'}} className="flex flex-col gap-[24px] px-[24px] bg-[#F6FAF6]">
+      <div
+        style={{ paddingTop: "32px" }}
+        className="flex flex-col gap-[24px] px-[24px] bg-[#F6FAF6]"
+      >
         {/* Top Bar */}
         <ContentHeader
-          text="Welcome back, Muthu!"
+          text={`Welcome back, ${username}!`}
           description="Here's what's happening in your newsroom today."
         />
 
@@ -94,7 +127,11 @@ export default function Dashboard() {
                   <div className="flex flex-col gap-[12px]">
                     {/* Notifications */}
                     {notificationList.map((note, index) => (
-                      <DashboardListCard key={index} {...note} />
+                      <DashboardListCard
+                        key={index}
+                        {...note}
+                        onClick={handleNavigate}
+                      />
                     ))}
                   </div>
                 </div>

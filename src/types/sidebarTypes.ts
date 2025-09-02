@@ -12,7 +12,10 @@ export type currentPageType =
   | "publish-center"
   | "editor-history"
   | "editor-dashboard"
-  | "calendar";
+  | "calendar"
+  | "textArticle"
+  | "audio"
+  | "video";
 
 export interface SidebarTypes {
   onNavigateToNewsFeeds: () => void;

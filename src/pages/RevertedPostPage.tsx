@@ -1,95 +1,33 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  RotateCcw,
-  Search,
-  Grid3X3,
-  List,
-  Eye,
-  AlertCircle,
-} from "lucide-react";
+import { RotateCcw, Eye, AlertCircle } from "lucide-react";
 import ContentHeader from "@/components/ContentHeader";
 import SearchFilterTab from "@/components/SearchFilterTab";
 import SharedCard from "@/components/shared/Card";
+import {
+  DELETE_DRAFT_MODAL_ID,
+  EDIT_DRAFT_NAVIGATE,
+  getTypeColor,
+  revertedArticlesData,
+} from "@/utils/draftUtils";
+import { useNavigate } from "react-router";
+import type { RevertedArticleTypes } from "@/types/draftPageTypes";
 
-interface RevertedPostPageProps {
-  onEditReverted?: (article: any) => void;
-  onNavigateToDashboard?: () => void;
-  onNavigateToDrafts?: () => void;
-  onNavigateToHistory?: () => void;
-  onNavigateToFilteredContent?: (contentType: string) => void;
-  onCreateNewTextArticle?: () => void;
-  onCreateNewAudioArticle?: () => void;
-  onCreateNewVideoArticle?: () => void;
-}
-
-export default function RevertedPostPage({
-  onEditReverted,
-  onNavigateToFilteredContent,
-}: RevertedPostPageProps) {
+const RevertedPostPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<
     "All Type" | "Text" | "Audio" | "Video"
   >("All Type");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  type ArticleType = "Text" | "Audio" | "Video";
-  type ArticleStatus = "Auto-saved" | "Reverted";
-  interface RevertedArticle {
-    id: number;
-    title: string;
-    type: ArticleType;
-    status: ArticleStatus;
-    wordCount: number;
-    lastUpdated: string;
-    timeAgo: string;
-    reason: string;
-    editor: string;
-  }
-  // Mock reverted articles data
-  const revertedArticles: RevertedArticle[] = [
-    {
-      id: 1,
-      title: "Climate Change Report: Impact on Local Communities",
-      type: "Text",
-      status: "Reverted",
-      wordCount: 1247,
-      lastUpdated: "14/01/2025",
-      timeAgo: "Reverted 1 day ago",
-      reason:
-        "Factual inconsistencies found in paragraph 3. Sources need verification.",
-      editor: "John Smith",
-    },
-    {
-      id: 2,
-      title: "Economic Impact of Local Business Closures",
-      type: "Text",
-      status: "Reverted",
-      wordCount: 892,
-      lastUpdated: "13/01/2025",
-      timeAgo: "Reverted 2 days ago",
-      reason: "Article lacks supporting evidence for statistical claims.",
-      editor: "Sarah Johnson",
-    },
-    {
-      id: 3,
-      title: "Traffic Management Solutions for City Center",
-      type: "Text",
-      status: "Reverted",
-      wordCount: 1156,
-      lastUpdated: "12/01/2025",
-      timeAgo: "Reverted 3 days ago",
-      reason: "Interview quotes need verification and proper attribution.",
-      editor: "Mike Davis",
-    },
-  ];
+  const [data, setData] =
+    useState<RevertedArticleTypes[]>(revertedArticlesData);
 
   const filterOptions = ["All Type", "Text", "Audio", "Video"];
+  const navigate = useNavigate();
 
-  // Filter articles based on active filter
-  const filteredArticles = revertedArticles.filter((article) => {
+  const filteredArticles = data.filter((article) => {
     const matchesSearch = article.title
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
@@ -98,32 +36,40 @@ export default function RevertedPostPage({
     return matchesSearch && matchesType;
   });
 
-  const handleFilterClick = (filter: string) => {
-    setActiveFilter(filter as "All Type" | "Text" | "Audio" | "Video");
+  // const handleFilterClick = (filter: string) => {
+  //   setActiveFilter(filter as "All Type" | "Text" | "Audio" | "Video");
 
-    // Navigate to filtered content page for specific content types
-    if (filter !== "All Type") {
-      onNavigateToFilteredContent(filter);
-    }
+  //   // Navigate to filtered content page for specific content types
+  //   if (filter !== "All Type") {
+  //     onNavigateToFilteredContent(filter);
+  //   }
+  // };
+
+  const handleDelete = (id: string) => {
+    DELETE_DRAFT_MODAL_ID(
+      id,
+      (draftArticles) => {
+        const revertedArticles = draftArticles.map((draft) => ({
+          ...draft,
+          reason: "",
+          editor: "",
+        }));
+        setData(revertedArticles);
+      },
+      data
+    );
   };
 
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case "Text":
-        return "bg-blue-100 text-blue-800";
-      case "Audio":
-        return "bg-purple-100 text-purple-800";
-      case "Video":
-        return "bg-orange-100 text-orange-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
+  const handleEdit = (id: string) => {
+    const articleType = EDIT_DRAFT_NAVIGATE(id, filteredArticles);
+    navigate(`/${articleType}/${id}?from=reverted`);
   };
 
   const renderGridView = () => (
     <div className="grid grid-cols-3 gap-6">
       {filteredArticles.map((article) => (
         <SharedCard
+          id={article.id}
           key={article.id}
           title={article.title}
           updatedDate={article.lastUpdated}
@@ -133,6 +79,8 @@ export default function RevertedPostPage({
           status={article.status}
           remarkMessage={article.reason}
           contentPreview={article.title}
+          handleDelete={() => handleDelete(article.id)}
+          handleEdit={() => handleEdit(article.id)}
         />
       ))}
     </div>
@@ -171,7 +119,7 @@ export default function RevertedPostPage({
                 <Button
                   size="sm"
                   className="bg-red-600 hover:bg-red-700 text-white gap-2 ml-4"
-                  onClick={() => onEditReverted(article)}
+                  // onClick={() => onEditReverted && onEditReverted(article)}
                 >
                   <Eye className="w-3 h-3" />
                   View Details
@@ -196,7 +144,10 @@ export default function RevertedPostPage({
   return (
     <div className=" flex-1 py-16 h-screen bg-gray-50">
       {/* Main Content */}
-      <div style={{paddingTop: '32px'}} className=" flex flex-col gap-[24px] px-[24px] bg-[#F6FAF6]">
+      <div
+        style={{ paddingTop: "32px" }}
+        className=" flex flex-col gap-[24px] px-[24px] bg-[#F6FAF6]"
+      >
         <ContentHeader
           text="Reverted Post"
           description="Your saved drafts and work in progress."
@@ -245,4 +196,6 @@ export default function RevertedPostPage({
       </div>
     </div>
   );
-}
+};
+
+export default RevertedPostPage;

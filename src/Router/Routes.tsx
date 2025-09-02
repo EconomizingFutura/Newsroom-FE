@@ -1,16 +1,8 @@
-import React from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  useNavigate,
-  useLocation,
-} from "react-router-dom";
+import React, { useEffect, useMemo } from "react";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 
 import Dashboard from "@/pages/Dashboard";
-import TextArticleEditor from "@/pages/TextArticleEditor";
-import AudioArticleEditor from "@/pages/AudioArticleEditor";
-import VideoArticleEditor from "@/pages/VideoArticleEditor";
+import ContentUploader from "@/pages/ContentUploader";
 import DraftsPage from "@/pages/DraftsPage";
 import RevertedPostPage from "@/pages/RevertedPostPage";
 import HistoryLogPage from "@/pages/HistoryLogPage";
@@ -23,34 +15,41 @@ import { HistoryLog } from "@/pages/Editor/HistoryLog";
 import { PublishCenter } from "@/pages/Editor/PublishCenter";
 import { ReviewQueue } from "@/pages/Editor/ReviewQueue";
 import { Dashboard as EditorDashboard } from "@/pages/Editor/Dashboard";
-import type { currentPageType } from "@/types/sidebarTypes";
-
-export default function Layout() {
+import LoginPage from "@/pages/LoginPage";
+import { useCurrentView } from "@/hooks/useCurrentView";
+import EditArticle from "@/pages/EditArticle";
+import AuthRoute from "./AuthRoutes";
+import ProtectedRoutes from "./ProtectedRoutes";
+import PublicRoute from "./PublicRoutes";
+const Layout: React.FC = () => {
   const navigate = useNavigate();
+  const getCurrentView = useCurrentView();
+  const currentViewMemo = useMemo(() => getCurrentView, [getCurrentView]);
   const location = useLocation();
-
-  const getCurrentView = (): currentPageType => {
-    if (location.pathname.startsWith("/dashboard")) return "dashboard";
-    if (location.pathname.startsWith("/drafts")) return "drafts";
-    if (location.pathname.startsWith("/reverted")) return "reverted";
-    if (location.pathname.startsWith("/history")) return "history";
-    if (location.pathname.startsWith("/editor/dashboard"))
-      return "editor-dashboard";
-    if (location.pathname.startsWith("/editor/calendarView")) return "calendar";
-    if (location.pathname.startsWith("/editor/publishCenter"))
-      return "publish-center";
-    if (location.pathname.startsWith("/editor/reviewQueue"))
-      return "review-queue";
-    if (location.pathname.startsWith("/editor/history"))
-      return "editor-history";
-    return "newsFeeds"; // default fallback
+  const routeTitles: Record<string, string> = {
+    "/news-feeds": "Agency Feeds",
+    "/dashboard": "Dashboard",
+    "/drafts": "Drafts",
+    "/reverted": "Reverted Post",
+    "/history": "History Log",
+    "/textArticle": "Text Article",
+    "/audio": "Audio",
+    "/video": "Video",
+    "/login": "Login",
   };
-
-  const currentViewMemo = React.useMemo(
-    () => getCurrentView(),
-    [location.pathname]
-  );
-
+  
+  useEffect(() => {
+    function getTitle(pathname: string, fallback = "CIJ NewsRoom") {
+      const path = pathname.toLowerCase();
+      const match = Object.entries(routeTitles).find(([key]) => {
+        const k = key.toLowerCase();
+        return path === k || path.startsWith(k + "/");
+      });
+      return match?.[1] ?? fallback;
+    }
+    const title = "CIJ NewsRoom - "+getTitle(location.pathname);
+    document.title = title;
+  }, [location]);
   return (
     <div>
       <Navigation />
@@ -71,29 +70,190 @@ export default function Layout() {
           }
           onNavigateEditorReviewQueue={() => navigate("/editor/reviewQueue")}
           onNavigateEditorHistory={() => navigate("/editor/history")}
-          currentView={currentViewMemo} // optional, can highlight active based on location
+          currentView={currentViewMemo}
         />
         <div className="flex-1 w-full h-screen overflow-y-auto">
           <Routes>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/textArticle" element={<TextArticleEditor />} />
-            <Route path="/audio" element={<AudioArticleEditor />} />
-            <Route path="/video" element={<VideoArticleEditor />} />
-            <Route path="/drafts" element={<DraftsPage />} />
-            <Route path="/reverted" element={<RevertedPostPage />} />
-            <Route path="/history" element={<HistoryLogPage />} />
-            <Route path="/filtered/:type" element={<FilteredContentPage />} />
-            <Route path="/news-feeds" element={<NewsFeedsPage />} />
+            <Route
+              path="/dashboard"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="reporter">
+                    <Dashboard />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
+            <Route
+              path="/textArticle"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="reporter">
+                    <ContentUploader />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
+            <Route
+              path="/audio"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="reporter">
+                    <ContentUploader />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
+            <Route
+              path="/video"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="reporter">
+                    <ContentUploader />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
+            <Route
+              path="/drafts"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="reporter">
+                    <DraftsPage />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
+
+            <Route
+              path="/reverted"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="reporter">
+                    <RevertedPostPage />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
+
+            <Route
+              path="/history"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="reporter">
+                    <HistoryLogPage />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
+
+            <Route
+              path="/filtered/:type"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="reporter">
+                    <FilteredContentPage />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
+
+            <Route
+              path="/news-feeds"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="reporter">
+                    <NewsFeedsPage />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
+
+            <Route
+              path="/:textArticle/:id"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="reporter">
+                    <EditArticle />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
 
             {/* Editor */}
-            <Route path="/editor/dashboard" element={<EditorDashboard />} />
-            <Route path="/editor/calendarView" element={<CalendarView />} />
-            <Route path="/editor/history" element={<HistoryLog />} />
-            <Route path="/editor/publishCenter" element={<PublishCenter />} />
-            <Route path="/editor/reviewQueue" element={<ReviewQueue />} />
+            <Route
+              path="/editor/dashboard"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="editor">
+                    <EditorDashboard />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
+
+            <Route
+              path="/editor/calendarView"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="editor">
+                    <CalendarView />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
+
+            <Route
+              path="/editor/history"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="editor">
+                    <HistoryLog />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
+
+            <Route
+              path="/editor/publishCenter"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="editor">
+                    <PublishCenter />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
+
+            <Route
+              path="/editor/reviewQueue"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="editor">
+                    <ReviewQueue />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
           </Routes>
         </div>
       </div>
     </div>
+  );
+};
+
+export default function AppRoutes() {
+  return (
+    <Routes>
+      <Route
+        path="/login"
+        element={
+          <PublicRoute>
+            <LoginPage />
+          </PublicRoute>
+        }
+      />
+      <Route path="/*" element={<Layout />} />
+    </Routes>
   );
 }

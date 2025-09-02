@@ -2,6 +2,14 @@ import { Bell } from "lucide-react";
 import cijlogo from "../assets/cijlogo.png";
 
 const Navigation = () => {
+  function capitalizeFirstLetter(str: string) {
+    if (!str) return "";
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+  
+  const username = localStorage.getItem('username');
+  const displayRole = capitalizeFirstLetter(localStorage.getItem('role') ?? '');
+
   return (
     <header className="w-full bg-[#ffffff] z-50 fixed border-b border-border shadow-[0px_4px_24px_0px_#959DA533]">
       <div className=" mx-auto flex justify-between items-center py-2 px-6">
@@ -30,8 +38,8 @@ const Navigation = () => {
               U
             </div>
             <div className="leading-tight">
-              <p className="text-sm font-semibold text-gray-800">User</p>
-              <p className="text-xs text-gray-500">Reporter</p>
+              <p className="text-sm font-semibold text-gray-800">{username}</p>
+              <p className="text-xs text-gray-500">{displayRole}</p>
             </div>
           </div>
         </div>

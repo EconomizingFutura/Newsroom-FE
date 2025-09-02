@@ -12,14 +12,15 @@ type NotificationCardProps = {
   title: string;
   message: string;
   buttonText: string;
-  onClick: () => void;
+  id: string;
+  onClick: (id: string) => void;
 };
 
 interface StatsCardProps {
   title: string;
   value: string | number;
-  pillBg?: string;      // Tailwind bg color class for title pill
-  pillText?: string;    // Tailwind text color class for title text
+  pillBg?: string; // Tailwind bg color class for title pill
+  pillText?: string; // Tailwind text color class for title text
 }
 
 function Card({ className, ...props }: React.ComponentProps<"div">) {
@@ -28,7 +29,7 @@ function Card({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="card"
       className={cn(
         "bg-card text-card-foreground flex flex-col gap-6 rounded-xl border",
-        className,
+        className
       )}
       {...props}
     />
@@ -41,7 +42,7 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="card-header"
       className={cn(
         "@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 pt-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6",
-        className,
+        className
       )}
       {...props}
     />
@@ -74,7 +75,7 @@ function CardAction({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="card-action"
       className={cn(
         "col-start-2 row-span-2 row-start-1 self-start justify-self-end",
-        className,
+        className
       )}
       {...props}
     />
@@ -101,7 +102,7 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-function StatCard({ title, count, icon: Icon, color } : StatCardProps) {
+function StatCard({ title, count, icon: Icon, color }: StatCardProps) {
   return (
     <div className="flex items-center justify-between rounded-2xl shadow-md bg-white p-5 w-56">
       {/* Left Section */}
@@ -118,7 +119,13 @@ function StatCard({ title, count, icon: Icon, color } : StatCardProps) {
   );
 }
 
-function DashboardListCard ({ title, message, buttonText, onClick }: NotificationCardProps) {
+function DashboardListCard({
+  title,
+  message,
+  buttonText,
+  id,
+  onClick,
+}: NotificationCardProps) {
   return (
     <div className="flex items-center justify-between bg-red-50 rounded-xl p-4 shadow-sm">
       {/* Left Section */}
@@ -129,7 +136,7 @@ function DashboardListCard ({ title, message, buttonText, onClick }: Notificatio
 
       {/* Right Button */}
       <button
-        onClick={onClick}
+        onClick={() => onClick(id)}
         className="px-4 py-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 text-white font-medium hover:from-red-600 hover:to-red-700 transition"
       >
         {buttonText}
@@ -138,21 +145,23 @@ function DashboardListCard ({ title, message, buttonText, onClick }: Notificatio
   );
 }
 
-function HistoryCard ({
+function HistoryCard({
   title,
   value,
   pillBg = "bg-gray-100",
   pillText = "text-gray-600",
-} : StatsCardProps) {
+}: StatsCardProps) {
   return (
     <div className="bg-white rounded-2xl shadow-md p-6 flex flex-col items-center justify-center">
-      <div className={`text-[14px] font-[600] px-6 py-2 rounded-full ${pillBg} ${pillText}`}>
+      <div
+        className={`text-[14px] font-[600] px-6 py-2 rounded-full ${pillBg} ${pillText}`}
+      >
         {title}
       </div>
-      <div className='text-3xl font-bold mt-4'>{value}</div>
+      <div className="text-3xl font-bold mt-4">{value}</div>
     </div>
   );
-};
+}
 
 export {
   Card,
@@ -164,5 +173,5 @@ export {
   CardContent,
   StatCard,
   DashboardListCard,
-  HistoryCard
+  HistoryCard,
 };
