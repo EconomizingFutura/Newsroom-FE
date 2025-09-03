@@ -10,13 +10,8 @@ import VideoPlayer from "@/components/ui/VideoPlayer";
 import { Controller, useForm } from "react-hook-form";
 import { API_LIST } from "@/api/endpoints";
 import { GET, PATCH, POST } from "@/api/apiMethods";
-import { useEffect } from "react";
-
-interface TextArticleEditorProps {
-  article?: any;
-  onBack?: () => void;
-  onNavigateToNewsFeeds?: () => void;
-}
+import { useEffect, useState } from "react";
+import SaveDraftsUI from "@/components/SaveDraftUI";
 
 type FormData = {
   title: string;
@@ -31,12 +26,29 @@ type FormData = {
   thumbnail: string;
 };
 
-const ContentUploader = ({}: TextArticleEditorProps) => {
+const ContentUploader = () => {
   const location = useLocation();
   const navigate = useNavigate();
-
-  // derive current path from router
-  const path = location.pathname.replace("/", ""); // textArticle | audio | video
+  const [submit, setSubmit] = useState<{
+    type: "draft" | "submit" | null;
+    isSubmit: boolean;
+  }>({
+    type: null,
+    isSubmit: false,
+  });
+  const handleSubmitUI = (type: "draft" | "submit") => {
+    setSubmit((prev) => ({
+      type: type,
+      isSubmit: !prev.isSubmit,
+    }));
+  };
+  const handleCloseUI = () => {
+    setSubmit((prev) => ({
+      type: null,
+      isSubmit: !prev.isSubmit,
+    }));
+  };
+  const path = location.pathname.replace("/", "");
 
   const tabs = [
     { id: "textArticle", name: "Text Article" },
@@ -44,12 +56,15 @@ const ContentUploader = ({}: TextArticleEditorProps) => {
     { id: "video", name: "Video Post" },
   ];
 
-  // header config by path
   const headerConfig: Record<
     string,
     { label: string; color: string; icon: string }
   > = {
-    textArticle: { label: "Create Text Article", color: "#2B7FFF", icon: "Text Article" },
+    textArticle: {
+      label: "Create Text Article",
+      color: "#2B7FFF",
+      icon: "Text Article",
+    },
     audio: { label: "Create Audio Post", color: "#ab3fff", icon: "audio" },
     video: { label: "Create Video Post", color: "#9f2e00", icon: "video" },
   };
@@ -68,23 +83,30 @@ const ContentUploader = ({}: TextArticleEditorProps) => {
     const actionName = e.nativeEvent.submitter.name; // "draft" | "save"
     try {
       if (actionName.toLowerCase() === "draft") {
-        if(reporterId){
-          const response: any = await PATCH(API_LIST.BASE_URL + API_LIST.DRAFT_BY_ARTICLE + reporterId, data);
-          if(response.id){
-            setValue('reporterId', response.id);
-            navigate("/drafts")
+        if (reporterId) {
+          const response: any = await PATCH(
+            API_LIST.BASE_URL + API_LIST.DRAFT_BY_ARTICLE + reporterId,
+            data
+          );
+          if (response.id) {
+            setValue("reporterId", response.id);
+            navigate("/drafts");
           }
-        }else {
-          const response: any = await POST(API_LIST.BASE_URL + API_LIST.DRAFT_ARTICLE, data);
-          if(response.id){
-            setValue('reporterId', response.id);
-            navigate("/drafts")
+        } else {
+          const response: any = await POST(
+            API_LIST.BASE_URL + API_LIST.DRAFT_ARTICLE,
+            data
+          );
+          if (response.id) {
+            setValue("reporterId", response.id);
+            navigate("/drafts");
           }
         }
-      }
-      else if (actionName.toLowerCase() === "save") {
+        handleSubmitUI("draft");
+      } else if (actionName.toLowerCase() === "save") {
         const response: any = await POST(API_LIST.SUBMIT_ARTICLE, data);
-        console.log(response, 'POST1');
+        console.log(response, "POST1");
+        handleSubmitUI("draft");
       }
 
       console.log("✅ Submitted:", data);
@@ -93,19 +115,28 @@ const ContentUploader = ({}: TextArticleEditorProps) => {
     }
   };
 
-  const { register, handleSubmit,  reset, setValue, control, watch, formState: { errors }, } = useForm<FormData>({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    control,
+    watch,
+    formState: { errors },
+  } = useForm<FormData>({
     defaultValues: {
-    title: "",
-    category: "Politics",
-    tags: [],
-    newTag: "",
-    content: "",
-    audio: null,
-    video: null,
-    status: "",
-    reporterId: null,
-    thumbnail: "",
-  }});
+      title: "",
+      category: "Politics",
+      tags: [],
+      newTag: "",
+      content: "",
+      audio: null,
+      video: null,
+      status: "",
+      reporterId: null,
+      thumbnail: "",
+    },
+  });
 
   const tags = watch("tags");
   const newTag = watch("newTag");
@@ -122,7 +153,10 @@ const ContentUploader = ({}: TextArticleEditorProps) => {
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
-    setValue( "tags", tags.filter((tag) => tag !== tagToRemove) );
+    setValue(
+      "tags",
+      tags.filter((tag) => tag !== tagToRemove)
+    );
   };
 
   useEffect(() => {
@@ -139,7 +173,7 @@ const ContentUploader = ({}: TextArticleEditorProps) => {
       thumbnail: "",
     });
   }, [path, reset]);
-  
+
   return (
     <div className="min-h-screen bg-[#f6faf6]">
       {/* Header */}
@@ -204,176 +238,219 @@ const ContentUploader = ({}: TextArticleEditorProps) => {
           </div>
 
           {/* Form  */}
-          <form id="myForm" onSubmit={handleSubmit(submitForReview)} >
-          <div className="bg-white border-b border-gray-200 px-6 py-4 rounded-2xl shadow-md">
-            <div className="flex items-center justify-between pt-[8px] pb-[32px]">
-              <h2 className="text-lg font-medium">Content Editor</h2>
-              <div className="flex gap-[12px]"> 
-                {/* {formData.status.toLowerCase() == 'draft' && <span className="px-[12px] py-[4px] text-sm text-[#6A7282] rounded-lg bg-[#F8FAF9] border-1 border-[#E5E7EB]">Draft</span>}
+          <form id="myForm" onSubmit={handleSubmit(submitForReview)}>
+            <div className="bg-white border-b border-gray-200 px-6 py-4 rounded-2xl shadow-md">
+              <div className="flex items-center justify-between pt-[8px] pb-[32px]">
+                <h2 className="text-lg font-medium">Content Editor</h2>
+                <div className="flex gap-[12px]">
+                  {/* {formData.status.toLowerCase() == 'draft' && <span className="px-[12px] py-[4px] text-sm text-[#6A7282] rounded-lg bg-[#F8FAF9] border-1 border-[#E5E7EB]">Draft</span>}
                 {formData.status.toLowerCase() == 'submitted' && <span className="px-[12px] py-[4px] text-sm text-[#006601] rounded-lg bg-[#f8faf9] border-1 border-[#B3E6B3]">Auto-saved</span>} */}
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-[24px]">
-              <div>
-              <div className="flex items-center gap-2 mb-[8px]">
-                <label className="text-600 font-medium">Select Category</label>
-                <span className="text-600">*</span>
-              </div>
-
-              <div className="flex gap-[12px] flex-wrap">
-                {categories.map((category) => (
-                  <Button
-                    type="button"
-                    key={category}
-                    variant= {watch("category") === category ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setValue("category", category)}
-                    className={`px-[24px] py-[6px] ${
-                      watch("category") === category
-                        ? " bg-[#008001] hover:bg-green-700"
-                        : "bg-[#F8FAF9]"}
-                    `}
-                  >
-                    {category}
-                  </Button>
-                ))}
-              </div>
-              </div>
-
-              {/* Title */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <label className="text-600 font-medium">Title</label>
-                  <span className="text-600">*</span>
                 </div>
-
-                <Input
-                  placeholder="Title"
-                  {...register("title", { required: "Title is required" })}
-                  className={`bg-[#f7fbf8] border-[#ECECEC] border-1 ${errors.title?'border-red-500':''}`}
-                />
               </div>
-            
-            {/* Content Editor */}
-            {path === "textArticle" && ( <>
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <label className="text-600 font-medium">Content</label>
-                  <span className="text-600">*</span>
-                </div>
 
-                <Controller
-                  control={control}
-                  name="content"
-                  rules={{
-                    validate: (value) => {
-                      if (path === "textArticle" && !value || value.trim() === "<p><br></p>") {
-                        return "Content is required";
-                      }
-                    }
-                  }}
-                  render={({ field }) => (
-                    <CustomQuilTextEditor
-                      selectedValue={field.value}
-                      onChange={field.onChange}
-                      placeholder="Write something..."
-                    />
-                  )}
-                />
-              </div>
-            </>)}
-
-              {/** Audio */}
-              {path === "audio" && ( <>
-                {!audio && <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl p-10 text-center">
-                  <div className="mx-auto w-16 h-16 rounded-full bg-purple-100 text-[#a32fff] flex items-center justify-center">
-                    <Mic className="h-6 w-6" />
-                  </div>
-                  <p className="mt-6 font-medium">Upload audio file</p>
-                  <p className="text-sm text-gray-500 mt-1">Supports MP3, WAV, M4A (Max 100MB)</p>
-                  <label className="inline-flex items-center gap-2 mt-6 bg-green-100 text-green-800 px-4 py-2 rounded-xl cursor-pointer">
-                    <Upload className="h-4 w-4" />
-                    <span>Choose File</span>
-                    <input type="file" accept=".mp3,.wav,.m4a" hidden 
-                    {...register("audio", {
-                      validate: (file) => {
-                        if (path === "audio" && !file) {
-                          return "Audio is required";
-                        }
-                        return true;
-                      },
-                    })}
-                    onChange={(e) => setValue("audio", e.target.files?.[0] || null)}/>
-                  </label>
-                </div>}
-                {audio && 
-                  <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl text-center">
-                    <AudioPlayer src={audio} fileName='' />
-                  </div>
-                }
-                </>
-              )}
-              
-                {/**Video */}
-                {path === "video" && ( <>
-                  {!video &&<div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl p-10 text-center">
-                    <div className="mx-auto w-16 h-16 rounded-full bg-orange-100 text-[#9f2e00] flex items-center justify-center">
-                      <Video className="h-6 w-6" />
-                    </div>
-                    <p className="mt-6 font-medium">Upload video</p>
-                    <p className="text-sm text-gray-500 mt-1">Drag & drop your video file or click to browse</p>
-                    <p className="text-sm text-gray-500">Supports MP4, MOV, AVI (Max 500MB)</p>
-                    <label className="inline-flex items-center gap-2 mt-6 bg-orange-700 text-white px-4 py-2 rounded-xl cursor-pointer">
-                      <Upload className="h-4 w-4" />
-                      <span>Choose File</span>
-                      <input type="file" accept=".mp4,.mov,.avi" hidden 
-                      {...register("video", {
-                        validate: (file) => {
-                          if (path === "video" && !file) {
-                            return "Video is required";
-                          }
-                          return true;
-                        },
-                      })}
-                      onChange={(e) => setValue("video", e.target.files?.[0] || null)}/>
+              <div className="flex flex-col gap-[24px]">
+                <div>
+                  <div className="flex items-center gap-2 mb-[8px]">
+                    <label className="text-600 font-medium">
+                      Select Category
                     </label>
-                  </div>}
-                  {video && 
-                  <VideoPlayer 
-                    src={video}
-                    onThumbnailGenerated={(thumb) => setValue("thumbnail", thumb)}
-                    onDelete={() => {
-                      setValue("video", null);
-                      setValue("thumbnail", "");
-                    }}
-                  />
-                  }
-                </>)}
+                    <span className="text-600">*</span>
+                  </div>
 
-                {path === "video" && ( <>      
-              <div>
-                <label className="block text-sm font-medium">Thumbnail Preview</label>
-                <div className="mt-2 h-28 w-full bg-gray-100 rounded-xl">
-                {thumbnail && (
-                    <img
-                      src={thumbnail}
-                      alt="Generated Thumbnail"
-                      className="h-full w-full object-cover"
-                    />
-                  )}
+                  <div className="flex gap-[12px] flex-wrap">
+                    {categories.map((category) => (
+                      <Button
+                        type="button"
+                        key={category}
+                        variant={
+                          watch("category") === category ? "default" : "outline"
+                        }
+                        size="sm"
+                        onClick={() => setValue("category", category)}
+                        className={`px-[24px] py-[6px] ${
+                          watch("category") === category
+                            ? " bg-[#008001] hover:bg-green-700"
+                            : "bg-[#F8FAF9]"
+                        }
+                    `}
+                      >
+                        {category}
+                      </Button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-      </>)}
 
-        {/* Tags Section */}
-        <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <label className="text-600 font-medium">Tag</label>
-                      <span className="text-600">*</span>
+                {/* Title */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <label className="text-600 font-medium">Title</label>
+                    <span className="text-600">*</span>
+                  </div>
+
+                  <Input
+                    placeholder="Title"
+                    {...register("title", { required: "Title is required" })}
+                    className={`bg-[#f7fbf8] border-[#ECECEC] border-1 ${
+                      errors.title ? "border-red-500" : ""
+                    }`}
+                  />
+                </div>
+
+                {/* Content Editor */}
+                {path === "textArticle" && (
+                  <>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <label className="text-600 font-medium">Content</label>
+                        <span className="text-600">*</span>
+                      </div>
+
+                      <Controller
+                        control={control}
+                        name="content"
+                        rules={{
+                          validate: (value) => {
+                            if (
+                              (path === "textArticle" && !value) ||
+                              value.trim() === "<p><br></p>"
+                            ) {
+                              return "Content is required";
+                            }
+                          },
+                        }}
+                        render={({ field }) => (
+                          <CustomQuilTextEditor
+                            selectedValue={field.value}
+                            onChange={field.onChange}
+                            placeholder="Write something..."
+                          />
+                        )}
+                      />
                     </div>
+                  </>
+                )}
 
-                    <div className="flex items-center gap-2">
+                {/** Audio */}
+                {path === "audio" && (
+                  <>
+                    {!audio && (
+                      <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl p-10 text-center">
+                        <div className="mx-auto w-16 h-16 rounded-full bg-purple-100 text-[#a32fff] flex items-center justify-center">
+                          <Mic className="h-6 w-6" />
+                        </div>
+                        <p className="mt-6 font-medium">Upload audio file</p>
+                        <p className="text-sm text-gray-500 mt-1">
+                          Supports MP3, WAV, M4A (Max 100MB)
+                        </p>
+                        <label className="inline-flex items-center gap-2 mt-6 bg-green-100 text-green-800 px-4 py-2 rounded-xl cursor-pointer">
+                          <Upload className="h-4 w-4" />
+                          <span>Choose File</span>
+                          <input
+                            type="file"
+                            accept=".mp3,.wav,.m4a"
+                            hidden
+                            {...register("audio", {
+                              validate: (file) => {
+                                if (path === "audio" && !file) {
+                                  return "Audio is required";
+                                }
+                                return true;
+                              },
+                            })}
+                            onChange={(e) =>
+                              setValue("audio", e.target.files?.[0] || null)
+                            }
+                          />
+                        </label>
+                      </div>
+                    )}
+                    {audio && (
+                      <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl text-center">
+                        <AudioPlayer src={audio} fileName="" />
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {/**Video */}
+                {path === "video" && (
+                  <>
+                    {!video && (
+                      <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl p-10 text-center">
+                        <div className="mx-auto w-16 h-16 rounded-full bg-orange-100 text-[#9f2e00] flex items-center justify-center">
+                          <Video className="h-6 w-6" />
+                        </div>
+                        <p className="mt-6 font-medium">Upload video</p>
+                        <p className="text-sm text-gray-500 mt-1">
+                          Drag & drop your video file or click to browse
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Supports MP4, MOV, AVI (Max 500MB)
+                        </p>
+                        <label className="inline-flex items-center gap-2 mt-6 bg-orange-700 text-white px-4 py-2 rounded-xl cursor-pointer">
+                          <Upload className="h-4 w-4" />
+                          <span>Choose File</span>
+                          <input
+                            type="file"
+                            accept=".mp4,.mov,.avi"
+                            hidden
+                            {...register("video", {
+                              validate: (file) => {
+                                if (path === "video" && !file) {
+                                  return "Video is required";
+                                }
+                                return true;
+                              },
+                            })}
+                            onChange={(e) =>
+                              setValue("video", e.target.files?.[0] || null)
+                            }
+                          />
+                        </label>
+                      </div>
+                    )}
+                    {video && (
+                      <VideoPlayer
+                        src={video}
+                        onThumbnailGenerated={(thumb) =>
+                          setValue("thumbnail", thumb)
+                        }
+                        onDelete={() => {
+                          setValue("video", null);
+                          setValue("thumbnail", "");
+                        }}
+                      />
+                    )}
+                  </>
+                )}
+
+                {path === "video" && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium">
+                        Thumbnail Preview
+                      </label>
+                      <div className="mt-2 h-28 w-full bg-gray-100 rounded-xl">
+                        {thumbnail && (
+                          <img
+                            src={thumbnail}
+                            alt="Generated Thumbnail"
+                            className="h-full w-full object-cover"
+                          />
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* Tags Section */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <label className="text-600 font-medium">Tag</label>
+                    <span className="text-600">*</span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
                     <div className="relative w-full">
                       <Input
                         {...register("newTag")}
@@ -398,17 +475,18 @@ const ContentUploader = ({}: TextArticleEditorProps) => {
                     </div>
                   </div>
 
-                    <div className="flex gap-2 flex-wrap">
-                      <Controller
-                        name="tags"
-                        control={control}
-                        rules={{
-                          validate: (tags) => tags.length > 0 || "At least one tag is required",
-                        }}
-                        render={({ field }) => (
-                          <>
-                            {field.value.map((tag: string, index: number) => (
-                              <Badge
+                  <div className="flex gap-2 flex-wrap">
+                    <Controller
+                      name="tags"
+                      control={control}
+                      rules={{
+                        validate: (tags) =>
+                          tags.length > 0 || "At least one tag is required",
+                      }}
+                      render={({ field }) => (
+                        <>
+                          {field.value.map((tag: string, index: number) => (
+                            <Badge
                               key={index}
                               variant="secondary"
                               className="gap-2 px-3 py-1 text-[#008001] bg-[#f8faf9] border-[#B3E6B3]"
@@ -421,18 +499,20 @@ const ContentUploader = ({}: TextArticleEditorProps) => {
                                 <X className="w-3 h-3" />
                               </button>
                             </Badge>
-                            ))}
-                          </>
-                        )}
-                      />
-                    </div>
+                          ))}
+                        </>
+                      )}
+                    />
                   </div>
+                </div>
+              </div>
             </div>
-
-          </div>
           </form>
         </div>
       </header>
+      {submit.isSubmit && submit.type && (
+        <SaveDraftsUI saveType={submit.type} onCancel={handleCloseUI} />
+      )}
     </div>
   );
 };

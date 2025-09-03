@@ -13,7 +13,11 @@ import {
   revertedArticlesData,
 } from "@/utils/draftUtils";
 import { useNavigate } from "react-router";
-import type { RevertedArticleTypes } from "@/types/draftPageTypes";
+import type {
+  DeleteArticleProps,
+  RevertedArticleTypes,
+} from "@/types/draftPageTypes";
+import DeleteConfirmation from "@/components/DeleteConfirmation";
 
 const RevertedPostPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -23,9 +27,20 @@ const RevertedPostPage: React.FC = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [data, setData] =
     useState<RevertedArticleTypes[]>(revertedArticlesData);
-
+  const [deletePost, setDeletePost] = useState<DeleteArticleProps>({
+    id: null,
+    isOpen: false,
+  });
   const filterOptions = ["All Type", "Text", "Audio", "Video"];
   const navigate = useNavigate();
+
+  const handleDeletePost = (id: string) => {
+    console.log(id);
+    setDeletePost((pre) => ({
+      id,
+      isOpen: !pre.isOpen,
+    }));
+  };
 
   const filteredArticles = data.filter((article) => {
     const matchesSearch = article.title
@@ -45,9 +60,12 @@ const RevertedPostPage: React.FC = () => {
   //   }
   // };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = () => {
+    if (!deletePost.id) {
+      return;
+    }
     DELETE_DRAFT_MODAL_ID(
-      id,
+      deletePost.id,
       (draftArticles) => {
         const revertedArticles = draftArticles.map((draft) => ({
           ...draft,
@@ -58,6 +76,10 @@ const RevertedPostPage: React.FC = () => {
       },
       data
     );
+    setDeletePost((pre) => ({
+      id: null,
+      isOpen: !pre.isOpen,
+    }));
   };
 
   const handleEdit = (id: string) => {
@@ -79,7 +101,7 @@ const RevertedPostPage: React.FC = () => {
           status={article.status}
           remarkMessage={article.reason}
           contentPreview={article.title}
-          handleDelete={() => handleDelete(article.id)}
+          handleDelete={() => handleDeletePost(article.id)}
           handleEdit={() => handleEdit(article.id)}
         />
       ))}
@@ -194,6 +216,17 @@ const RevertedPostPage: React.FC = () => {
           )}
         </div>
       </div>
+      {deletePost.isOpen && (
+        <DeleteConfirmation
+          onConfirm={handleDelete}
+          onCancel={() =>
+            setDeletePost((pre) => ({
+              id: null,
+              isOpen: !pre.isOpen,
+            }))
+          }
+        />
+      )}
     </div>
   );
 };

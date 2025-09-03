@@ -18,6 +18,7 @@ import CustomQuilTextEditor from "@/components/ui/CustomQuilTextEditor";
 import AudioPlayer from "@/components/ui/AudioPlayer";
 import EditorRemarks from "@/components/EditorRemarks";
 import { StatusBadge } from "@/components/StatusBadge";
+import SaveDraftsUI from "@/components/SaveDraftUI";
 
 // ---------- Types ----------
 type FormData = {
@@ -38,6 +39,25 @@ const EditArticle = () => {
   const [searchParams] = useSearchParams();
   const from = searchParams.get("from");
 
+  const [submit, setSubmit] = useState<{
+    type: "draft" | "submit" | null;
+    isSubmit: boolean;
+  }>({
+    type: null,
+    isSubmit: false,
+  });
+  const handleSubmitUI = (type: "draft" | "submit") => {
+    setSubmit((prev) => ({
+      type: type,
+      isSubmit: !prev.isSubmit,
+    }));
+  };
+  const handleCloseUI = () => {
+    setSubmit((prev) => ({
+      type: null,
+      isSubmit: !prev.isSubmit,
+    }));
+  };
   const handleBack = () => {
     if (from) {
       navigate(`/${from}`);
@@ -174,6 +194,7 @@ const EditArticle = () => {
       console.log("✅ Status:", status);
       console.log("✅ Form submitted:", formData);
     }
+    handleSubmitUI(status ? "submit" : "draft");
   };
 
   return (
@@ -413,6 +434,9 @@ const EditArticle = () => {
             </div>
           </form>
         </div>
+        {submit.isSubmit && submit.type && (
+          <SaveDraftsUI saveType={submit.type} onCancel={handleCloseUI} />
+        )}
       </header>
     </div>
   );

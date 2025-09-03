@@ -37,7 +37,7 @@ const Layout: React.FC = () => {
     "/video": "Video",
     "/login": "Login",
   };
-  
+
   useEffect(() => {
     function getTitle(pathname: string, fallback = "CIJ NewsRoom") {
       const path = pathname.toLowerCase();
@@ -47,8 +47,9 @@ const Layout: React.FC = () => {
       });
       return match?.[1] ?? fallback;
     }
-    const title = "CIJ NewsRoom - "+getTitle(location.pathname);
+    const title = "CIJ NewsRoom - " + getTitle(location.pathname);
     document.title = title;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
   return (
     <div>

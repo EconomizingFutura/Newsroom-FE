@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router";
+
 export const returnType = (type: string) => {
   let route: string;
 
@@ -24,4 +26,9 @@ export const TOKEN = () => {
 
 export const USER_ROLE = () => {
   return localStorage.getItem("role");
+};
+
+export const LOGOUT = () => {
+  localStorage.clear();
+  window.location.href = "/login";
 };

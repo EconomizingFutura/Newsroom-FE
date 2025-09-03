@@ -60,3 +60,8 @@ export interface RevertedArticleTypes {
   reason: string;
   editor: string;
 }
+
+export interface DeleteArticleProps {
+  id: string | null;
+  isOpen: boolean;
+}

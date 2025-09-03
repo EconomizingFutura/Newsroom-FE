@@ -6,7 +6,11 @@ import { Edit, Trash2 } from "lucide-react";
 import ContentHeader from "@/components/ContentHeader";
 import SearchFilterTab from "@/components/SearchFilterTab";
 import SharedCard from "@/components/shared/Card";
-import { draftArticles, type DraftArticle } from "@/types/draftPageTypes";
+import {
+  draftArticles,
+  type DeleteArticleProps,
+  type DraftArticle,
+} from "@/types/draftPageTypes";
 import {
   DELETE_DRAFT_MODAL_ID,
   EDIT_DRAFT_NAVIGATE,
@@ -15,6 +19,7 @@ import {
 } from "@/utils/draftUtils";
 import { useNavigate } from "react-router";
 import EmptyStateComponent from "@/components/EmptyStateComponent";
+import DeleteConfirmation from "@/components/DeleteConfirmation";
 
 export default function DraftsPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -25,7 +30,10 @@ export default function DraftsPage() {
   const [data, setData] = useState<DraftArticle[]>(draftArticles);
   const navigate = useNavigate();
   const filterOptions = ["All Type", "Text", "Audio", "Video"];
-
+  const [deletePost, setDeletePost] = useState<DeleteArticleProps>({
+    id: null,
+    isOpen: false,
+  });
   const filteredArticles = data.filter((article) => {
     const matchesSearch = article.title
       .toLowerCase()
@@ -54,8 +62,23 @@ export default function DraftsPage() {
     );
   };
 
-  const handleDelete = (id: string) => {
-    DELETE_DRAFT_MODAL_ID(id, setData, data);
+  const handleDeletePost = (id: string) => {
+    console.log(id);
+    setDeletePost((pre) => ({
+      id,
+      isOpen: !pre.isOpen,
+    }));
+  };
+
+  const handleDelete = () => {
+    if (!deletePost.id) {
+      return;
+    }
+    DELETE_DRAFT_MODAL_ID(deletePost.id, setData, data);
+    setDeletePost((pre) => ({
+      id: null,
+      isOpen: !pre.isOpen,
+    }));
   };
 
   const handleEdit = (id: string) => {
@@ -77,7 +100,7 @@ export default function DraftsPage() {
           status={article.status}
           remarkMessage={""}
           contentPreview={article.title}
-          handleDelete={() => handleDelete(article.id)}
+          handleDelete={() => handleDeletePost(article.id)}
           handleEdit={() => handleEdit(article.id)}
         />
       ))}
@@ -177,6 +200,17 @@ export default function DraftsPage() {
             : renderListView()}
         </div>
       </div>
+      {deletePost.isOpen && (
+        <DeleteConfirmation
+          onConfirm={handleDelete}
+          onCancel={() =>
+            setDeletePost((pre) => ({
+              id: null,
+              isOpen: !pre.isOpen,
+            }))
+          }
+        />
+      )}
     </div>
   );
 }
