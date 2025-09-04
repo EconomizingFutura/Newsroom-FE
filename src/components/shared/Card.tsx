@@ -10,7 +10,7 @@ type CardProps = {
   wordCount?: number;
   savedTime?: string;
   type?: "Text" | "All Type" | "Audio" | "Video" | undefined;
-  status?: "Auto-saved" | "Reverted";
+  status?: "Auto-saved" | "REVERTED";
   remarkMessage?: string;
   handleDelete: (id: string) => void;
   handleEdit: (id: string) => void;
@@ -29,6 +29,7 @@ const Card: React.FC<CardProps> = ({
   handleDelete,
   handleEdit,
 }) => {
+  console.log("status", status);
   // const EDITNAVIGATE = (id: string) => {
   //   console.log("Edit article with ID:", id);
   // };
@@ -63,7 +64,7 @@ const Card: React.FC<CardProps> = ({
       )}
 
       {/* Remark Block */}
-      {status === "Reverted" && (
+      {status === "REVERTED" && (
         <div className="mt-3 p-3 border border-red-300 bg-red-50 rounded-lg text-sm text-red-700">
           <div className="flex gap-[8px]">
             <MessageSquare size={18} />

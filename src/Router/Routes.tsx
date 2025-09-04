@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo } from "react";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 
-import Dashboard from "@/pages/Dashboard";
+import Dashboard from "@/pages/Reporter/Dashboard";
 import ContentUploader from "@/pages/ContentUploader";
 import DraftsPage from "@/pages/DraftsPage";
-import RevertedPostPage from "@/pages/RevertedPostPage";
+import RevertedPostPage from "@/pages/Reporter/RevertedPost/RevertedPostPage";
 import HistoryLogPage from "@/pages/HistoryLogPage";
 import FilteredContentPage from "@/pages/FilteredContentPage";
 import NewsFeedsPage from "@/pages/NewsFeedsPage";

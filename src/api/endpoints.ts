@@ -8,4 +8,5 @@ export const API_LIST = Object.freeze({
   SUBMIT_ARTICLE: import.meta.env.VITE_SUBMIT,
   DRAFT_ARTICLE: import.meta.env.VITE_DRAFT,
   DRAFT_BY_ARTICLE: import.meta.env.VITE_DRAFT_BY_ID,
+  REVERTED_POST: import.meta.env.VITE_REVERTED_POST,
 });

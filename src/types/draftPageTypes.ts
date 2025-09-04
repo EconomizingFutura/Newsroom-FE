@@ -1,5 +1,5 @@
 export type ArticleType = "Text" | "Audio" | "Video";
-export type ArticleStatus = "Auto-saved" | "Reverted";
+export type ArticleStatus = "Auto-saved" | "REVERTED";
 export interface DraftArticle {
   id: string;
   title: string;
@@ -57,7 +57,7 @@ export interface RevertedArticleTypes {
   wordCount: number;
   lastUpdated: string;
   timeAgo: string;
-  reason: string;
+  remarks: string;
   editor: string;
 }
 

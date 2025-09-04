@@ -12,8 +12,8 @@ type NotificationCardProps = {
   title: string;
   message: string;
   buttonText: string;
-  id: string;
-  onClick: (id: string) => void;
+  id: number;
+  onClick: (id: number) => void;
 };
 
 interface StatsCardProps {

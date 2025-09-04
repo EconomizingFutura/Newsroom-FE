@@ -54,44 +54,6 @@ export const EDIT_DRAFT_NAVIGATE = (
   }
 };
 
-// Mock reverted articles data
-export const revertedArticlesData: RevertedArticleTypes[] = [
-  {
-    id: "1",
-    title: "Climate Change Report: Impact on Local Communities",
-    type: "Text",
-    status: "Reverted",
-    wordCount: 1247,
-    lastUpdated: "14/01/2025",
-    timeAgo: "Reverted 1 day ago",
-    reason:
-      "Factual inconsistencies found in paragraph 3. Sources need verification.",
-    editor: "John Smith",
-  },
-  {
-    id: "2",
-    title: "Economic Impact of Local Business Closures",
-    type: "Text",
-    status: "Reverted",
-    wordCount: 892,
-    lastUpdated: "13/01/2025",
-    timeAgo: "Reverted 2 days ago",
-    reason: "Article lacks supporting evidence for statistical claims.",
-    editor: "Sarah Johnson",
-  },
-  {
-    id: "3",
-    title: "Traffic Management Solutions for City Center",
-    type: "Text",
-    status: "Reverted",
-    wordCount: 1156,
-    lastUpdated: "12/01/2025",
-    timeAgo: "Reverted 3 days ago",
-    reason: "Interview quotes need verification and proper attribution.",
-    editor: "Mike Davis",
-  },
-];
-
 export const HISTORY_STATUS = (status: string) => {
   switch (status.toLowerCase()) {
     case "approved":
