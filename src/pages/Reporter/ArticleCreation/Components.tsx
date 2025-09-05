@@ -1,5 +1,6 @@
-import { Upload, Video } from "lucide-react";
+import { Mic, Upload, Video } from "lucide-react";
 import VideoPlayer from "@/components/ui/VideoPlayer";
+import AudioPlayer from "@/components/ui/AudioPlayer";
 
 
 type VideoContainerProps = {
@@ -10,6 +11,15 @@ type VideoContainerProps = {
         options?: { shouldValidate: boolean }
     ) => void;
     thumbnail: string;
+};
+
+type AudioContainerProps = {
+    audio: File | null; // video file object or null
+    setValue: (
+        field: "audio" | "thumbnail",
+        value: File | string | null,
+        options?: { shouldValidate: boolean }
+    ) => void;
 };
 
 
@@ -53,7 +63,6 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({ video, setValue,
             }}
         />
     )}
-
     {/* Thumbnail */}
     {video && (
         <div className="mt-4">
@@ -72,3 +81,38 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({ video, setValue,
         </div>
     )}
 </div>)
+
+
+export const AudioContainer: React.FC<AudioContainerProps> = ({ audio, setValue }) => (
+    <div className="mt-6">
+        {!audio ? (
+            <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl p-10 text-center">
+                <div className="mx-auto w-16 h-16 rounded-full bg-purple-100 text-[#a32fff] flex items-center justify-center">
+                    <Mic className="h-6 w-6" />
+                </div>
+                <p className="mt-6 font-medium">Upload audio file</p>
+                <p className="text-sm text-gray-500 mt-1">
+                    Supports MP3, WAV, M4A (Max 100MB)
+                </p>
+                <label className="inline-flex items-center gap-2 mt-6 bg-green-100 text-green-800 px-4 py-2 rounded-xl cursor-pointer">
+                    <Upload className="h-4 w-4" />
+                    <span>Choose File</span>
+                    <input
+                        type="file"
+                        accept=".mp3,.wav,.m4a"
+                        hidden
+                        onChange={(e) =>
+                            setValue("audio", e.target.files?.[0] || null, {
+                                shouldValidate: true,
+                            })
+                        }
+                    />
+                </label>
+            </div>
+        ) : (
+            <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl text-center">
+                <AudioPlayer src={audio} fileName={audio.name} />
+            </div>
+        )}
+    </div>
+)
