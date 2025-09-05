@@ -3,9 +3,9 @@ import { useForm } from "react-hook-form";
 import { Eye, EyeOff, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import tnlogo from "../assets/tngovtlogo.png";
-import cijlogo from "../assets/cijlogo.png";
-import mkstalin from "../assets/mkstalin.png";
+import tnlogo from "@/assets/tngovtlogo.png";
+import cijlogo from "@/assets/cijlogo.png";
+import mkstalin from "@/assets/mkstalin.png";
 import { useNavigate } from "react-router";
 import type { LoginResponse } from "@/types/apitypes";
 import { POST } from "@/api/apiMethods";
@@ -39,6 +39,9 @@ export default function LoginPage() {
       const decoded = JSON.parse(
         atob(payload.replace(/-/g, "+").replace(/_/g, "/"))
       );
+
+      console.log("accessToken:", decoded);
+
       if (decoded?.username) {
         localStorage.setItem("username", decoded.username);
       }

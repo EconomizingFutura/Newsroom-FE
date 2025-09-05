@@ -17,6 +17,7 @@ export default function TextArticleEditor({
   article,
   onBack,
 }: TextArticleEditorProps) {
+  console.log('coming inside edit artivle')
   const [title, setTitle] = useState(article?.title || "");
   const [content, setContent] = useState(
     article?.content ||

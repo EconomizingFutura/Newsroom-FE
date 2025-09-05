@@ -1,5 +1,6 @@
 import React from "react";
 import { Trash, MessageSquare, PenLine, Clock } from "lucide-react";
+import { formatDate } from "@/utils/utils";
 
 type CardProps = {
   id: string;
@@ -10,7 +11,7 @@ type CardProps = {
   wordCount?: number;
   savedTime?: string;
   type?: "Text" | "All Type" | "Audio" | "Video" | undefined;
-  status?: "Auto-saved" | "REVERTED";
+  status?: "Auto-saved" | "REVERTED" | "DRAFT";
   remarkMessage?: string;
   handleDelete: (id: string) => void;
   handleEdit: (id: string) => void;
@@ -41,13 +42,12 @@ const Card: React.FC<CardProps> = ({
       {/* Tags */}
       <div className="flex items-center gap-2 mt-2">
         <span
-          className={`px-2 py-0.5 text-xs font-medium rounded-md ${
-            type === "Text"
-              ? "bg-[#DBEAFE] border border-[#BEDBFF] text-[#193CB8]"
-              : type === "Audio"
+          className={`px-2 py-0.5 text-xs font-medium rounded-md ${type === "Text"
+            ? "bg-[#DBEAFE] border border-[#BEDBFF] text-[#193CB8]"
+            : type === "Audio"
               ? "bg-[#F3E8FF] border border-[#EAD4FF] text-[#6D11B0]"
               : "bg-[#FFEDD4] border border-[#FFD6A7] text-[#9F2E00]"
-          }`}
+            }`}
         >
           {type}
         </span>
@@ -79,11 +79,11 @@ const Card: React.FC<CardProps> = ({
       )}
 
       {/* Footer */}
-      {savedTime && status === "Auto-saved" && (
+      {savedTime && status === "DRAFT" && (
         <div className="flex items-center justify-between mt-3 text-[14px] text-gray-500">
           <div className="flex items-center gap-2">
             <Clock className="w-5 h-5" />
-            <p>Updated {updatedDate}</p>
+            <p>Updated {formatDate(updatedDate)}</p>
           </div>
           <div>{wordCount && <p>{wordCount} words</p>}</div>
 

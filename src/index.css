@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @custom-variant dark (&:is(.dark *));
+
 :root {
   --font-size: 14px;
   --background: #ffffff;
@@ -212,4 +213,21 @@ html {
 
 .ql-editor {
   height: calc(100% - 53px) !important;
+}
+
+
+@layer base {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  label,
+  div,
+  span,
+  p {
+    @apply cursor-default select-none;
+  }
 }

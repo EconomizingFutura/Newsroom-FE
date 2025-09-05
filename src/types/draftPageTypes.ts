@@ -6,7 +6,7 @@ export interface DraftArticle {
   type: ArticleType;
   status: ArticleStatus;
   wordCount: number;
-  lastUpdated: string;
+  updatedAt: string;
   timeAgo: string;
 }
 
@@ -17,7 +17,7 @@ export const draftArticles: DraftArticle[] = [
     type: "Text",
     status: "Auto-saved",
     wordCount: 1247,
-    lastUpdated: "15/01/2025",
+    updatedAt: "15/01/2025",
     timeAgo: "Saved 2 minutes ago",
   },
   {
@@ -26,7 +26,7 @@ export const draftArticles: DraftArticle[] = [
     type: "Text",
     status: "Auto-saved",
     wordCount: 1247,
-    lastUpdated: "15/01/2025",
+    updatedAt: "15/01/2025",
     timeAgo: "Saved 2 minutes ago",
   },
   {
@@ -35,7 +35,7 @@ export const draftArticles: DraftArticle[] = [
     type: "Text",
     status: "Auto-saved",
     wordCount: 1247,
-    lastUpdated: "15/01/2025",
+    updatedAt: "15/01/2025",
     timeAgo: "Saved 2 minutes ago",
   },
   {
@@ -44,7 +44,7 @@ export const draftArticles: DraftArticle[] = [
     type: "Audio",
     status: "Auto-saved",
     wordCount: 1247,
-    lastUpdated: "15/01/2025",
+    updatedAt: "15/01/2025",
     timeAgo: "Saved 2 minutes ago",
   },
 ];
@@ -55,7 +55,7 @@ export interface RevertedArticleTypes {
   type: ArticleType;
   status: ArticleStatus;
   wordCount: number;
-  lastUpdated: string;
+  updatedAt: string;
   timeAgo: string;
   remarks: string;
   editor: string;

@@ -1,32 +1,35 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { RotateCcw } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import ContentHeader from "@/components/ContentHeader";
 import SearchFilterTab from "@/components/SearchFilterTab";
-import { DELETE_DRAFT_MODAL_ID, EDIT_DRAFT_NAVIGATE } from "@/utils/draftUtils";
-import { useNavigate } from "react-router";
-import type {
-  DeleteArticleProps,
-  RevertedArticleTypes,
+import {
+  draftArticles,
+  type DeleteArticleProps,
+  type RevertedArticleTypes,
 } from "@/types/draftPageTypes";
+import {
+  DELETE_DRAFT_MODAL_ID,
+  EDIT_DRAFT_NAVIGATE,
+} from "@/utils/draftUtils";
+import { useNavigate } from "react-router";
+import EmptyStateComponent from "@/components/EmptyStateComponent";
 import DeleteConfirmation from "@/components/DeleteConfirmation";
-import { GET } from "@/api/apiMethods";
 import { API_LIST } from "@/api/endpoints";
-import { RenderGridView, RenderListView } from "./Components";
+import { GET } from "@/api/apiMethods";
+import { RenderGridView, RenderListView, RenderListViewDraft } from "./RevertedPost/Components";
 
-const RevertedPostPage: React.FC = () => {
+export default function DraftsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<
     "All Type" | "Text" | "Audio" | "Video"
   >("All Type");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [data, setData] = useState<RevertedArticleTypes[]>([]);
-
+  const navigate = useNavigate();
+  const filterOptions = ["All Type", "Text", "Audio", "Video"];
   const [deletePost, setDeletePost] = useState<DeleteArticleProps>({
     id: null,
     isOpen: false,
   });
-  const filterOptions = ["All Type", "Text", "Audio", "Video"];
-  const navigate = useNavigate();
 
   const filteredArticles = useMemo(() => {
     return data.filter((article) => {
@@ -39,26 +42,25 @@ const RevertedPostPage: React.FC = () => {
     });
   }, [data, searchQuery, activeFilter]);
 
-  useEffect(() => {
-    const controller = new AbortController();
-
-    const getRevertedPost = async () => {
-      try {
-        const response: any = await GET(
-          API_LIST.BASE_URL + API_LIST.REVERTED_POST,
-          { signal: controller.signal }
-        );
-        setData(response.data);
-      } catch (error: any) {
-        if (error.name !== "AbortError") {
-          console.error("Error fetching data:", error);
-        }
-      }
+  const renderEmptyState = () => {
+    const isAudio =
+      activeFilter === "Audio"
+        ? "audio"
+        : activeFilter === "Video"
+          ? "video"
+          : "textArticle";
+    const handleNav = () => {
+      navigate(`/${isAudio}`);
     };
 
-    getRevertedPost();
-    return () => controller.abort();
-  }, []);
+    return (
+      <EmptyStateComponent
+        state={activeFilter === "All Type" ? "Text" : activeFilter}
+        onCreateNew={handleNav}
+      />
+    );
+  };
+
 
   const handleDelete = () => {
     if (!deletePost.id) {
@@ -82,20 +84,42 @@ const RevertedPostPage: React.FC = () => {
     }));
   };
 
+
   const handleEdit = (id: string) => {
-    const articleType = EDIT_DRAFT_NAVIGATE(id, filteredArticles);
-    navigate(`/${articleType}/${id}?from=reverted`);
+    const articleType = EDIT_DRAFT_NAVIGATE(id, draftArticles);
+    navigate(`/${articleType}/${id}?from=drafts`);
   };
 
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const getDraftArticle = async () => {
+      try {
+        const response: any = await GET(
+          `${API_LIST.BASE_URL}${API_LIST.DRAFT_ARTICLE}?page=${1}&pageSize=${10}`,
+          { signal: controller.signal }
+        );
+        setData(response.drafts)
+        console.log('repose', response)
+      } catch (error: any) {
+        if (error.name !== "AbortError") {
+          console.error("Error fetching reverted posts:", error);
+        }
+      }
+    };
+
+    getDraftArticle();
+    return () => controller.abort();
+  }, []);
+
   return (
-    <div className=" flex-1 py-16 h-screen bg-gray-50">
-      {/* Main Content */}
+    <div className="flex-1 py-16 h-screen bg-gray-50">
       <div
         style={{ paddingTop: "32px" }}
         className=" flex flex-col gap-[24px] px-[24px] bg-[#F6FAF6]"
       >
         <ContentHeader
-          text="Reverted Post"
+          text="Drafts"
           description="Your saved drafts and work in progress."
           number={filteredArticles.length}
           iconName="Drafts"
@@ -107,7 +131,6 @@ const RevertedPostPage: React.FC = () => {
           ]}
         />
 
-        {/* Search and Filters */}
         <SearchFilterTab
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
@@ -117,31 +140,20 @@ const RevertedPostPage: React.FC = () => {
             setActiveFilter(filter as "All Type" | "Text" | "Audio" | "Video")
           }
         />
-        {/* Content Area */}
+
+        {/* Content Area - Show empty state or filtered content */}
         <div className="flex-1 bg-gray-50">
-          {filteredArticles.length > 0 ? (
-            viewMode === "grid" ? (
-              <RenderGridView
-                filteredArticles={filteredArticles}
-                handleDeletePost={(id) => setDeletePost({ id, isOpen: true })}
-                handleEdit={handleEdit}
-                status="REVERTED"
-              />
-            ) : (
-              <RenderListView filteredArticles={filteredArticles} />
-            )
+          {filteredArticles.length === 0 ? (
+            renderEmptyState()
+          ) : viewMode === "grid" ? (
+            <RenderGridView
+              filteredArticles={filteredArticles}
+              handleDeletePost={(id) => setDeletePost({ id, isOpen: true })}
+              handleEdit={handleEdit}
+              status="DRAFT"
+            />
           ) : (
-            <div className="flex flex-col items-center justify-center py-20">
-              <div className="w-16 h-16 bg-red-100 rounded-lg flex items-center justify-center mb-6">
-                <RotateCcw className="w-8 h-8 text-red-500" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                No reverted posts found
-              </h3>
-              <p className="text-sm text-gray-500">
-                All your articles are in good standing
-              </p>
-            </div>
+            <RenderListViewDraft filteredArticles={filteredArticles} />
           )}
         </div>
       </div>
@@ -158,6 +170,4 @@ const RevertedPostPage: React.FC = () => {
       )}
     </div>
   );
-};
-
-export default RevertedPostPage;
+}

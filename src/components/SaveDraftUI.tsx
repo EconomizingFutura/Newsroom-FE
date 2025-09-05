@@ -4,12 +4,12 @@ import Success from "@/assets/Success.gif";
 
 interface SaveDraftUIProps {
   onCancel: () => void;
-  saveType: "draft" | "submit";
+  saveType: "DRAFT" | "SUBMIT";
 }
 
 const SaveDraftsUI: React.FC<SaveDraftUIProps> = ({ onCancel, saveType }) => {
   const wordings =
-    saveType == "draft"
+    saveType == "DRAFT"
       ? "Successfully Article Stored in the Draft  !"
       : "Successfully Article Submit for the review  !";
   useEffect(() => {

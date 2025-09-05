@@ -5,7 +5,7 @@ import type {
 
 export const getTypeColor = (type: string) => {
   switch (type) {
-    case "Text":
+    case "TEXT":
       return "bg-[#DBEAFE] border border-[#BEDBFF] text-[#193CB8]";
     case "Audio":
       return "bg-[#F3E8FF] border border-[#EAD4FF] text-[#6D11B0]";

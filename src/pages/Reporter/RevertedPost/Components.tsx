@@ -2,21 +2,27 @@ import SharedCard from "@/components/shared/Card";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import type { RevertedArticleTypes } from "@/types/draftPageTypes";
-import { getTypeColor } from "@/utils/draftUtils";
-import { AlertCircle, Badge, Eye } from "lucide-react";
+import { getStatusColor, getTypeColor } from "@/utils/draftUtils";
+import { AlertCircle, Edit, Eye, Trash2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { formatDate, formatRelativeTime } from "@/utils/utils";
+
 type GridViewProps = {
   filteredArticles: RevertedArticleTypes[];
   handleDeletePost: (id: string) => void;
   handleEdit: (id: string) => void;
+  status: "Auto-saved" | "REVERTED" | "DRAFT";
 };
 
 type ListViewProps = {
   filteredArticles: RevertedArticleTypes[];
+  handleEdit?: (id: string) => void;
+
 };
 export const RenderGridView: React.FC<GridViewProps> = ({
   filteredArticles,
   handleDeletePost,
-  handleEdit,
+  handleEdit, status
 }) => (
   <div className="grid grid-cols-3 gap-6">
     {filteredArticles.map((article) => (
@@ -24,11 +30,11 @@ export const RenderGridView: React.FC<GridViewProps> = ({
         id={article.id}
         key={article.id}
         title={article.title}
-        updatedDate={article.lastUpdated}
+        updatedDate={article.updatedAt}
         wordCount={article.wordCount}
-        savedTime={article.timeAgo}
+        savedTime={formatRelativeTime(article.updatedAt)}
         type={article.type}
-        status="REVERTED"
+        status={status}
         remarkMessage={article.remarks}
         contentPreview={article.title}
         handleDelete={() => handleDeletePost(article.id)}
@@ -64,7 +70,7 @@ export const RenderListView: React.FC<ListViewProps> = ({
                     {article.status}
                   </Badge>
                   <span className="text-xs text-gray-500">
-                    Reverted {article.lastUpdated} • {article.wordCount} words •
+                    Reverted {article.updatedAt} • {article.wordCount} words •
                     Editor: {article.editor}
                   </span>
                 </div>
@@ -73,7 +79,7 @@ export const RenderListView: React.FC<ListViewProps> = ({
               <Button
                 size="sm"
                 className="bg-red-600 hover:bg-red-700 text-white gap-2 ml-4"
-                // onClick={() => onEditReverted && onEditReverted(article)}
+              // onClick={() => onEditReverted && onEditReverted(article)}
               >
                 <Eye className="w-3 h-3" />
                 View Details
@@ -88,6 +94,63 @@ export const RenderListView: React.FC<ListViewProps> = ({
                 {article.remarks}
               </div>
             </div>
+          </div>
+        </div>
+      </Card>
+    ))}
+  </div>
+);
+
+export const RenderListViewDraft: React.FC<ListViewProps> = ({
+  filteredArticles, handleEdit
+}) => (
+  <div className="space-y-3">
+    {filteredArticles.map((article) => (
+      <Card
+        key={article.id}
+        className="p-4 bg-white hover:shadow-sm transition-shadow"
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-3 mb-2">
+              <h3 className="text-sm font-medium text-gray-900 truncate">
+                {article.title}
+              </h3>
+              <div className="flex gap-2 flex-shrink-0">
+                <Badge className={`text-xs ${getTypeColor(article.type)}`}>
+                  {article.type}
+                </Badge>
+                <Badge
+                  className={`text-xs ${getStatusColor(article.status)}`}
+                >
+                  {article.status}
+                </Badge>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 text-xs text-gray-500">
+              <span>Updated {formatDate(article.updatedAt)}</span>
+              {article.wordCount > 0 && (
+                <span>{article.wordCount} words</span>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 ml-4">
+            <Button
+              size="sm"
+              className="bg-green-600 hover:bg-green-700 text-white gap-2"
+              onClick={() => handleEdit?.(article.id)}
+            >
+              <Edit className="w-3 h-3" />
+              Edit
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="border-red-200 text-red-600 hover:bg-red-50 w-8 h-8 p-0"
+            >
+              <Trash2 className="w-3 h-3" />
+            </Button>
           </div>
         </div>
       </Card>
