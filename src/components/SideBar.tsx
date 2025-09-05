@@ -14,8 +14,15 @@ import {
 import { Separator } from "@radix-ui/react-separator";
 import type { currentPageType } from "../types/sidebarTypes";
 import { cn } from "./ui/utils";
+import { USER_ROLE } from "@/utils/utils";
 
 export type UserRole = "reporter" | "editor";
+const toUserRole = (role: string): UserRole => {
+  if (role === "reporter" || role === "editor") {
+    return role;
+  }
+  throw new Error("Invalid role: " + role);
+}
 
 export interface SidebarTypes {
   onNavigateToNewsFeeds: () => void;
@@ -118,7 +125,8 @@ const SideBar: React.FC<SidebarTypes> = (props) => {
     onCreateNewVideoArticle,
     currentView,
   } = props;
-  const currentRole: UserRole = "reporter";
+  const role = USER_ROLE();
+  const currentRole: UserRole = toUserRole(role ? role : "reporter");
   const [multiWindow, setMultiWindow] = useState({
     newsFeeds: false,
     createArticle: false,

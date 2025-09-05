@@ -34,7 +34,7 @@ export default function LoginPage() {
     if (response.accessToken) {
       navigate("/news-feeds");
       localStorage.setItem("token", response.accessToken);
-      localStorage.setItem("role", "reporter");
+      localStorage.setItem("role", response.role.toLowerCase());
       const [, payload] = response.accessToken.split(".");
       const decoded = JSON.parse(
         atob(payload.replace(/-/g, "+").replace(/_/g, "/"))
