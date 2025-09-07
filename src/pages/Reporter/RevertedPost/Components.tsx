@@ -17,15 +17,15 @@ type GridViewProps = {
 type ListViewProps = {
   filteredArticles: RevertedArticleTypes[];
   handleEdit?: (id: string) => void;
-
 };
 export const RenderGridView: React.FC<GridViewProps> = ({
   filteredArticles,
   handleDeletePost,
-  handleEdit, status
+  handleEdit,
+  status,
 }) => (
   <div className="grid grid-cols-3 gap-6">
-    {filteredArticles.map((article) => (
+    {filteredArticles?.map((article) => (
       <SharedCard
         id={article.id}
         key={article.id}
@@ -79,7 +79,7 @@ export const RenderListView: React.FC<ListViewProps> = ({
               <Button
                 size="sm"
                 className="bg-red-600 hover:bg-red-700 text-white gap-2 ml-4"
-              // onClick={() => onEditReverted && onEditReverted(article)}
+                // onClick={() => onEditReverted && onEditReverted(article)}
               >
                 <Eye className="w-3 h-3" />
                 View Details
@@ -102,7 +102,8 @@ export const RenderListView: React.FC<ListViewProps> = ({
 );
 
 export const RenderListViewDraft: React.FC<ListViewProps> = ({
-  filteredArticles, handleEdit
+  filteredArticles,
+  handleEdit,
 }) => (
   <div className="space-y-3">
     {filteredArticles.map((article) => (
@@ -120,18 +121,14 @@ export const RenderListViewDraft: React.FC<ListViewProps> = ({
                 <Badge className={`text-xs ${getTypeColor(article.type)}`}>
                   {article.type}
                 </Badge>
-                <Badge
-                  className={`text-xs ${getStatusColor(article.status)}`}
-                >
+                <Badge className={`text-xs ${getStatusColor(article.status)}`}>
                   {article.status}
                 </Badge>
               </div>
             </div>
             <div className="flex items-center gap-4 text-xs text-gray-500">
               <span>Updated {formatDate(article.updatedAt)}</span>
-              {article.wordCount > 0 && (
-                <span>{article.wordCount} words</span>
-              )}
+              {article.wordCount > 0 && <span>{article.wordCount} words</span>}
             </div>
           </div>
 

@@ -35,19 +35,20 @@ const Card: React.FC<CardProps> = ({
   //   console.log("Edit article with ID:", id);
   // };
   return (
-    <div className="w-full max-w-sm bg-white rounded-2xl shadow-md border border-gray-200 p-[24px] flex flex-col justify-between">
+    <div className="w-full max-w-sm bg-white rounded-2xl shadow-md border border-gray-200 max-h-[300px] p-[24px] flex flex-col justify-between">
       {/* Title */}
       <h2 className="text-base font-semibold text-gray-900">{title}</h2>
 
       {/* Tags */}
       <div className="flex items-center gap-2 mt-2">
         <span
-          className={`px-2 py-0.5 text-xs font-medium rounded-md ${type === "Text"
-            ? "bg-[#DBEAFE] border border-[#BEDBFF] text-[#193CB8]"
-            : type === "Audio"
+          className={`px-2 py-0.5 text-xs font-medium rounded-md ${
+            type === "Text"
+              ? "bg-[#DBEAFE] border border-[#BEDBFF] text-[#193CB8]"
+              : type === "Audio"
               ? "bg-[#F3E8FF] border border-[#EAD4FF] text-[#6D11B0]"
               : "bg-[#FFEDD4] border border-[#FFD6A7] text-[#9F2E00]"
-            }`}
+          }`}
         >
           {type}
         </span>

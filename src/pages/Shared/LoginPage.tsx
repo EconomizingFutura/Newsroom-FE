@@ -10,6 +10,7 @@ import { useNavigate } from "react-router";
 import type { LoginResponse } from "@/types/apitypes";
 import { POST } from "@/api/apiMethods";
 import { API_LIST } from "@/api/endpoints";
+import loginbg from "@/assets/loginbg.svg";
 
 type FormData = {
   email: string;
@@ -49,7 +50,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white w-full">
+    <div className="min-h-screen w-full overflow-y-hidden">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-4 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -80,7 +81,10 @@ export default function LoginPage() {
       </header>
 
       {/* Main */}
-      <main className="min-h-[calc(100vh-200px)] bg-gradient-to-br from-green-50 to-green-100 relative overflow-hidden">
+      <main
+        className="min-h-[calc(100vh-200px)] bg-gradient-to-br from-green-50 bg-[#DFF4DF] to-green-100 relative overflow-hidden"
+        style={{ backgroundImage: `url(${loginbg})` }}
+      >
         {/* Login Form */}
         <div className="flex items-center justify-center min-h-full pt-[6px] pb-12 px-4">
           <div className="w-full max-w-md">
