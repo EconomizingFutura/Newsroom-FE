@@ -57,7 +57,6 @@ const EditArticle: React.FC = () => {
   };
   const activeConfig = headerConfig[path] ?? headerConfig.textArticle;
 
-  // build schema dynamically so we can use `path` inside tests
   const schema = yup.object().shape({
     category: yup.string().required("Category is required"),
     name: yup.string().required("Name is required"),
@@ -97,7 +96,6 @@ const EditArticle: React.FC = () => {
             return false;
           })
         : yup.mixed().notRequired(),
-    // video: if video page, require video file or valid URL string
     video:
       path === "video"
         ? yup
@@ -148,9 +146,7 @@ const EditArticle: React.FC = () => {
     reValidateMode: "onChange",
   });
 
-  // watch tags reactively so UI updates after setValue from API
   const tags = watch("tags") || [];
-  // watch audio/video for preview
   const audioVal = watch("audio");
   const videoVal = watch("video");
 
@@ -166,7 +162,6 @@ const EditArticle: React.FC = () => {
     }
   };
 
-  // fetch article and populate form
   useEffect(() => {
     const controller = new AbortController();
 
@@ -177,18 +172,17 @@ const EditArticle: React.FC = () => {
           { signal: controller.signal }
         );
 
-        // expected API shape as you posted previously
         if (response) {
-          // keep original field names mapping
           setValue("category", response.category ?? "");
           setValue("name", response.title ?? "");
-          setValue("content", response.content ?? "");
-          // tags must be an array
+          setValue("content", response.content ?? "", {
+            shouldValidate: true,
+            shouldDirty: true,
+          });
           setValue("tags", Array.isArray(response.tags) ? response.tags : [], {
             shouldValidate: true,
             shouldDirty: true,
           });
-          // API returns URL strings for audio/video - store them as string
           setValue("video", response.videoUrl ?? null);
           setValue("audio", response.audioUrl ?? null);
           setValue("status", response.status ?? null);
@@ -202,10 +196,8 @@ const EditArticle: React.FC = () => {
 
     getDraftArticle();
     return () => controller.abort();
-    // note: setValue is stable from react-hook-form, safe to include
   }, [id, setValue]);
 
-  // tag helpers (use getValues to avoid stale snapshot when adding)
   const handleAddTag = () => {
     const tag = newTag.trim();
     if (!tag) return;
@@ -225,12 +217,9 @@ const EditArticle: React.FC = () => {
     );
   };
 
-  // onSubmit handler (you can replace console.log with your POST/PATCH logic)
   const onSubmit = (data: ArticleFormValues) => {
-    // set status to something or send as part of payload
-    console.log("Submitting form:", data);
+    console.log('data ', data)
     submitForReview(data)
-    // example: handleSubmitUI('SUBMIT');
   };
 
   const submitForReview = async (data: ArticleFormValues) => {
