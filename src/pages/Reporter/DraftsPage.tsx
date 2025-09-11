@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import ContentHeader from "@/components/ContentHeader";
 import SearchFilterTab from "@/components/SearchFilterTab";
 import {
-  draftArticles,
   type DeleteArticleProps,
   type RevertedArticleTypes,
 } from "@/types/draftPageTypes";
@@ -14,19 +13,18 @@ import { API_LIST } from "@/api/endpoints";
 import { GET } from "@/api/apiMethods";
 import {
   RenderGridView,
-  RenderListView,
   RenderListViewDraft,
 } from "./RevertedPost/Components";
 
 export default function DraftsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<
-    "All Type" | "Text" | "Audio" | "Video"
+    "All Type" | "TEXT" | "AUDIO" | "VIDEO"
   >("All Type");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [data, setData] = useState<RevertedArticleTypes[]>([]);
   const navigate = useNavigate();
-  const filterOptions = ["All Type", "Text", "Audio", "Video"];
+  const filterOptions = ["All Type", "TEXT", "AUDIO", "VIDEO"];
   const [deletePost, setDeletePost] = useState<DeleteArticleProps>({
     id: null,
     isOpen: false,
@@ -45,18 +43,18 @@ export default function DraftsPage() {
 
   const renderEmptyState = () => {
     const isAudio =
-      activeFilter === "Audio"
+      activeFilter === "AUDIO"
         ? "audio"
-        : activeFilter === "Video"
-        ? "video"
-        : "textArticle";
+        : activeFilter === "VIDEO"
+          ? "video"
+          : "textArticle";
     const handleNav = () => {
       navigate(`/${isAudio}`);
     };
 
     return (
       <EmptyStateComponent
-        state={activeFilter === "All Type" ? "Text" : activeFilter}
+        state={activeFilter === "All Type" ? "TEXT" : activeFilter}
         onCreateNew={handleNav}
       />
     );
@@ -68,8 +66,8 @@ export default function DraftsPage() {
     }
     DELETE_DRAFT_MODAL_ID(
       deletePost.id,
-      (draftArticles) => {
-        const revertedArticles = draftArticles.map((draft) => ({
+      (filteredArticles) => {
+        const revertedArticles = filteredArticles.map((draft) => ({
           ...draft,
           remarks: "",
           editor: "",
@@ -85,7 +83,7 @@ export default function DraftsPage() {
   };
 
   const handleEdit = (id: string) => {
-    const articleType = EDIT_DRAFT_NAVIGATE(id, draftArticles);
+    const articleType = EDIT_DRAFT_NAVIGATE(id, filteredArticles);
     navigate(`/${articleType}/${id}?from=drafts`);
   };
 
@@ -95,8 +93,7 @@ export default function DraftsPage() {
     const getDraftArticle = async () => {
       try {
         const response: any = await GET(
-          `${API_LIST.BASE_URL}${
-            API_LIST.DRAFT_ARTICLE
+          `${API_LIST.BASE_URL}${API_LIST.DRAFT_ARTICLE
           }?page=${1}&pageSize=${10}`,
           { signal: controller.signal }
         );
@@ -121,7 +118,6 @@ export default function DraftsPage() {
         style={{ paddingTop: "32px" }}
         className=" flex flex-col gap-[24px] px-[24px] bg-[#F6FAF6]"
       >
-        {console.log(filteredArticles, "cdraft")}
         <ContentHeader
           text="Drafts"
           description="Your saved drafts and work in progress."
@@ -141,7 +137,7 @@ export default function DraftsPage() {
           filterOptions={filterOptions}
           activeFilter={activeFilter}
           setActiveFilter={(filter: string) =>
-            setActiveFilter(filter as "All Type" | "Text" | "Audio" | "Video")
+            setActiveFilter(filter as "All Type" | "TEXT" | "AUDIO" | "VIDEO")
           }
         />
 

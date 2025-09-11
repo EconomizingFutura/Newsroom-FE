@@ -16,7 +16,7 @@ const s3 = new S3Client({
   useDualstackEndpoint: false,
 });
 
-type ArticleType = "video" | "audio";
+type ArticleType = "video" | "audio" | "thumbnail";
 type submitType = "save" | "draft";
 
 export const uploadToS3 = async (
@@ -28,8 +28,8 @@ export const uploadToS3 = async (
 
   const bucket = import.meta.env.VITE_S3_BUCKET;
   const region = import.meta.env.VITE_S3_LOCATION;
-
-  const key = `${submitType}/${type}/${id}-${encodeURIComponent(file.name)}`;
+  const safeFileName = file.name.replace(/\s+/g, "_"); // replace spaces with _
+  const key = `${submitType}/${type}/${id}-${encodeURIComponent(safeFileName)}`;
 
   try {
     const fileBuffer = new Uint8Array(await file.arrayBuffer());

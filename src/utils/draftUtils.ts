@@ -1,6 +1,5 @@
 import type {
-  DraftArticle,
-  RevertedArticleTypes,
+  DraftArticle
 } from "@/types/draftPageTypes";
 
 export const getTypeColor = (type: string) => {
@@ -40,14 +39,15 @@ export const EDIT_DRAFT_NAVIGATE = (
   draftArticles: DraftArticle[]
 ): "textArticle" | "audio" | "video" => {
   const articleType =
-    draftArticles.find((article) => article.id === id)?.type || "Text";
+    draftArticles.find((article) => article.id === id)?.type || "TEXT";
+  console.log(articleType)
 
   switch (articleType) {
-    case "Text":
+    case "TEXT":
       return "textArticle";
-    case "Audio":
+    case "AUDIO":
       return "audio";
-    case "Video":
+    case "VIDEO":
       return "video";
     default:
       return "textArticle";

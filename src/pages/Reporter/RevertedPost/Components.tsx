@@ -35,6 +35,7 @@ export const RenderGridView: React.FC<GridViewProps> = ({
         savedTime={formatRelativeTime(article.updatedAt)}
         type={article.type}
         status={status}
+        thumbnailUrl={article.thumbnailUrl}
         remarkMessage={article.remarks}
         contentPreview={article.title}
         handleDelete={() => handleDeletePost(article.id)}
@@ -79,7 +80,7 @@ export const RenderListView: React.FC<ListViewProps> = ({
               <Button
                 size="sm"
                 className="bg-red-600 hover:bg-red-700 text-white gap-2 ml-4"
-                // onClick={() => onEditReverted && onEditReverted(article)}
+              // onClick={() => onEditReverted && onEditReverted(article)}
               >
                 <Eye className="w-3 h-3" />
                 View Details

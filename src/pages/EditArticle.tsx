@@ -24,6 +24,11 @@ import { API_LIST } from "@/api/endpoints";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import VideoUrlPlayer, { VideoContainer } from "./Reporter/ArticleCreation/Components";
+import type { ArticleType, DraftArticle } from "@/types/draftPageTypes";
+import { uploadToS3 } from "@/config/s3Config";
+import { base64ToFile } from "@/utils/compression";
+import { v4 as uuidv4 } from "uuid";
 
 type ArticleFormValues = {
   category: string;
@@ -33,6 +38,8 @@ type ArticleFormValues = {
   video: File | string | null;
   audio: File | string | null;
   status: string | null;
+  thumbnail?: string | File | null;
+
 };
 
 const EditArticle: React.FC = () => {
@@ -49,6 +56,7 @@ const EditArticle: React.FC = () => {
   }>({ type: null, isSubmit: false });
 
   const [newTag, setNewTag] = useState("");
+  const [originalArticle, setOriginalArticle] = useState<ArticleFormValues | null>(null);
 
   const headerConfig: Record<string, { label: string; color: string; icon: HeaderKey }> = {
     textArticle: { label: "Text Article", color: "#2B7FFF", icon: "Text Article" },
@@ -130,7 +138,7 @@ const EditArticle: React.FC = () => {
     setValue,
     getValues,
     watch,
-    formState: { errors },
+    formState: { errors, dirtyFields },
   } = useForm<ArticleFormValues>({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -140,6 +148,7 @@ const EditArticle: React.FC = () => {
       tags: [],
       video: null,
       audio: null,
+      thumbnail: "",
       status: "",
     },
     mode: "onSubmit",
@@ -149,6 +158,7 @@ const EditArticle: React.FC = () => {
   const tags = watch("tags") || [];
   const audioVal = watch("audio");
   const videoVal = watch("video");
+  const thumbnailVal = watch("thumbnail");
 
   const handleSubmitUI = (type: "DRAFT" | "SUBMIT") => {
     setSubmit({ type, isSubmit: true });
@@ -173,30 +183,34 @@ const EditArticle: React.FC = () => {
         );
 
         if (response) {
-          setValue("category", response.category ?? "");
-          setValue("name", response.title ?? "");
-          setValue("content", response.content ?? "", {
-            shouldValidate: true,
-            shouldDirty: true,
+          const mapped: ArticleFormValues = {
+            category: response.category ?? "",
+            name: response.title ?? "",
+            content: response.content ?? "",
+            tags: Array.isArray(response.tags) ? response.tags : [],
+            video: response.videoUrl ?? null,
+            audio: response.audioUrl ?? null,
+            thumbnail: response.thumbnailUrl ?? null,
+            status: response.status ?? null,
+          };
+
+          setOriginalArticle(mapped);
+
+          // fill form
+          Object.entries(mapped).forEach(([key, value]) => {
+            setValue(key as keyof ArticleFormValues, value, { shouldValidate: true, shouldDirty: false });
           });
-          setValue("tags", Array.isArray(response.tags) ? response.tags : [], {
-            shouldValidate: true,
-            shouldDirty: true,
-          });
-          setValue("video", response.videoUrl ?? null);
-          setValue("audio", response.audioUrl ?? null);
-          setValue("status", response.status ?? null);
         }
       } catch (error: any) {
-        if (error.name !== "AbortError") {
-          console.error("Error fetching article:", error);
-        }
+        if (error.name !== "AbortError") console.error("Error fetching article:", error);
       }
     };
 
     getDraftArticle();
     return () => controller.abort();
   }, [id, setValue]);
+
+
 
   const handleAddTag = () => {
     const tag = newTag.trim();
@@ -218,27 +232,67 @@ const EditArticle: React.FC = () => {
   };
 
   const onSubmit = (data: ArticleFormValues) => {
-    console.log('data ', data)
     submitForReview(data)
   };
 
+  // const submitForReview = async (data: ArticleFormValues) => {
+
+  //   try {
+
+  //     const response: any = await PATCH(
+  //       API_LIST.BASE_URL + API_LIST.DRAFT_BY_ARTICLE + id,
+  //       data
+  //     );
+  //     console.log("response :", response);
+  //     navigate("/drafts");
+
+
+  //   } catch (err) {
+  //     console.error("❌ Error:", err);
+  //   }
+  // };
+
   const submitForReview = async (data: ArticleFormValues) => {
 
-    try {
-
-      const response: any = await PATCH(
-        API_LIST.BASE_URL + API_LIST.DRAFT_BY_ARTICLE + id,
-        data
-      );
-      console.log("response :", response);
-      navigate("/drafts");
-
-
-    } catch (err) {
-      console.error("❌ Error:", err);
+    const changedKeys = Object.keys(dirtyFields) as (keyof ArticleFormValues)[];
+    if (changedKeys.length === 0) {
+      console.log("⚡ No changes detected");
+      return;
     }
-  };
 
+    const changes: Partial<ArticleFormValues> = {};
+
+
+
+
+    for (const key of changedKeys) {
+      const value = data[key];
+      if (value !== null && value !== undefined) {
+        changes[key] = value as any; // 👈 cast so TS accepts it
+      }
+    }
+
+    // Handle file uploads only if changed
+    if (dirtyFields.audio && data.audio instanceof File) {
+      changes.audio = await uploadToS3(data.audio, "audio", "draft");
+    }
+    if (dirtyFields.video && data.video instanceof File) {
+      changes.video = await uploadToS3(data.video, "video", "draft");
+    }
+    if (dirtyFields.thumbnail && data.thumbnail && typeof data.thumbnail === "string") {
+      changes.thumbnail = await uploadToS3(
+        base64ToFile(data.thumbnail as string, `${uuidv4()}.png`),
+        "thumbnail",
+        "draft"
+      );
+    }
+
+    console.log("🔄 Sending only changed fields:", changes);
+
+
+    await PATCH(`${API_LIST.BASE_URL}${API_LIST.DRAFT_BY_ARTICLE}${id}`, changes);
+    navigate("/drafts");
+  };
 
   return (
     <div className="min-h-screen bg-[#f6faf6]">
@@ -396,38 +450,33 @@ const EditArticle: React.FC = () => {
                 {/* Video */}
                 {path === "video" && (
                   <>
-                    {!videoVal && (
-                      <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl p-10 text-center">
-                        <div className="mx-auto w-16 h-16 rounded-full bg-orange-100 text-[#9f2e00] flex items-center justify-center">
-                          <Video className="h-6 w-6" />
-                        </div>
-                        <p className="mt-6 font-medium">Upload video</p>
-                        <p className="text-sm text-gray-500 mt-1">Drag & drop your video file or click to browse</p>
-                        <p className="text-sm text-gray-500">Supports MP4, MOV, AVI (Max 500MB)</p>
-                        <label className="inline-flex items-center gap-2 mt-6 bg-orange-700 text-white px-4 py-2 rounded-xl cursor-pointer">
-                          <Upload className="h-4 w-4" />
-                          <span>Choose File</span>
-                          <input
-                            type="file"
-                            accept=".mp4,.mov,.avi"
-                            hidden
-                            onChange={(e) => {
-                              setValue("video", e.target.files?.[0] || null, { shouldValidate: true, shouldDirty: true });
-                            }}
-                          />
-                        </label>
-                        {errors.video && <p className="text-sm text-red-500">{errors.video.message as string}</p>}
-                      </div>
-                    )}
-                    {videoVal && (
+                    {typeof videoVal === "string" && videoVal ? (
+                      // ✅ Video URL from API
                       <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl text-center">
-                        {/* Reuse your existing video player component if available; here we just show thumbnail logic in your earlier code */}
-                        <video src={typeof videoVal === "string" ? videoVal : URL.createObjectURL(videoVal as File)} controls className="w-full max-h-60 object-cover" />
+                        <VideoUrlPlayer
+                          videoUrl={videoVal}
+                          thumbnailUrl={thumbnailVal || undefined}
+                          onDelete={() => {
+                            // reset values when removed
+                            setValue("video", null, { shouldValidate: true, shouldDirty: true });
+                            setValue("thumbnail", null, { shouldValidate: true, shouldDirty: true });
+                          }}
+                        />
                       </div>
+                    ) : (
+                      // ✅ File upload or empty → show container
+                      <VideoContainer
+                        video={videoVal as File | null}
+                        thumbnail={thumbnailVal as string | undefined}
+                        setValue={setValue}
+                      />
                     )}
-                    {/* Thumbnail preview area (if you generate thumbnails elsewhere) */}
+                    {errors.video && (
+                      <p className="text-sm text-red-500">{errors.video.message as string}</p>
+                    )}
                   </>
                 )}
+
 
                 {/* Tags */}
                 <div className="space-y-3">

@@ -8,7 +8,7 @@ type VideoContainerProps = {
     setValue: (
         field: "video" | "thumbnail",
         value: File | string | null,
-        options?: { shouldValidate: boolean }
+        options?: { shouldValidate: boolean, shouldDirty: boolean }
     ) => void;
     thumbnail: string;
 };
@@ -46,6 +46,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({ video, setValue,
                     onChange={(e) =>
                         setValue("video", e.target.files?.[0] || null, {
                             shouldValidate: true,
+                            shouldDirty: true
                         })
                     }
                 />
@@ -116,3 +117,56 @@ export const AudioContainer: React.FC<AudioContainerProps> = ({ audio, setValue 
         )}
     </div>
 )
+
+type VideoUrlPlayerProps = {
+    videoUrl: string;
+    thumbnailUrl?: string;
+    onDelete?: () => void;
+};
+const VideoUrlPlayer: React.FC<VideoUrlPlayerProps> = ({
+    videoUrl,
+    thumbnailUrl,
+    onDelete,
+}) => {
+    return (
+        <div className="mt-6">
+            {/* Video Player */}
+            <div className="relative rounded-xl overflow-hidden shadow-md bg-black">
+                <video
+                    src={videoUrl}
+                    controls
+                    playsInline
+                    preload="metadata"
+                    className="w-full h-64 rounded-xl object-cover"
+                >
+                    Your browser does not support the video tag.
+                </video>
+                {onDelete && (
+                    <button
+                        type="button"
+                        onClick={onDelete}
+                        className="absolute top-2 right-2 bg-red-600 text-white text-sm px-3 py-1 rounded-lg shadow"
+                    >
+                        Remove
+                    </button>
+                )}
+            </div>
+
+            {/* Thumbnail Preview */}
+            {thumbnailUrl && (
+                <div className="mt-4">
+                    <label className="block text-sm font-medium">Thumbnail Preview</label>
+                    <div className="mt-2 h-28 w-full bg-gray-100 rounded-xl overflow-hidden">
+                        <img
+                            src={thumbnailUrl}
+                            alt="Video Thumbnail"
+                            className="h-full w-full object-cover"
+                        />
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default VideoUrlPlayer;

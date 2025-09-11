@@ -110,40 +110,43 @@ export default function Dashboard() {
         </div>
 
         {/* Urgent Actions Section */}
-        <div className="space-y-3">
-          <div
-            style={{ borderLeftWidth: "2px" }}
-            className="border-red-500 bg-white rounded-2xl px-[24px] py-[16px] shadow-md"
-          >
-            <div className="flex flex-col gap-[16px]">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 warning-color font-semibold text-lg">
-                  <RotateCcw className="w-5 h-5 warning-color" />
-                  Urgent Actions Required
-                  <span className="ml-2 bg-red-100 warning-color text-sm px-2 py-0.5 rounded-full">
-                    {revertedPost.length}
-                  </span>
+
+        {revertedPost.length > 0 &&
+          < div className="space-y-3">
+            <div
+              style={{ borderLeftWidth: "2px" }}
+              className="border-red-500 bg-white rounded-2xl px-[24px] py-[16px] shadow-md"
+            >
+              <div className="flex flex-col gap-[16px]">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 warning-color font-semibold text-lg">
+                    <RotateCcw className="w-5 h-5 warning-color" />
+                    Urgent Actions Required
+                    <span className="ml-2 bg-red-100 warning-color text-sm px-2 py-0.5 rounded-full">
+                      {revertedPost.length}
+                    </span>
+                  </div>
                 </div>
-              </div>
 
-              <hr className="border-t border-gray-200" />
+                <hr className="border-t border-gray-200" />
 
-              <div className="flex flex-col gap-[12px]">
-                {revertedPost.map((note, index) => (
-                  <DashboardListCard
-                    key={note.id ?? index}
-                    id={index}
-                    title={note.title}
-                    message={note.remarks}
-                    buttonText="Edit Story"
-                    onClick={handleNavigate}
-                  />
-                ))}
+                <div className="flex flex-col gap-[12px]">
+                  {revertedPost.map((note, index) => (
+                    <DashboardListCard
+                      key={note.id ?? index}
+                      id={index}
+                      title={note.title}
+                      message={note.remarks}
+                      buttonText="Edit Story"
+                      onClick={handleNavigate}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        }
       </div>
-    </div>
+    </div >
   );
 }

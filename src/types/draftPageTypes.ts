@@ -1,4 +1,4 @@
-export type ArticleType = "Text" | "Audio" | "Video";
+export type ArticleType = "TEXT" | "AUDIO" | "VIDEO";
 export type ArticleStatus = "Auto-saved" | "REVERTED";
 export interface DraftArticle {
   id: string;
@@ -8,46 +8,47 @@ export interface DraftArticle {
   wordCount: number;
   updatedAt: string;
   timeAgo: string;
+  thumbnailUrl?: string;
 }
 
-export const draftArticles: DraftArticle[] = [
-  {
-    id: "1",
-    title: "Climate Change Report: Impact on Local Communities",
-    type: "Text",
-    status: "Auto-saved",
-    wordCount: 1247,
-    updatedAt: "15/01/2025",
-    timeAgo: "Saved 2 minutes ago",
-  },
-  {
-    id: "2",
-    title: "Climate Change Report: Impact on Local Communities",
-    type: "Text",
-    status: "Auto-saved",
-    wordCount: 1247,
-    updatedAt: "15/01/2025",
-    timeAgo: "Saved 2 minutes ago",
-  },
-  {
-    id: "3",
-    title: "Climate Change Report: Impact on Local Communities",
-    type: "Text",
-    status: "Auto-saved",
-    wordCount: 1247,
-    updatedAt: "15/01/2025",
-    timeAgo: "Saved 2 minutes ago",
-  },
-  {
-    id: "4",
-    title: "Climate Change Report: Impact on Local Communities",
-    type: "Audio",
-    status: "Auto-saved",
-    wordCount: 1247,
-    updatedAt: "15/01/2025",
-    timeAgo: "Saved 2 minutes ago",
-  },
-];
+// export const draftArticles: DraftArticle[] = [
+//   {
+//     id: "1",
+//     title: "Climate Change Report: Impact on Local Communities",
+//     type: "Text",
+//     status: "Auto-saved",
+//     wordCount: 1247,
+//     updatedAt: "15/01/2025",
+//     timeAgo: "Saved 2 minutes ago",
+//   },
+//   {
+//     id: "2",
+//     title: "Climate Change Report: Impact on Local Communities",
+//     type: "Text",
+//     status: "Auto-saved",
+//     wordCount: 1247,
+//     updatedAt: "15/01/2025",
+//     timeAgo: "Saved 2 minutes ago",
+//   },
+//   {
+//     id: "3",
+//     title: "Climate Change Report: Impact on Local Communities",
+//     type: "Text",
+//     status: "Auto-saved",
+//     wordCount: 1247,
+//     updatedAt: "15/01/2025",
+//     timeAgo: "Saved 2 minutes ago",
+//   },
+//   {
+//     id: "4",
+//     title: "Climate Change Report: Impact on Local Communities",
+//     type: "Audio",
+//     status: "Auto-saved",
+//     wordCount: 1247,
+//     updatedAt: "15/01/2025",
+//     timeAgo: "Saved 2 minutes ago",
+//   },
+// ];
 
 export interface RevertedArticleTypes {
   id: string;
@@ -59,6 +60,8 @@ export interface RevertedArticleTypes {
   timeAgo: string;
   remarks: string;
   editor: string;
+  thumbnailUrl?: string;
+
 }
 
 export interface DeleteArticleProps {

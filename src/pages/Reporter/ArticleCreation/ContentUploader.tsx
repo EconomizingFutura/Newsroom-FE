@@ -12,6 +12,8 @@ import { useEffect, useState } from "react";
 import SaveDraftsUI from "@/components/SaveDraftUI";
 import { AudioContainer, VideoContainer } from "./Components";
 import { uploadToS3 } from "@/config/s3Config";
+import { base64ToFile } from "@/utils/compression";
+import { v4 as uuidv4 } from "uuid";
 
 type FormData = {
   title: string;
@@ -116,20 +118,39 @@ const ContentUploader = () => {
   /** Submit Handler */
   const submitForReview = async (data: FormData, e: any) => {
     const actionName = (e?.nativeEvent as any)?.submitter?.name || "";
-    const file = data.audio || data.video;
-    console.log(data, "file");
-    const fileType = data.audio == null ? "video" : "audio";
-    const url =
-      file && (await uploadToS3(file, fileType, actionName.toLowerCase()));
-
-    const API_DATA = {
-      ...data,
-      audio: data.video == null ? url : "",
-      video: data.audio == null ? url : "",
-      thumbnail: "",
-    };
+    let url = "";
+    let articleType = "TEXT";
+    let thumbnailStr = "";
 
     try {
+      // Determine article type based on active tab (path)
+      if (path === "audio" && data.audio) {
+        articleType = "AUDIO";
+        url = await uploadToS3(data.audio, "audio", actionName.toLowerCase());
+      } else if (path === "video" && data.video) {
+        articleType = "VIDEO";
+        url = await uploadToS3(data.video, "video", actionName.toLowerCase());
+      } else {
+        articleType = "TEXT";
+      }
+
+      // upload thumbnail
+      if (data.thumbnail) {
+        thumbnailStr = await uploadToS3(
+          base64ToFile(data.thumbnail, `${uuidv4()}.png`),   // ensure it's a File
+          "thumbnail",
+          actionName.toLowerCase()
+        );
+      }
+      // Build API payload
+      const API_DATA = {
+        ...data,
+        type: articleType,
+        audio: articleType === "AUDIO" ? url : "",
+        video: articleType === "VIDEO" ? url : "",
+        thumbnail: articleType === "VIDEO" ? thumbnailStr : "",
+      };
+
       const reporterId = getValues("reporterId");
 
       if (actionName.toLowerCase() === "draft") {
@@ -248,11 +269,10 @@ const ContentUploader = () => {
                     key={tab.id}
                     type="button"
                     onClick={() => navigate(`/${tab.id}`)}
-                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                      isActive
-                        ? "bg-white text-gray-900 shadow-sm"
-                        : "text-gray-500 hover:text-gray-700"
-                    }`}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${isActive
+                      ? "bg-white text-gray-900 shadow-sm"
+                      : "text-gray-500 hover:text-gray-700"
+                      }`}
                   >
                     {tab.name}
                   </button>
@@ -280,11 +300,10 @@ const ContentUploader = () => {
                       }
                       size="sm"
                       onClick={() => setValue("category", category)}
-                      className={`px-[24px] py-[6px] ${
-                        watch("category") === category
-                          ? " bg-[#008001] hover:bg-green-700"
-                          : "bg-[#F8FAF9]"
-                      }`}
+                      className={`px-[24px] py-[6px] ${watch("category") === category
+                        ? " bg-[#008001] hover:bg-green-700"
+                        : "bg-[#F8FAF9]"
+                        }`}
                     >
                       {category}
                     </Button>
@@ -300,9 +319,8 @@ const ContentUploader = () => {
                 <Input
                   placeholder="Title"
                   {...register("title", { required: "Title is required" })}
-                  className={`bg-[#f7fbf8] border-[#ECECEC] ${
-                    errors.title ? "border-red-500" : ""
-                  }`}
+                  className={`bg-[#f7fbf8] border-[#ECECEC] ${errors.title ? "border-red-500" : ""
+                    }`}
                 />
               </div>
 

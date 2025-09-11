@@ -3,7 +3,7 @@ import React from "react";
 import { Button } from "./ui/button";
 
 interface EmptyStateProps {
-  state: "Text" | "Audio" | "Video";
+  state: "TEXT" | "AUDIO" | "VIDEO";
   onCreateNew?: () => void;
 }
 
