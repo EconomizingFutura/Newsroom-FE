@@ -33,14 +33,14 @@ const ContentUploader = () => {
   const navigate = useNavigate();
 
   const [submit, setSubmit] = useState<{
-    type: "draft" | "submit" | null;
+    type: "DRAFT" | "SUBMIT" | null;
     isSubmit: boolean;
   }>({
     type: null,
     isSubmit: false,
   });
 
-  const handleSubmitUI = (type: "draft" | "submit") => {
+  const handleSubmitUI = (type: "DRAFT" | "SUBMIT") => {
     setSubmit({
       type,
       isSubmit: true,
@@ -121,6 +121,7 @@ const ContentUploader = () => {
     let url = "";
     let articleType = "TEXT";
     let thumbnailStr = "";
+    let modifiedContent = "";
 
     try {
       // Determine article type based on active tab (path)
@@ -132,6 +133,8 @@ const ContentUploader = () => {
         url = await uploadToS3(data.video, "video", actionName.toLowerCase());
       } else {
         articleType = "TEXT";
+        modifiedContent = await processAndUploadImages(data.content)
+        console.log(modifiedContent)
       }
 
       // upload thumbnail
@@ -145,6 +148,7 @@ const ContentUploader = () => {
       // Build API payload
       const API_DATA = {
         ...data,
+        content: modifiedContent,
         type: articleType,
         audio: articleType === "AUDIO" ? url : "",
         video: articleType === "VIDEO" ? url : "",
@@ -173,11 +177,11 @@ const ContentUploader = () => {
             navigate("/drafts");
           }
         }
-        handleSubmitUI("draft");
+        handleSubmitUI("DRAFT");
       } else if (actionName.toLowerCase() === "save") {
         const response: any = await POST(API_LIST.SUBMIT_ARTICLE, API_DATA);
         console.log(response, "POST1");
-        handleSubmitUI("submit");
+        handleSubmitUI("SUBMIT");
       }
 
       console.log(API_DATA);
@@ -200,6 +204,37 @@ const ContentUploader = () => {
       tags.filter((tag) => tag !== tagToRemove)
     );
   };
+
+  async function processAndUploadImages(html: string): Promise<string> {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    const images = doc.querySelectorAll("img");
+
+    for (const img of images) {
+      if (img.src.startsWith("data:")) {
+        // Convert base64 to file
+        const file = base64ToFile(img.src, "upload.jpg");
+        // Upload to S3
+        const imageUrl = await uploadToS3(file, 'TEXT', 'draft');
+        // Replace src with S3 URL
+        img.setAttribute("src", imageUrl);
+      }
+    }
+
+    return doc.body.innerHTML; // cleaned HTML with S3 URLs
+  }
+
+  function base64ToFile(base64: string, filename: string): File {
+    const arr = base64.split(",");
+    const mime = arr[0].match(/:(.*?);/)?.[1] || "image/png";
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], filename, { type: mime });
+  }
 
   /** Reset form when tab changes */
   useEffect(() => {

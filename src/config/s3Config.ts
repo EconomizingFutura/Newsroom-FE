@@ -16,7 +16,7 @@ const s3 = new S3Client({
   useDualstackEndpoint: false,
 });
 
-type ArticleType = "video" | "audio" | "thumbnail";
+type ArticleType = "video" | "audio" | "thumbnail" | "TEXT";
 type submitType = "save" | "draft";
 
 export const uploadToS3 = async (

@@ -16,7 +16,7 @@ import { RenderGridView, RenderListView } from "./Components";
 const RevertedPostPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<
-    "All Type" | "Text" | "Audio" | "Video"
+    "All Type" | "TEXT" | "AUDIO" | "VIDEO"
   >("All Type");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [data, setData] = useState<RevertedArticleTypes[]>([]);
@@ -25,7 +25,7 @@ const RevertedPostPage: React.FC = () => {
     id: null,
     isOpen: false,
   });
-  const filterOptions = ["All Type", "Text", "Audio", "Video"];
+  const filterOptions = ["All Type", "TEXT", "AUDIO", "VIDEO"];
   const navigate = useNavigate();
 
   const filteredArticles = useMemo(() => {
@@ -114,7 +114,7 @@ const RevertedPostPage: React.FC = () => {
           filterOptions={filterOptions}
           activeFilter={activeFilter}
           setActiveFilter={(filter: string) =>
-            setActiveFilter(filter as "All Type" | "Text" | "Audio" | "Video")
+            setActiveFilter(filter as "All Type" | "TEXT" | "AUDIO" | "VIDEO")
           }
         />
         {/* Content Area */}
