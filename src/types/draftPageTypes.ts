@@ -9,6 +9,7 @@ export interface DraftArticle {
   updatedAt: string;
   timeAgo: string;
   thumbnailUrl?: string;
+  content?: string;
 }
 
 // export const draftArticles: DraftArticle[] = [
@@ -61,6 +62,7 @@ export interface RevertedArticleTypes {
   remarks: string;
   editor: string;
   thumbnailUrl?: string;
+  content?: string;
 
 }
 

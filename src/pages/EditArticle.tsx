@@ -262,9 +262,6 @@ const EditArticle: React.FC = () => {
 
     const changes: Partial<ArticleFormValues> = {};
 
-
-
-
     for (const key of changedKeys) {
       const value = data[key];
       if (value !== null && value !== undefined) {

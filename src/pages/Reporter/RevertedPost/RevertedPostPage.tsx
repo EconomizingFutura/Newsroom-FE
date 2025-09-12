@@ -128,7 +128,10 @@ const RevertedPostPage: React.FC = () => {
                 status="REVERTED"
               />
             ) : (
-              <RenderListView filteredArticles={filteredArticles} />
+              <RenderListView
+                handleDeletePost={(id) => setDeletePost({ id, isOpen: true })}
+                handleEdit={handleEdit}
+                filteredArticles={filteredArticles} />
             )
           ) : (
             <div className="flex flex-col items-center justify-center py-20">

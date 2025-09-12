@@ -6,6 +6,7 @@ import { getStatusColor, getTypeColor } from "@/utils/draftUtils";
 import { AlertCircle, Edit, Eye, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatDate, formatRelativeTime } from "@/utils/utils";
+import { extractTextSummary } from "../utils";
 
 type GridViewProps = {
   filteredArticles: RevertedArticleTypes[];
@@ -17,6 +18,8 @@ type GridViewProps = {
 type ListViewProps = {
   filteredArticles: RevertedArticleTypes[];
   handleEdit?: (id: string) => void;
+  handleDeletePost: (id: string) => void;
+
 };
 export const RenderGridView: React.FC<GridViewProps> = ({
   filteredArticles,
@@ -31,13 +34,13 @@ export const RenderGridView: React.FC<GridViewProps> = ({
         key={article.id}
         title={article.title}
         updatedDate={article.updatedAt}
-        wordCount={article.wordCount}
+        wordCount={extractTextSummary(article.content ?? '', 30).wordCount}
         savedTime={formatRelativeTime(article.updatedAt)}
         type={article.type}
         status={status}
         thumbnailUrl={article.thumbnailUrl}
         remarkMessage={article.remarks}
-        contentPreview={article.title}
+        contentPreview={extractTextSummary(article.content ?? '', 30).text}
         handleDelete={() => handleDeletePost(article.id)}
         handleEdit={() => handleEdit(article.id)}
       />
@@ -104,7 +107,8 @@ export const RenderListView: React.FC<ListViewProps> = ({
 
 export const RenderListViewDraft: React.FC<ListViewProps> = ({
   filteredArticles,
-  handleEdit,
+  handleEdit, handleDeletePost,
+
 }) => (
   <div className="space-y-3">
     {filteredArticles.map((article) => (
@@ -143,6 +147,7 @@ export const RenderListViewDraft: React.FC<ListViewProps> = ({
               Edit
             </Button>
             <Button
+              onClick={() => handleDeletePost(article.id)}
               size="sm"
               variant="outline"
               className="border-red-200 text-red-600 hover:bg-red-50 w-8 h-8 p-0"

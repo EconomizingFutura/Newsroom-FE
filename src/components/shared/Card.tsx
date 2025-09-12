@@ -23,7 +23,7 @@ const Card: React.FC<CardProps> = ({
   title,
   contentPreview,
   updatedDate,
-  wordCount,
+  wordCount = 0,
   savedTime,
   type = "TEXT",
   status = "Auto-saved",
@@ -60,7 +60,7 @@ const Card: React.FC<CardProps> = ({
       {/* Dynamic Preview Section */}
       <div className="mt-2">
         {/* TEXT */}
-        {type === "TEXT" && status === "Auto-saved" && (
+        {type === "TEXT" && (
           <p className="text-sm text-gray-600 line-clamp-2">{contentPreview}</p>
         )}
 
@@ -120,7 +120,7 @@ const Card: React.FC<CardProps> = ({
             <Clock className="w-5 h-5" />
             <p>Updated {formatDate(updatedDate)}</p>
           </div>
-          <div>{wordCount && <p>{wordCount} words</p>}</div>
+          {wordCount > 0 && <div>{wordCount && <p>{wordCount} words</p>}</div>}
           <p className="text-green-600 ">{savedTime}</p>
         </div>
       )}

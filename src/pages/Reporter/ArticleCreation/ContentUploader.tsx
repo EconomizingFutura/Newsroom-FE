@@ -14,6 +14,7 @@ import { AudioContainer, VideoContainer } from "./Components";
 import { uploadToS3 } from "@/config/s3Config";
 import { base64ToFile } from "@/utils/compression";
 import { v4 as uuidv4 } from "uuid";
+import processAndUploadImages from "../utils";
 
 type FormData = {
   title: string;
@@ -205,36 +206,9 @@ const ContentUploader = () => {
     );
   };
 
-  async function processAndUploadImages(html: string): Promise<string> {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, "text/html");
-    const images = doc.querySelectorAll("img");
 
-    for (const img of images) {
-      if (img.src.startsWith("data:")) {
-        // Convert base64 to file
-        const file = base64ToFile(img.src, "upload.jpg");
-        // Upload to S3
-        const imageUrl = await uploadToS3(file, 'TEXT', 'draft');
-        // Replace src with S3 URL
-        img.setAttribute("src", imageUrl);
-      }
-    }
 
-    return doc.body.innerHTML; // cleaned HTML with S3 URLs
-  }
 
-  function base64ToFile(base64: string, filename: string): File {
-    const arr = base64.split(",");
-    const mime = arr[0].match(/:(.*?);/)?.[1] || "image/png";
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new File([u8arr], filename, { type: mime });
-  }
 
   /** Reset form when tab changes */
   useEffect(() => {

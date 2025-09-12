@@ -20,6 +20,7 @@ import Pagination from "@/components/Pagination";
 import { API_LIST } from "@/api/endpoints";
 import { GET } from "@/api/apiMethods";
 import moment from "moment";
+import type { RevertedArticleTypes } from "@/types/draftPageTypes";
 
 const HistoryLogPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -27,21 +28,35 @@ const HistoryLogPage: React.FC = () => {
   const [typeFilter, setTypeFilter] = useState("All Type");
   const [dateRange, setDateRange] = useState("Date Range");
   const navigate = useNavigate();
+  const [pageMetaData, setPageMetaData] = useState<{
+    "total": number,
+    "page": number,
+    "pageSize": number,
+    "totalPages": number,
+    "hasNextPage": boolean,
+    "hasPrevPage": boolean
 
+  }>({
+    "total": 11,
+    "page": 1,
+    "pageSize": 10,
+    "totalPages": 2,
+    "hasNextPage": true,
+    "hasPrevPage": false
+  });
   const handlePageSize = (val: string) => {
     const size = val.split(" ")[0];
-    console.log(size, val);
     setPageSize(Number(size));
   };
-  const [historyArticles, setHistoryArticles] = useState([]);
+  const [historyArticles, setHistoryArticles] = useState<RevertedArticleTypes[]>([]);
   const statusOptions = [
     "All Status",
-    "Approved",
-    "Submitted",
-    "Reverted",
-    "Draft",
+    "APPROVED",
+    "SUBMITTED",
+    "REVERTED",
+    "DRAFT",
   ];
-  const typeOptions = ["All Type", "Text", "Audio", "Video"];
+  const typeOptions = ["All Type", "TEXT", "AUDIO", "VIDEO"];
 
   const filteredArticles = historyArticles?.filter((article: any) => {
     const matchesSearch = article.title
@@ -63,13 +78,10 @@ const HistoryLogPage: React.FC = () => {
     pageSize,
   } = usePagination({
     initialPage: 1,
-    totalPages: filteredArticles.length,
+    totalPages: pageMetaData.totalPages,
     initialPageSize: 10,
   });
 
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = startIndex + pageSize;
-  const paginatedArticles = filteredArticles.slice(startIndex, endIndex);
 
   const initialStats = [
     {
@@ -112,11 +124,12 @@ const HistoryLogPage: React.FC = () => {
 
   const handleEdit = (id: string) => {
     const articleType =
-      paginatedArticles.find((article: any) => article.id === id)?.type ||
+      filteredArticles.find((article: any) => article.id === id)?.type ||
       "Text";
     const route = returnType(articleType);
     navigate(`/${route}/${id}?from=history`);
   };
+
 
   const [stats, setStats] = useState(initialStats);
   useEffect(() => {
@@ -136,18 +149,32 @@ const HistoryLogPage: React.FC = () => {
       }
     };
 
+    getStatsData();
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
     const getHistoryList = async () => {
       try {
-        const response: any = await GET(API_LIST.BASE_URL + API_LIST.HISTORY);
-        setHistoryArticles(response.data ?? []);
-      } catch (error) {
-        console.error("Error fetching data:", error);
+        const response: any = await GET(
+          `${API_LIST.BASE_URL}${API_LIST.HISTORY
+          }?page=${currentPage}&pageSize=${pageSize}`,
+          { signal: controller.signal }
+        );
+        setHistoryArticles(response.articles ?? []);
+        setPageMetaData(response.pagination)
+      } catch (error: any) {
+        if (error.name !== "AbortError") {
+          console.error("Error fetching reverted posts:", error);
+        }
       }
     };
 
     getHistoryList();
-    getStatsData();
-  }, []);
+    return () => controller.abort();
+  }, [currentPage, pageSize]);
+
 
   function getArticleType(article: any): "text" | "audio" | "video" {
     if (article.content && article.content !== "") {
@@ -276,8 +303,8 @@ const HistoryLogPage: React.FC = () => {
 
             {/* Table Rows */}
             <div className="divide-y divide-gray-200">
-              {paginatedArticles.length > 0 ? (
-                paginatedArticles.map((article: any) => (
+              {filteredArticles.length > 0 ? (
+                filteredArticles.map((article: any) => (
                   <div
                     key={article.id}
                     className="grid grid-cols-12 gap-4 p-6 hover:bg-gray-50 transition-colors items-center"
@@ -341,8 +368,8 @@ const HistoryLogPage: React.FC = () => {
           </div>
         </div>
         <Pagination
-          currentPage={currentPage}
-          pageCount={pageCount}
+          currentPage={pageMetaData.page}
+          pageCount={pageMetaData.totalPages}
           onPageChange={handlePageChange}
           setCurrentPage={setCurrentPage}
           setSortConfig={handlePageSize}

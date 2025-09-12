@@ -15,6 +15,8 @@ import {
   RenderGridView,
   RenderListViewDraft,
 } from "./RevertedPost/Components";
+import Pagination from "@/components/Pagination";
+import { usePagination } from "@/hooks/usePagination";
 
 export default function DraftsPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -23,6 +25,23 @@ export default function DraftsPage() {
   >("All Type");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [data, setData] = useState<RevertedArticleTypes[]>([]);
+  const [pageMetaData, setPageMetaData] = useState<{
+    "total": number,
+    "page": number,
+    "pageSize": number,
+    "totalPages": number,
+    "hasNextPage": boolean,
+    "hasPrevPage": boolean
+
+  }>({
+    "total": 11,
+    "page": 1,
+    "pageSize": 10,
+    "totalPages": 2,
+    "hasNextPage": true,
+    "hasPrevPage": false
+  });
+
   const navigate = useNavigate();
   const filterOptions = ["All Type", "TEXT", "AUDIO", "VIDEO"];
   const [deletePost, setDeletePost] = useState<DeleteArticleProps>({
@@ -41,6 +60,25 @@ export default function DraftsPage() {
     });
   }, [data, searchQuery, activeFilter]);
 
+  const {
+    pageCount,
+    currentPage,
+    setPageSize,
+    setCurrentPage,
+    handlePageChange,
+    pageSize,
+  } = usePagination({
+    initialPage: 1,
+    totalPages: pageMetaData.totalPages,
+    initialPageSize: 10,
+  });
+
+
+
+  const handlePageSize = (val: string) => {
+    const size = val.split(" ")[0];
+    setPageSize(Number(size));
+  };
   const renderEmptyState = () => {
     const isAudio =
       activeFilter === "AUDIO"
@@ -94,10 +132,11 @@ export default function DraftsPage() {
       try {
         const response: any = await GET(
           `${API_LIST.BASE_URL}${API_LIST.DRAFT_ARTICLE
-          }?page=${1}&pageSize=${10}`,
+          }?page=${currentPage}&pageSize=${pageSize}`,
           { signal: controller.signal }
         );
         setData(response.drafts);
+        setPageMetaData(response.pagination)
         console.log("repose", response);
       } catch (error: any) {
         if (error.name !== "AbortError") {
@@ -108,9 +147,7 @@ export default function DraftsPage() {
 
     getDraftArticle();
     return () => controller.abort();
-  }, []);
-
-  console.log(data, filteredArticles, "as");
+  }, [currentPage, pageSize]);
 
   return (
     <div className="flex-1 py-16 h-screen bg-gray-50">
@@ -153,9 +190,20 @@ export default function DraftsPage() {
               status="DRAFT"
             />
           ) : (
-            <RenderListViewDraft filteredArticles={filteredArticles} />
+            <RenderListViewDraft
+              handleDeletePost={(id) => setDeletePost({ id, isOpen: true })}
+              handleEdit={handleEdit}
+              filteredArticles={filteredArticles} />
           )}
         </div>
+
+        <Pagination
+          currentPage={pageMetaData.page}
+          pageCount={pageMetaData.totalPages}
+          onPageChange={handlePageChange}
+          setCurrentPage={setCurrentPage}
+          setSortConfig={handlePageSize}
+        />
       </div>
       {deletePost.isOpen && (
         <DeleteConfirmation
@@ -168,6 +216,8 @@ export default function DraftsPage() {
           }
         />
       )}
+
+
     </div>
   );
 }
