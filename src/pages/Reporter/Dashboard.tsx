@@ -15,7 +15,7 @@ type StatCardProps = {
 };
 
 const INITIAL_STATS: StatCardProps[] = [
-  { title: "Total Posts", count: 0, icon: FilePen, color: "#155DFC" },
+  { title: "Total", count: 0, icon: FilePen, color: "#155DFC" },
   { title: "Draft", count: 0, icon: FilePen, color: "#4A5565" },
   { title: "Submitted", count: 0, icon: Clock, color: "#2B7FFF" },
   { title: "Approved", count: 0, icon: CheckCircle, color: "#008001" },

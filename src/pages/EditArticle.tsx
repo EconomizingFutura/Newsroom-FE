@@ -7,7 +7,6 @@ import {
   Save,
   Send,
   Upload,
-  Video,
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,13 +18,12 @@ import AudioPlayer from "@/components/ui/AudioPlayer";
 import EditorRemarks from "@/components/EditorRemarks";
 import { StatusBadge } from "@/components/StatusBadge";
 import SaveDraftsUI from "@/components/SaveDraftUI";
-import { GET, PATCH } from "@/api/apiMethods";
+import { GET, PATCH, POST } from "@/api/apiMethods";
 import { API_LIST } from "@/api/endpoints";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import VideoUrlPlayer, { VideoContainer } from "./Reporter/ArticleCreation/Components";
-import type { ArticleType, DraftArticle } from "@/types/draftPageTypes";
 import { uploadToS3 } from "@/config/s3Config";
 import { base64ToFile } from "@/utils/compression";
 import { v4 as uuidv4 } from "uuid";
@@ -39,7 +37,6 @@ type ArticleFormValues = {
   audio: File | string | null;
   status: string | null;
   thumbnail?: string | File | null;
-
 };
 
 const EditArticle: React.FC = () => {
@@ -231,32 +228,15 @@ const EditArticle: React.FC = () => {
     );
   };
 
-  const onSubmit = (data: ArticleFormValues) => {
-    submitForReview(data)
+  const onSubmit = (data: ArticleFormValues, status: "SUBMIT" | "DRAFT") => {
+    submitForReview(data, status)
   };
 
-  // const submitForReview = async (data: ArticleFormValues) => {
 
-  //   try {
-
-  //     const response: any = await PATCH(
-  //       API_LIST.BASE_URL + API_LIST.DRAFT_BY_ARTICLE + id,
-  //       data
-  //     );
-  //     console.log("response :", response);
-  //     navigate("/drafts");
-
-
-  //   } catch (err) {
-  //     console.error("❌ Error:", err);
-  //   }
-  // };
-
-  const submitForReview = async (data: ArticleFormValues) => {
+  const submitForReview = async (data: ArticleFormValues, status: "SUBMIT" | "DRAFT") => {
 
     const changedKeys = Object.keys(dirtyFields) as (keyof ArticleFormValues)[];
     if (changedKeys.length === 0) {
-      console.log("⚡ No changes detected");
       return;
     }
 
@@ -284,11 +264,22 @@ const EditArticle: React.FC = () => {
       );
     }
 
-    console.log("🔄 Sending only changed fields:", changes);
+    if (status === 'DRAFT') {
+      await PATCH(`${API_LIST.BASE_URL}${API_LIST.DRAFT_BY_ARTICLE}${id}`, changes);
+      handleSubmitUI("DRAFT");
+      navigate("/drafts");
+    }
+    else if (status === "SUBMIT") {
 
+      const API_DATA = {
+        ...data,
+        articleId: id
+      };
+      const response: any = await POST(API_LIST.SUBMIT_ARTICLE, API_DATA);
+      handleSubmitUI("SUBMIT");
+      navigate("/drafts");
 
-    await PATCH(`${API_LIST.BASE_URL}${API_LIST.DRAFT_BY_ARTICLE}${id}`, changes);
-    navigate("/drafts");
+    }
   };
 
   return (
@@ -323,8 +314,7 @@ const EditArticle: React.FC = () => {
                 onClick={handleSubmit((data) => {
                   // save draft -> update status and show UI
                   setValue("status", "DRAFT");
-                  handleSubmitUI("DRAFT");
-                  onSubmit({ ...data, status: "DRAFT" });
+                  onSubmit(data, "DRAFT");
                 })}
                 variant="outline"
                 size="sm"
@@ -338,8 +328,7 @@ const EditArticle: React.FC = () => {
                 type="button"
                 onClick={handleSubmit((data) => {
                   setValue("status", "SUBMIT");
-                  handleSubmitUI("SUBMIT");
-                  onSubmit({ ...data, status: "SUBMIT" });
+                  onSubmit(data, "SUBMIT");
                 })}
                 size="sm"
                 className="bg-green-700 hover:bg-green-700 text-white gap-2"
@@ -350,7 +339,7 @@ const EditArticle: React.FC = () => {
             </div>
           </div>
 
-          <form id="myForm" onSubmit={handleSubmit(onSubmit)}>
+          <form id="myForm" >
             <div className="bg-white  border-gray-200 px-8 py-6  shadow-md">
               <div className="flex items-center justify-between ">
                 <h2 className="text-[20px] font-semibold">Content Editor</h2>

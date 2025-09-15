@@ -85,7 +85,7 @@ const HistoryLogPage: React.FC = () => {
 
   const initialStats = [
     {
-      title: "Total Posts",
+      title: "Total",
       value: 0,
       pillBg: "bg-[#F2F4F6]",
       pillText: "text-[#4A5565]",
