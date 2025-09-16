@@ -127,7 +127,7 @@ const HistoryLogPage: React.FC = () => {
       filteredArticles.find((article: any) => article.id === id)?.type ||
       "Text";
     const route = returnType(articleType);
-    navigate(`/${route}/${id}?from=history`);
+    navigate(`/${route}/${id}?from=history`, { state: {name: 'harish'} });
   };
 
 

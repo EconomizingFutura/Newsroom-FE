@@ -1,7 +1,8 @@
 import type {
   DraftArticle
 } from "@/types/draftPageTypes";
-
+import { DELETE } from "@/api/apiMethods";
+import { API_LIST } from "@/api/endpoints";
 export const getTypeColor = (type: string) => {
   switch (type) {
     case "TEXT":
@@ -24,14 +25,16 @@ export const getStatusColor = (status: string) => {
   }
 };
 
-export const DELETE_DRAFT_MODAL_ID = (
+export const DELETE_DRAFT_MODAL_ID = async (
   id: string,
   callBack: (draftArticles: DraftArticle[]) => void,
   state: DraftArticle[]
 ) => {
-  const filteredDrafts = state.filter((article) => article.id !== id);
-
-  callBack(filteredDrafts);
+  const response: any = await DELETE(`${API_LIST.BASE_URL}${API_LIST.DELETE_ARTICLE}${id}`);
+  if(!response?.error) {
+    const filteredDrafts = state.filter((article) => article.id !== id);
+    callBack(filteredDrafts);
+  }
 };
 
 export const EDIT_DRAFT_NAVIGATE = (

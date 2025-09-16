@@ -160,7 +160,7 @@ const SideBar: React.FC<SidebarTypes> = (props) => {
                   {item.icon}
                   {item.label}
                 </span>
-                {item.badge && (
+                {item.badge && false && (
                   <span
                     className={cn(
                       "bg-green-600 text-white text-xs font-medium px-2 rounded-full",
@@ -230,7 +230,8 @@ const SideBar: React.FC<SidebarTypes> = (props) => {
         <Separator className="my-4 bg-gray-200 h-px" />
 
         {/* Multi Window */}
-        <div className="space-y-2">
+        {false && (
+          <div className="space-y-2">
           <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1">
             Multi Window
           </h4>
@@ -280,6 +281,8 @@ const SideBar: React.FC<SidebarTypes> = (props) => {
             ))}
           </div>
         </div>
+        )}
+        
       </div>
     </div>
   );

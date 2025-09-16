@@ -41,6 +41,7 @@ type ArticleFormValues = {
 
 const EditArticle: React.FC = () => {
   const location = useLocation();
+  const isPreviewMode = location.state || false;
   const navigate = useNavigate();
   const path = location.pathname.split("/")[1];
   const { id } = useParams<{ id: string }>();
@@ -307,7 +308,7 @@ const EditArticle: React.FC = () => {
               <HeaderIcon className="text-white" name="Text Article" />
             </Button>
             <p className="font-bold text-2xl">{activeConfig.label}</p>
-            <div className="flex items-center gap-2 px-2 ml-auto">
+            { !isPreviewMode && <div className="flex items-center gap-2 px-2 ml-auto">
               <Button
                 form="myForm"
                 type="button"
@@ -337,6 +338,7 @@ const EditArticle: React.FC = () => {
                 Submit for Review
               </Button>
             </div>
+          }
           </div>
 
           <form id="myForm" >
@@ -363,6 +365,7 @@ const EditArticle: React.FC = () => {
                     <span>*</span>
                   </div>
                   <Input
+                    disabled={isPreviewMode}
                     {...register("name")}
                     placeholder="Name"
                     className="bg-[#f7fbf8] border-[#ECECEC] border"
@@ -385,6 +388,7 @@ const EditArticle: React.FC = () => {
                       name="content"
                       render={({ field }) => (
                         <CustomQuilTextEditor
+                          readOnly={isPreviewMode}
                           selectedValue={field.value}
                           placeholder="Write something..."
                           onChange={(val: string) => {
@@ -414,6 +418,7 @@ const EditArticle: React.FC = () => {
                           <Upload className="h-4 w-4" />
                           <span>Choose File</span>
                           <input
+                            disabled={isPreviewMode}
                             type="file"
                             accept=".mp3,.wav,.m4a"
                             hidden
@@ -474,18 +479,19 @@ const EditArticle: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <div className="relative w-full">
                       <Input
+                        disabled={isPreviewMode}
                         placeholder="Add tag"
                         value={newTag}
                         onChange={(e) => setNewTag(e.target.value)}
                         onKeyPress={(e) => {
-                          if (e.key === "Enter") {
+                          if (e.key === "Enter" && !isPreviewMode) {
                             e.preventDefault();
                             handleAddTag();
                           }
                         }}
                         className="py-[19px] border-[#ECECEC] border bg-[#f7fbf8]"
                       />
-                      <Button
+                      {!isPreviewMode && <Button
                         type="button"
                         size="sm"
                         onClick={handleAddTag}
@@ -493,7 +499,7 @@ const EditArticle: React.FC = () => {
                       >
                         <Plus className="w-3 h-3" />
                         Add
-                      </Button>
+                      </Button>}
                     </div>
                   </div>
 
@@ -501,9 +507,9 @@ const EditArticle: React.FC = () => {
                     {tags.map((tag: string, index: number) => (
                       <Badge key={index} variant="secondary" className="gap-2 px-3 py-1 text-[#008001] bg-[#f8faf9] border-[#B3E6B3]">
                         {tag}
-                        <button type="button" onClick={() => handleRemoveTag(tag)} className="hover:text-red-600">
+                        {!isPreviewMode && <button type="button" onClick={() => handleRemoveTag(tag)} className="hover:text-red-600">
                           <X className="w-3 h-3" />
-                        </button>
+                        </button>}
                       </Badge>
                     ))}
                   </div>

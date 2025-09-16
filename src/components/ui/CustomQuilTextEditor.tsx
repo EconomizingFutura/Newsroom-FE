@@ -5,13 +5,15 @@ import "react-quill-new/dist/quill.snow.css";
 type CustomQuilTextEditorProps = {
   placeholder?: string;
   onChange?: (json: any) => void;
-  selectedValue?: string
+  selectedValue?: string;
+  readOnly?:boolean;
 };
 
 const CustomQuilTextEditor: React.FC<CustomQuilTextEditorProps> = ({
   placeholder = "Start typing...",
   onChange,
-  selectedValue
+  selectedValue,
+  readOnly
 }) => {
   const [content, setContent] = useState<any>(selectedValue);
 
@@ -39,8 +41,9 @@ const CustomQuilTextEditor: React.FC<CustomQuilTextEditorProps> = ({
     <div className="w-full">
       <div className="relative border rounded-lg bg-[#f9fdfa] overflow-hidden">
         <ReactQuill
+          readOnly={readOnly}
           value={content}
-          modules={modules}
+          modules={readOnly ? modules : { toolbar: false }}
           formats={formats}
           placeholder={placeholder}
           className="h-40"

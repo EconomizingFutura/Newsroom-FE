@@ -9,5 +9,6 @@ export const API_LIST = Object.freeze({
   DRAFT_ARTICLE: import.meta.env.VITE_DRAFT,
   DRAFT_BY_ARTICLE: import.meta.env.VITE_DRAFT_BY_ID,
   REVERTED_POST: import.meta.env.VITE_REVERTED_POST,
-  GET_ARTICLE: import.meta.env.VITE_GET_ARTICLE
+  GET_ARTICLE: import.meta.env.VITE_GET_ARTICLE,
+  DELETE_ARTICLE: import.meta.env.VITE_DELETE_ARTICLE
 });
