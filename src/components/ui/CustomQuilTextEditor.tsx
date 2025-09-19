@@ -6,7 +6,7 @@ type CustomQuilTextEditorProps = {
   placeholder?: string;
   onChange?: (json: any) => void;
   selectedValue?: string;
-  readOnly?:boolean;
+  readOnly?: boolean;
 };
 
 const CustomQuilTextEditor: React.FC<CustomQuilTextEditorProps> = ({
@@ -43,7 +43,9 @@ const CustomQuilTextEditor: React.FC<CustomQuilTextEditorProps> = ({
         <ReactQuill
           readOnly={readOnly}
           value={content}
-          modules={readOnly ? modules : { toolbar: false }}
+          modules={modules}
+
+          //   modules={readOnly ? modules : { toolbar: false }}
           formats={formats}
           placeholder={placeholder}
           className="h-40"

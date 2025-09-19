@@ -1,17 +1,15 @@
-import { useNavigate } from "react-router";
 
 export const returnType = (type: string) => {
   let route: string;
 
   switch (type) {
     case "Text":
-    case "Text Article":
       route = "textArticle";
       break;
-    case "Audio Post":
+    case "AUDIO":
       route = "audio";
       break;
-    case "Video Post":
+    case "VIDEO":
       route = "video";
       break;
     default:

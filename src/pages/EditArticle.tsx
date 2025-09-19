@@ -23,10 +23,11 @@ import { API_LIST } from "@/api/endpoints";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import VideoUrlPlayer, { VideoContainer } from "./Reporter/ArticleCreation/Components";
+import VideoUrlPlayer, { AudioUrlPlayer, VideoContainer } from "./Reporter/ArticleCreation/Components";
 import { uploadToS3 } from "@/config/s3Config";
 import { base64ToFile } from "@/utils/compression";
 import { v4 as uuidv4 } from "uuid";
+import { HISTORY_STATUS } from "@/utils/draftUtils";
 
 type ArticleFormValues = {
   category: string;
@@ -54,7 +55,6 @@ const EditArticle: React.FC = () => {
   }>({ type: null, isSubmit: false });
 
   const [newTag, setNewTag] = useState("");
-  const [originalArticle, setOriginalArticle] = useState<ArticleFormValues | null>(null);
 
   const headerConfig: Record<string, { label: string; color: string; icon: HeaderKey }> = {
     textArticle: { label: "Text Article", color: "#2B7FFF", icon: "Text Article" },
@@ -192,8 +192,6 @@ const EditArticle: React.FC = () => {
             status: response.status ?? null,
           };
 
-          setOriginalArticle(mapped);
-
           // fill form
           Object.entries(mapped).forEach(([key, value]) => {
             setValue(key as keyof ArticleFormValues, value, { shouldValidate: true, shouldDirty: false });
@@ -235,37 +233,37 @@ const EditArticle: React.FC = () => {
 
 
   const submitForReview = async (data: ArticleFormValues, status: "SUBMIT" | "DRAFT") => {
-
-    const changedKeys = Object.keys(dirtyFields) as (keyof ArticleFormValues)[];
-    if (changedKeys.length === 0) {
-      return;
-    }
-
-    const changes: Partial<ArticleFormValues> = {};
-
-    for (const key of changedKeys) {
-      const value = data[key];
-      if (value !== null && value !== undefined) {
-        changes[key] = value as any; // 👈 cast so TS accepts it
-      }
-    }
-
-    // Handle file uploads only if changed
-    if (dirtyFields.audio && data.audio instanceof File) {
-      changes.audio = await uploadToS3(data.audio, "audio", "draft");
-    }
-    if (dirtyFields.video && data.video instanceof File) {
-      changes.video = await uploadToS3(data.video, "video", "draft");
-    }
-    if (dirtyFields.thumbnail && data.thumbnail && typeof data.thumbnail === "string") {
-      changes.thumbnail = await uploadToS3(
-        base64ToFile(data.thumbnail as string, `${uuidv4()}.png`),
-        "thumbnail",
-        "draft"
-      );
-    }
-
     if (status === 'DRAFT') {
+
+      const changedKeys = Object.keys(dirtyFields) as (keyof ArticleFormValues)[];
+      if (changedKeys.length === 0) {
+        return;
+      }
+
+      const changes: Partial<ArticleFormValues> = {};
+
+      for (const key of changedKeys) {
+        const value = data[key];
+        if (value !== null && value !== undefined) {
+          changes[key] = value as any; // 👈 cast so TS accepts it
+        }
+      }
+
+      // Handle file uploads only if changed
+      if (dirtyFields.audio && data.audio instanceof File) {
+        changes.audio = await uploadToS3(data.audio, "audio", "draft");
+      }
+      if (dirtyFields.video && data.video instanceof File) {
+        changes.video = await uploadToS3(data.video, "video", "draft");
+      }
+      if (dirtyFields.thumbnail && data.thumbnail && typeof data.thumbnail === "string") {
+        changes.thumbnail = await uploadToS3(
+          base64ToFile(data.thumbnail as string, `${uuidv4()}.png`),
+          "thumbnail",
+          "draft"
+        );
+      }
+
       await PATCH(`${API_LIST.BASE_URL}${API_LIST.DRAFT_BY_ARTICLE}${id}`, changes);
       handleSubmitUI("DRAFT");
       navigate("/drafts");
@@ -308,7 +306,7 @@ const EditArticle: React.FC = () => {
               <HeaderIcon className="text-white" name="Text Article" />
             </Button>
             <p className="font-bold text-2xl">{activeConfig.label}</p>
-            { !isPreviewMode && <div className="flex items-center gap-2 px-2 ml-auto">
+            {!isPreviewMode && <div className="flex items-center gap-2 px-2 ml-auto">
               <Button
                 form="myForm"
                 type="button"
@@ -338,7 +336,7 @@ const EditArticle: React.FC = () => {
                 Submit for Review
               </Button>
             </div>
-          }
+            }
           </div>
 
           <form id="myForm" >
@@ -346,12 +344,20 @@ const EditArticle: React.FC = () => {
               <div className="flex items-center justify-between ">
                 <h2 className="text-[20px] font-semibold">Content Editor</h2>
                 <div className="flex gap-2">
-                  <StatusBadge
-                    label="Draft"
+                  {/* <StatusBadge
+                    label={getValues("status") || ''}
                     active={getValues("status") === "DRAFT"}
                     activeClass="text-[#6A7282] bg-[#F8FAF9] border-[#E5E7EB]"
                     inactiveClass="text-[#6A7282] opacity-50 border border-transparent"
-                  />
+                  /> */}
+
+                  <Badge
+                    className={`px-[16px] font-semibold py-[6px] text-[14px] ${HISTORY_STATUS(
+                      getValues("status") || ''
+                    )}`}
+                  >
+                    <span>{getValues("status")}</span>
+                  </Badge>
                 </div>
               </div>
 
@@ -413,7 +419,9 @@ const EditArticle: React.FC = () => {
                           <Mic className="h-6 w-6" />
                         </div>
                         <p className="mt-6 font-medium">Upload audio file</p>
-                        <p className="text-sm text-gray-500 mt-1">Supports MP3, WAV, M4A (Max 100MB)</p>
+                        <p className="text-sm text-gray-500 mt-1">
+                          Supports MP3, WAV, M4A (Max 100MB)
+                        </p>
                         <label className="inline-flex items-center gap-2 mt-6 bg-green-100 text-green-800 px-4 py-2 rounded-xl cursor-pointer">
                           <Upload className="h-4 w-4" />
                           <span>Choose File</span>
@@ -423,16 +431,31 @@ const EditArticle: React.FC = () => {
                             accept=".mp3,.wav,.m4a"
                             hidden
                             onChange={(e) => {
-                              setValue("audio", e.target.files?.[0] || null, { shouldValidate: true, shouldDirty: true });
+                              setValue("audio", e.target.files?.[0] || null, {
+                                shouldValidate: true,
+                                shouldDirty: true,
+                              });
                             }}
                           />
                         </label>
-                        {errors.audio && <p className="text-sm text-red-500">{errors.audio.message as string}</p>}
+                        {errors.audio && (
+                          <p className="text-sm text-red-500">
+                            {errors.audio.message as string}
+                          </p>
+                        )}
                       </div>
                     )}
+
                     {audioVal && (
                       <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl text-center">
-                        <AudioPlayer src={audioVal} fileName={typeof audioVal === "object" ? audioVal.name : ""} />
+                        {typeof audioVal === "string" ? (
+                          <AudioUrlPlayer src={audioVal} />
+                        ) : (
+                          <AudioPlayer
+                            src={URL.createObjectURL(audioVal)}
+                            fileName={audioVal.name}
+                          />
+                        )}
                       </div>
                     )}
                   </>

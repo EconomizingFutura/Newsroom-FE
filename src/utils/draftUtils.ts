@@ -43,7 +43,6 @@ export const EDIT_DRAFT_NAVIGATE = (
 ): "textArticle" | "audio" | "video" => {
   const articleType =
     draftArticles.find((article) => article.id === id)?.type || "TEXT";
-  console.log(articleType)
 
   switch (articleType) {
     case "TEXT":
