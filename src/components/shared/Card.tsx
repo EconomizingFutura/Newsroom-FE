@@ -1,6 +1,8 @@
 import React from "react";
 import { Trash, MessageSquare, PenLine, Clock } from "lucide-react";
 import { formatDate } from "@/utils/utils";
+import { cn } from "../ui/utils";
+import { ImageWithFallback } from "../ImageWithFallback";
 
 type CardProps = {
   id: string;
@@ -61,13 +63,14 @@ const Card: React.FC<CardProps> = ({
       <div className="mt-2">
         {/* TEXT */}
         {type === "TEXT" && (
-          <p className="text-sm text-gray-600 line-clamp-2">{contentPreview}</p>
+          <p className="text-sm text-gray-600  min-h-20 line-clamp-2">{contentPreview}</p>
         )}
 
         {/* AUDIO */}
         {type === "AUDIO" && (
           <div className="flex justify-center items-center">
-            <img
+            <ImageWithFallback
+              mediaType="audio"
               src={thumbnailUrl || "/images/audio-placeholder.png"}
               alt="Audio Thumbnail"
               className="w-full h-32 object-cover rounded-lg"
@@ -78,7 +81,8 @@ const Card: React.FC<CardProps> = ({
         {/* VIDEO */}
         {type === "VIDEO" && (
           <div className="flex justify-center items-center relative">
-            <img
+            <ImageWithFallback
+            mediaType="video"
               src={thumbnailUrl || "/images/video-placeholder.png"}
               alt="Video Thumbnail"
               className="w-full h-32 object-cover rounded-lg"
@@ -115,12 +119,16 @@ const Card: React.FC<CardProps> = ({
 
       {/* Footer */}
       {savedTime && status === "DRAFT" && (
-        <div className="flex items-center justify-between gap-2 mt-3 text-[14px] text-gray-500">
-          <div className="flex items-center gap-2">
+        <div
+          className={cn(
+            "grid items-center justify-between mt-3 text-[14px] text-gray-500",
+            wordCount > 0 ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-2"
+          )}        >
+          <div className="flex items-center  gap-2">
             <Clock className="w-5 h-5" />
             <p>Updated {formatDate(updatedDate)} </p>
           </div>
-          {wordCount > 0 && <div>{wordCount && <p>{wordCount} words</p>}</div>}
+          {wordCount > 0 && <div className="text-center ">{wordCount && <p>{wordCount} words</p>}</div>}
           <p className="text-green-600 ">{savedTime}</p>
         </div>
       )}

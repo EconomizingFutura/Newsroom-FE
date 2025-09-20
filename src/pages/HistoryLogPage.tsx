@@ -277,23 +277,23 @@ const HistoryLogPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex-1 px-4 overflow-auto bg-white rounded-2xl shadow-md">
+        <div className="flex-1 px-4 overflow-auto  bg-white rounded-2xl shadow-md">
           <div className="bg-white">
             {/* Table Header */}
-            <div className="grid grid-cols-12 gap-4 p-6 border-b border-gray-200 text-xs font-medium text-gray-500 uppercase tracking-wide">
-              <div className="col-span-4 font-bold text-sm text-gray-500">
+            <div className="grid grid-cols-12 gap-4 p-6 border-b border-gray-200 text-sm font-bold text-gray-500 uppercase tracking-wide">
+              <div className="col-span-3 font-bold text-sm text-gray-500">
                 Title
               </div>
-              <div className="col-span-2 font-bold text-sm text-gray-500">
+              <div className="col-span-2  px-4 font-bold text-sm text-gray-500">
                 Type
               </div>
-              <div className="col-span-2 font-bold text-sm text-gray-500">
+              <div className="col-span-2  font-bold text-sm text-gray-500">
                 Status
               </div>
               <div className="col-span-1 font-bold text-sm text-gray-500">
                 Category
               </div>
-              <div className="col-span-2 font-bold text-sm text-gray-500">
+              <div className="col-span-3 font-bold text-sm text-gray-500">
                 Last Updated
               </div>
               <div className="col-span-1 font-bold text-sm text-gray-500">
@@ -309,22 +309,22 @@ const HistoryLogPage: React.FC = () => {
                     key={article.id}
                     className="grid grid-cols-12 gap-4 p-6 hover:bg-gray-50 transition-colors items-center"
                   >
-                    <div className="col-span-4 truncate">
+                    <div className="col-span-3 truncate">
                       <h3 className="text-sm font-normal text-[14px] text-[#1E2939] truncate">
-                        {article.title}
-                      </h3>
+                        {article.title} 
+                      </h3> 
                     </div>
 
-                    <div className="col-span-2">
+                    <div className="col-span-2 px-4">
                       <div className="text-[14px] flex items-center gap-[8px]">
                         {typeIcons[getArticleType(article) as PostType]}
-                        <span>{getArticleType(article)}</span>
+                        <span className=" first-letter:uppercase">{getArticleType(article)}</span> {getArticleType(article) == 'text' ? 'Article' : 'Post'}
                       </div>
                     </div>
 
                     <div className="col-span-2">
                       <Badge
-                        className={`px-[16px] font-semibold py-[6px] text-[14px] ${HISTORY_STATUS(
+                        className={`px-[16px] font-medium py-[4px] !text-[14px] ${HISTORY_STATUS(
                           article.status
                         )}`}
                       >
@@ -334,11 +334,11 @@ const HistoryLogPage: React.FC = () => {
 
                     <div className="col-span-1">
                       <div className="text-[14px] text-gray-900">
-                        {article.category}
+                        {article.category} 
                       </div>
                     </div>
 
-                    <div className="col-span-2 flex items-center gap-[8px]">
+                    <div className="col-span-3 flex items-center gap-[8px]">
                       <Calendar className="w-4 h-4" />
                       <div className="text-[14px] text-gray-900">
                         {moment(article.updatedAt).format(

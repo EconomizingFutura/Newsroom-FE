@@ -1,6 +1,7 @@
-import { Mic, Upload, Video } from "lucide-react";
+import { Mic, Trash, Upload, Video } from "lucide-react";
 import VideoPlayer from "@/components/ui/VideoPlayer";
 import AudioPlayer from "@/components/ui/AudioPlayer";
+import { ImageWithFallback } from "@/components/ImageWithFallback";
 
 
 type VideoContainerProps = {
@@ -72,7 +73,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({ video, setValue,
             </label>
             <div className="mt-2 h-28 w-full bg-gray-100 rounded-xl">
                 {thumbnail && (
-                    <img
+                    <ImageWithFallback
                         src={thumbnail}
                         alt="Generated Thumbnail"
                         className="h-full w-full object-cover"
@@ -86,6 +87,10 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({ video, setValue,
 
 export const AudioContainer: React.FC<AudioContainerProps> = ({ audio, setValue }) => {
     const isUrl = typeof audio === "string";
+
+    const handleRomoveAudio = () => {
+        setValue('audio', null)
+    }
 
     console.log(isUrl)
 
@@ -116,12 +121,24 @@ export const AudioContainer: React.FC<AudioContainerProps> = ({ audio, setValue 
                     </label>
                 </div>
             ) : (
-                <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl text-center">
-                    {isUrl ? (
-                        <AudioUrlPlayer src={audio as string} />
-                    ) : (
-                        <AudioPlayer src={audio} fileName={(audio as File).name} />
-                    )}
+                <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl text-end">
+                    <div>
+                        <button
+                            type="button"
+                            onClick={handleRomoveAudio}
+                            className="  bg-red-400 flex items-center gap-2 ml-auto mx-8 my-4 w-min text-white text-sm px-3 py-1 rounded-lg shadow"
+                        >
+                         <Trash size={12}/>    Remove
+                        </button>
+                    </div>
+                    <div className="p-2">
+                        {isUrl ? (
+                            <AudioUrlPlayer src={audio as string} />
+                        ) : (
+                            <AudioPlayer src={audio} fileName={(audio as File).name} />
+                        )}
+                    </div>
+
                 </div>
             )}
         </div>
@@ -139,7 +156,7 @@ const VideoUrlPlayer: React.FC<VideoUrlPlayerProps> = ({
     onDelete,
 }) => {
     return (
-        <div className="mt-6">
+        <div className="">
             {/* Video Player */}
             <div className="relative rounded-xl overflow-hidden shadow-md bg-black">
                 <video
@@ -167,7 +184,7 @@ const VideoUrlPlayer: React.FC<VideoUrlPlayerProps> = ({
                 <div className="mt-4">
                     <label className="block text-sm font-medium">Thumbnail Preview</label>
                     <div className="mt-2 h-28 w-full bg-gray-100 rounded-xl overflow-hidden">
-                        <img
+                        <ImageWithFallback
                             src={thumbnailUrl}
                             alt="Video Thumbnail"
                             className="h-full w-full object-cover"

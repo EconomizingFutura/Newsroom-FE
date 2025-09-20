@@ -141,45 +141,52 @@ const SideBar: React.FC<SidebarTypes> = (props) => {
 
   return (
     <div className="w-60 mt-16 py-4 bg-[#F8FAF9] border-r border-gray-200 flex flex-col">
-      <div className="flex-1 px-4">
+      <div className="flex-1 px-2">
         {/* Top Menu */}
-        <div className="space-y-1">
-          {menuConfig[currentRole].map((item) => {
+        <div className="space-y-1  p-2 ">
+          {menuConfig[currentRole].map((item,index) => {
+            const active =   isActive(item.key as currentPageType);
+             const isAfterActive = menuConfig[currentRole].slice(0, index).some(
+              (prevItem) => isActive(prevItem.key as currentPageType))
+
+              console.log(active,isAfterActive)
             return (
-              <Button
-                key={item.key}
-                variant="ghost"
-                size="sm"
-                key={item.key}
-                className={`w-full justify-between px-3 py-2 ${isActive(
-                  item.key as currentPageType
-                )}`}
-                onClick={props[item.action as keyof SidebarTypes] as () => void}
-              >
-                <span className="flex items-center gap-2">
-                  {item.icon}
-                  {item.label}
-                </span>
-                {item.badge && false && (
-                  <span
-                    className={cn(
-                      "bg-green-600 text-white text-xs font-medium px-2 rounded-full",
-                      item.key === "reverted"
-                        ? "border border-[#FFC9C9] bg-[#ffe2e2] text-red-500"
-                        : "bg-[#D9F2D9] border border-[#B3E6B3] text-[#006601]"
-                    )}
-                  >
-                    4
+              <div className="">
+                <Button
+                  key={item.key}
+                  variant="ghost"
+                  size="sm"
+                  className={`w-full justify-between px-3 py-2 ${isActive(
+                    item.key as currentPageType
+                  )}`}
+                  onClick={props[item.action as keyof SidebarTypes] as () => void}
+                >
+                  <span className="flex items-center gap-2">
+                    {item.icon}
+                    {item.label}
                   </span>
-                )}
-              </Button>
+                  {item.badge && false && (
+                    <span
+                      className={cn(
+                        "bg-green-600 text-white text-xs font-medium px-2 rounded-full",
+                        item.key === "reverted"
+                          ? "border border-[#FFC9C9] bg-[#ffe2e2] text-red-500"
+                          : "bg-[#D9F2D9] border border-[#B3E6B3] text-[#006601]"
+                      )}
+                    >
+                      4
+                    </span>
+                  )}
+                </Button>
+              </div>
+
             );
           })}
         </div>
 
         {/* Quick Create */}
         {currentRole === "reporter" && (
-          <>
+          <div className="px-2">
             <Separator className="my-4 bg-gray-200 h-px" />
             <div className="space-y-2">
               <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1">
@@ -224,65 +231,65 @@ const SideBar: React.FC<SidebarTypes> = (props) => {
                 </Button>
               </div>
             </div>
-          </>
+          </div>
         )}
 
-        <Separator className="my-4 bg-gray-200 h-px" />
+        <Separator className="my-4 bg-gray-200 px-2" />
 
         {/* Multi Window */}
         {false && (
           <div className="space-y-2">
-          <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1">
-            Multi Window
-          </h4>
-          <div className="space-y-1 text-sm text-gray-700">
-            {[
-              {
-                key: "newsFeeds",
-                label: "News Feeds",
-                icon: <Rss className="w-4 h-4" />,
-              },
-              {
-                key: "createArticle",
-                label: "Create Article",
-                icon: <Plus className="w-4 h-4" />,
-              },
-              {
-                key: "reverted",
-                label: "Reverted Post",
-                icon: <RotateCcw className="w-4 h-4" />,
-              },
-              {
-                key: "drafts",
-                label: "Drafts",
-                icon: <FileText className="w-4 h-4" />,
-              },
-              {
-                key: "favourites",
-                label: "Favourites",
-                icon: <Heart className="w-4 h-4" />,
-              },
-            ].map((item) => (
-              <label
-                key={item.key}
-                className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md"
-              >
-                <input
-                  type="checkbox"
-                  checked={multiWindow[item.key as keyof typeof multiWindow]}
-                  onChange={() =>
-                    toggleCheckbox(item.key as keyof typeof multiWindow)
-                  }
-                  className="w-4 h-4 accent-green-600"
-                />
-                {item.icon}
-                <span>{item.label}</span>
-              </label>
-            ))}
+            <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1">
+              Multi Window
+            </h4>
+            <div className="space-y-1 text-sm text-gray-700">
+              {[
+                {
+                  key: "newsFeeds",
+                  label: "News Feeds",
+                  icon: <Rss className="w-4 h-4" />,
+                },
+                {
+                  key: "createArticle",
+                  label: "Create Article",
+                  icon: <Plus className="w-4 h-4" />,
+                },
+                {
+                  key: "reverted",
+                  label: "Reverted Post",
+                  icon: <RotateCcw className="w-4 h-4" />,
+                },
+                {
+                  key: "drafts",
+                  label: "Drafts",
+                  icon: <FileText className="w-4 h-4" />,
+                },
+                {
+                  key: "favourites",
+                  label: "Favourites",
+                  icon: <Heart className="w-4 h-4" />,
+                },
+              ].map((item) => (
+                <label
+                  key={item.key}
+                  className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md"
+                >
+                  <input
+                    type="checkbox"
+                    checked={multiWindow[item.key as keyof typeof multiWindow]}
+                    onChange={() =>
+                      toggleCheckbox(item.key as keyof typeof multiWindow)
+                    }
+                    className="w-4 h-4 accent-green-600"
+                  />
+                  {item.icon}
+                  <span>{item.label}</span>
+                </label>
+              ))}
+            </div>
           </div>
-        </div>
         )}
-        
+
       </div>
     </div>
   );

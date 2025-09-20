@@ -6,6 +6,7 @@ import {
   Plus,
   Save,
   Send,
+  Trash,
   Upload,
   X,
 } from "lucide-react";
@@ -132,6 +133,7 @@ const EditArticle: React.FC = () => {
   const {
     control,
     register,
+    resetField,
     handleSubmit,
     setValue,
     getValues,
@@ -169,6 +171,11 @@ const EditArticle: React.FC = () => {
       navigate(`/${from}`);
     }
   };
+
+  const handleRemoveAudioVal = () => {
+  setValue("audio", null, { shouldDirty: true, shouldValidate: true });
+};
+
 
   useEffect(() => {
     const controller = new AbortController();
@@ -447,14 +454,31 @@ const EditArticle: React.FC = () => {
                     )}
 
                     {audioVal && (
-                      <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl text-center">
+                      <div className="border-2 w-full  border-dashed border-[#B2E6B3] rounded-2xl text-end">
+                           <button
+                            type="button"
+                            onClick={handleRemoveAudioVal}
+                            className="  bg-red-400 flex items-center gap-2 ml-auto mx-8 my-4 w-min text-white text-sm px-3 py-1 rounded-lg shadow"
+                        >
+                         <Trash size={12}/>    Remove
+                        </button>
+                       
                         {typeof audioVal === "string" ? (
-                          <AudioUrlPlayer src={audioVal} />
+                          <div className="py-2 w-full flex flex-col">
+                           
+                            <div>
+                              <AudioUrlPlayer src={audioVal} />
+                            </div>
+
+                          </div>
                         ) : (
-                          <AudioPlayer
-                            src={URL.createObjectURL(audioVal)}
-                            fileName={audioVal.name}
-                          />
+                          <div className="p-2 ">
+                            <AudioPlayer
+                              src={audioVal}
+                              fileName={audioVal.name}
+                            />
+                          </div>
+
                         )}
                       </div>
                     )}
@@ -466,7 +490,7 @@ const EditArticle: React.FC = () => {
                   <>
                     {typeof videoVal === "string" && videoVal ? (
                       // ✅ Video URL from API
-                      <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl text-center">
+                      <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl  p-3 text-center">
                         <VideoUrlPlayer
                           videoUrl={videoVal}
                           thumbnailUrl={thumbnailVal || undefined}

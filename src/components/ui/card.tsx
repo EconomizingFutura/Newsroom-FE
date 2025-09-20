@@ -104,7 +104,7 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
 
 function StatCard({ title, count, icon: Icon, color }: StatCardProps) {
   return (
-    <div className="flex items-center justify-between rounded-2xl shadow-md bg-white p-5 w-56">
+    <div className="flex items-center justify-between rounded-2xl shadow-md bg-white p-5 max-w-[230px] w-full">
       {/* Left Section */}
       <div>
         <p className="text-gray-500 text-sm font-medium">{title}</p>

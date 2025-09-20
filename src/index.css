@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @custom-variant dark (&:is(.dark *));
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap');
 
 :root {
   --font-size: 14px;
@@ -42,6 +43,11 @@
   --sidebar-ring: oklch(0.708 0 0);
   --history-select-border: #ececec;
   --history-search-shadow: "0px 2px 10px 0px #959DA533";
+  --screen-2xl: 1536px; /* large desktops */
+  --screen-3xl: 1920px; /* Full HD */
+  --screen-4xl: 2560px; /* 2K */
+  --screen-5xl: 3840px; /* 4K UHD */
+  --screen-6xl: 6016px;  /*Imac*/
 }
 
 .dark {
@@ -197,6 +203,9 @@ html {
   color: #c10007 !important;
 }
 
+body{
+  font-family: 'Open Sans', sans-serif;
+}
 
 .ql-toolbar {
   position: absolute;

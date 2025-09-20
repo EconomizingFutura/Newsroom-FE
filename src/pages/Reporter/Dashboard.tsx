@@ -84,7 +84,7 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="flex-1 py-16 h-screen bg-background">
+    <div className="flex-1 py-16 h-screen bg-[#F6FAF6] ">
       <div
         style={{ paddingTop: "32px" }}
         className="flex flex-col gap-[24px] px-[24px] bg-[#F6FAF6]"
@@ -95,24 +95,36 @@ export default function Dashboard() {
         />
 
         {/* Stats Section */}
-        <div className="grid gap-4 mb-8">
-          <div className="flex gap-4">
-            {stats.map((stat, index) => (
-              <StatCard
-                key={stat.title}
-                title={stat.title}
-                count={stat.count}
-                icon={stat.icon}
-                color={stat.color}
-              />
-            ))}
-          </div>
+        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-6 mb-8">
+          {stats.map((stat) => (
+            <StatCard
+              key={stat.title}
+              title={stat.title}
+              count={stat.count}
+              icon={stat.icon}
+              color={stat.color}
+            />
+          ))}
         </div>
+
 
         {/* Urgent Actions Section */}
 
-        {revertedPost.length > 0 &&
-          < div className="space-y-3">
+      
+        
+
+        {revertedPost.length == 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="mb-4 p-4  rounded-full">
+              <CheckCircle className="w-12 h-12 text-green-500" />
+            </div>
+            <h3 className="text-4xl font-semibold text-gray-900 mb-2">All caught up!</h3>
+            <p className="text-gray-500 text-lg max-w-md">
+              Great news! You don't have any articles that need revision right now. Keep up the excellent work!
+            </p>
+          </div>
+        ) : (
+             < div className="space-y-3">
             <div
               style={{ borderLeftWidth: "2px" }}
               className="border-red-500 bg-white rounded-2xl px-[24px] py-[16px] shadow-md"
@@ -145,7 +157,7 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
-        }
+        )}
       </div>
     </div >
   );

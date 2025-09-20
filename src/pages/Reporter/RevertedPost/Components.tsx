@@ -27,7 +27,7 @@ export const RenderGridView: React.FC<GridViewProps> = ({
   handleEdit,
   status,
 }) => (
-  <div className="grid grid-cols-3 justify-items-center gap-6">
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
     {filteredArticles?.map((article) => (
       <SharedCard
         id={article.id}
@@ -107,56 +107,61 @@ export const RenderListView: React.FC<ListViewProps> = ({
 
 export const RenderListViewDraft: React.FC<ListViewProps> = ({
   filteredArticles,
-  handleEdit, handleDeletePost,
-
-}) => (
-  <div className="space-y-3">
-    {filteredArticles.map((article) => (
-      <Card
-        key={article.id}
-        className="p-4 bg-white hover:shadow-sm transition-shadow"
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-3 mb-2">
-              <h3 className="text-[16px] font-medium text-[#101828] truncate">
-                {article.title}
-              </h3>
-              <div className="flex gap-2 flex-shrink-0">
-                <Badge className={`text-xs ${getTypeColor(article.type)}`}>
-                  {article.type}
-                </Badge>
-                <Badge className={`text-xs ${getStatusColor(article.status)}`}>
-                  {article.status}
-                </Badge>
+  handleEdit,
+  handleDeletePost,
+}) => {
+  return (
+    <div className="space-y-3">
+      {filteredArticles.map((article) => (
+        <Card
+          key={article.id}
+          className="p-4 bg-white hover:shadow-sm transition-shadow"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3 mb-2">
+                <h3 className="text-[16px] font-medium text-[#101828] truncate">
+                  {article.title}
+                </h3>
+                <div className="flex gap-2 flex-shrink-0">
+                  <Badge className={`text-xs ${getTypeColor(article.type.toLowerCase())}`}>
+                    {article.type}
+                  </Badge>
+                  <Badge className={`text-xs ${getStatusColor(article.status)}`}>
+                    {article.status}
+                  </Badge>
+                </div>
               </div>
-            </div>
-            <div className="flex items-center gap-4 text-xs text-gray-500">
+             <div className="flex items-center gap-4 text-xs font-normal text-gray-500">
               <span>Updated {formatDate(article.updatedAt)}</span>
-              {article.wordCount > 0 && <span>{article.wordCount} words</span>}
+              {extractTextSummary(article.content ?? "", 30).wordCount > 0 && (
+                <p>{extractTextSummary(article.content ?? "", 30).wordCount} words</p>
+              )}
+            </div>
+
+            </div>
+
+            <div className="flex items-center gap-2 ml-4">
+              <Button
+                size="sm"
+                className="bg-green-600 hover:bg-green-700 text-white gap-2"
+                onClick={() => handleEdit?.(article.id)}
+              >
+                <Edit className="w-3 h-3" />
+                Edit
+              </Button>
+              <Button
+                onClick={() => handleDeletePost(article.id)}
+                size="sm"
+                variant="outline"
+                className="border-red-200 text-red-600 hover:bg-red-50 w-8 h-8 p-0"
+              >
+                <Trash2 className="w-3 h-3" />
+              </Button>
             </div>
           </div>
-
-          <div className="flex items-center gap-2 ml-4">
-            <Button
-              size="sm"
-              className="bg-green-600 hover:bg-green-700 text-white gap-2"
-              onClick={() => handleEdit?.(article.id)}
-            >
-              <Edit className="w-3 h-3" />
-              Edit
-            </Button>
-            <Button
-              onClick={() => handleDeletePost(article.id)}
-              size="sm"
-              variant="outline"
-              className="border-red-200 text-red-600 hover:bg-red-50 w-8 h-8 p-0"
-            >
-              <Trash2 className="w-3 h-3" />
-            </Button>
-          </div>
-        </div>
-      </Card>
-    ))}
-  </div>
-);
+        </Card>
+      ))}
+    </div>
+  );
+};

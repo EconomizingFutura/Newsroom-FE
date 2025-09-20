@@ -5,15 +5,18 @@ import { DELETE } from "@/api/apiMethods";
 import { API_LIST } from "@/api/endpoints";
 export const getTypeColor = (type: string) => {
   switch (type) {
-    case "TEXT":
-      return "bg-[#DBEAFE] border border-[#BEDBFF] text-[#193CB8]";
-    case "Audio":
-      return "bg-[#F3E8FF] border border-[#EAD4FF] text-[#6D11B0]";
-    case "Video":
-      return "bg-[#FFEDD4] border border-[#FFD6A7] text-[#9F2E00]";
-    default:
-      return "bg-[#DBEAFE] border border-[#BEDBFF] text-[#193CB8]";
-  }
+  case "text":
+    return "!bg-[#DBEAFE] !border !border-[#BEDBFF] !text-[#193CB8]";
+  case "Audio":
+  case "audio":
+    return "!bg-[#F3E8FF] !border !border-[#EAD4FF] !text-[#6D11B0]";
+  case "Video":
+  case "video":
+    return "!bg-[#FFEDD4] !border !border-[#FFD6A7] !text-[#9F2E00]";
+  default:
+    return "!bg-[#DBEAFE] !border !border-[#BEDBFF] !text-[#193CB8]";
+}
+
 };
 
 export const getStatusColor = (status: string) => {

@@ -11,6 +11,9 @@ import type { LoginResponse } from "@/types/apitypes";
 import { POST } from "@/api/apiMethods";
 import { API_LIST } from "@/api/endpoints";
 import loginbg from "@/assets/loginbg.svg";
+import { toast, Toaster } from "sonner";
+import { string } from "yup";
+
 
 type FormData = {
   email: string;
@@ -24,35 +27,56 @@ export default function LoginPage() {
     register,
     handleSubmit,
     formState: { errors },
+    reset
   } = useForm<FormData>();
 
   const onSubmit = async (data: FormData) => {
     console.log("Form Data:", data);
-    const response = await POST<LoginResponse>(API_LIST.LOGIN, {
-      email: data.email,
-      password: data.password,
-    });
-    if (response.accessToken) {
-      navigate("/news-feeds");
-      localStorage.setItem("token", response.accessToken);
-      localStorage.setItem("role", "reporter");
-      const [, payload] = response.accessToken.split(".");
-      const decoded = JSON.parse(
-        atob(payload.replace(/-/g, "+").replace(/_/g, "/"))
-      );
+    try {
+      const response = await POST<LoginResponse>(API_LIST.LOGIN, {
+        email: data.email,
+        password: data.password,
+      });
 
-      console.log("accessToken:", decoded);
+      console.log(response)
 
-      if (decoded?.username) {
-        localStorage.setItem("username", decoded.username);
+
+      if (response.accessToken) {
+        navigate("/news-feeds");
+        localStorage.setItem("token", response.accessToken);
+        localStorage.setItem("role", "reporter");
+        const [, payload] = response.accessToken.split(".");
+        const decoded = JSON.parse(
+          atob(payload.replace(/-/g, "+").replace(/_/g, "/"))
+        );
+
+        console.log("accessToken:", decoded);
+
+        if (decoded?.username) {
+          localStorage.setItem("username", decoded.username);
+        }
+      } else {
+        toast.error('Invalid Credentials')
+        reset()
       }
+    } catch (error: unknown) {
+      console.error("Login error:", error);
+        reset()
+      const err = error as { message?: string };
+      toast.error(err.message || "Invalid Credentials");
     }
-  };
 
+
+  };
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSubmit(onSubmit)();
+  };
   return (
     <div className="min-h-screen w-full overflow-y-hidden">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-4 py-4">
+        <Toaster position="top-center" richColors />
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex-shrink-0">
             <img
@@ -100,7 +124,7 @@ export default function LoginPage() {
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
+              <form onSubmit={handleFormSubmit} className="space-y-2">
                 {/* Email */}
                 <div>
                   <label

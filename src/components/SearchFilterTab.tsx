@@ -18,19 +18,19 @@ const SearchFilterTab: React.FC<SearchFilterTabProps> = ({
   setActiveFilter,
 }) => {
   return (
-    <div className="bg-white shadow-md rounded-xl px-4 sm:px-6 py-3 sm:py-4">
+    <div className=" bg-[#FFFFFF] shadow-md rounded-xl px-4 sm:px-6 py-3 sm:py-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         {/* Search Box */}
-        <div className="relative w-full sm:w-72">
+        <div className="relative w-full rounded-lg  border-[#ECECEC] bg-[#F7FBF7] sm:w-72">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
           <Input
             placeholder="Search Drafts..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 w-full sm:w-72 rounded-lg border border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            className="pl-9 w-full sm:w-72  border bg-[#F6FAF6]  border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-green-500"
           />
         </div>
-
+     
         {/* Filters - Right Aligned */}
         <div className="flex gap-2 justify-end">
           {filterOptions.map((filter) => (
