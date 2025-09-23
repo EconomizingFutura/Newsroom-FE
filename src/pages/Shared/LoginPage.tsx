@@ -12,8 +12,6 @@ import { POST } from "@/api/apiMethods";
 import { API_LIST } from "@/api/endpoints";
 import loginbg from "@/assets/loginbg.svg";
 import { toast, Toaster } from "sonner";
-import { string } from "yup";
-
 
 type FormData = {
   email: string;

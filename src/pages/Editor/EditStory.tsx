@@ -13,7 +13,6 @@ import {
   History,
   Search,
   Bell,
-  User,
   ArrowLeft,
   Save,
   Bold,

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -11,27 +10,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Rss,
-  Home,
-  FileStack,
-  BookOpen,
-  Calendar,
-  History,
+
   Search,
   Bell,
-  User,
   X,
   Clock,
-  FileText,
   AlertCircle,
   CheckCircle,
   Info,
-  Settings,
 } from "lucide-react";
 
-interface NotificationsProps {
-  onBack: () => void;
-}
+// interface NotificationsProps {
+//   onBack: () => void;
+// }
 
 interface Notification {
   id: number;
@@ -43,7 +34,7 @@ interface Notification {
   category: string;
 }
 
-export function Notifications({ onBack }: NotificationsProps) {
+export function Notifications() {
   const [filter, setFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
 

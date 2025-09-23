@@ -70,7 +70,6 @@ const HistoryLogPage: React.FC = () => {
   });
 
   const {
-    pageCount,
     currentPage,
     setPageSize,
     setCurrentPage,

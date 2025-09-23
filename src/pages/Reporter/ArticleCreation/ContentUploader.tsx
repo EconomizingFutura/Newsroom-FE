@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { Plus, Save, Send, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { HeaderIcon } from "@/utils/HeaderIcons";
+import { HeaderIcon, type HeaderKey } from "@/utils/HeaderIcons";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import CustomQuilTextEditor from "@/components/ui/CustomQuilTextEditor";
@@ -240,7 +240,7 @@ const ContentUploader = () => {
               className="border border-[#E5E7EB] h-10 w-10 rounded-[8.5px]"
               style={{ backgroundColor: activeConfig.color }}
             >
-              <HeaderIcon className="text-white" name={activeConfig.icon} />
+              <HeaderIcon className="text-white" name={activeConfig.icon as HeaderKey} />
             </Button>
             <p className="font-bold text-2xl">{activeConfig.label}</p>
             <div className="flex items-center gap-2 px-2 ml-auto">

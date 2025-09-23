@@ -6,7 +6,6 @@ import ContentUploader from "@/pages/Reporter/ArticleCreation/ContentUploader";
 import DraftsPage from "@/pages/Reporter/DraftsPage";
 import RevertedPostPage from "@/pages/Reporter/RevertedPost/RevertedPostPage";
 import HistoryLogPage from "@/pages/HistoryLogPage";
-import FilteredContentPage from "@/pages/FilteredContentPage";
 import NewsFeedsPage from "@/pages/NewsFeedsPage";
 import SideBar from "@/components/SideBar";
 import Navigation from "@/components/Navigation";
@@ -143,17 +142,6 @@ const Layout: React.FC = () => {
                 <AuthRoute>
                   <ProtectedRoutes allowedRoles="reporter">
                     <HistoryLogPage />
-                  </ProtectedRoutes>
-                </AuthRoute>
-              }
-            />
-
-            <Route
-              path="/filtered/:type"
-              element={
-                <AuthRoute>
-                  <ProtectedRoutes allowedRoles="reporter">
-                    <FilteredContentPage />
                   </ProtectedRoutes>
                 </AuthRoute>
               }

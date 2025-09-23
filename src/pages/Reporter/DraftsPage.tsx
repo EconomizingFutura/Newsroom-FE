@@ -61,7 +61,6 @@ export default function DraftsPage() {
   }, [data, searchQuery, activeFilter]);
 
   const {
-    pageCount,
     currentPage,
     setPageSize,
     setCurrentPage,

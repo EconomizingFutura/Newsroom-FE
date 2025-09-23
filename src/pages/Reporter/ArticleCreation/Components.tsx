@@ -11,7 +11,7 @@ type VideoContainerProps = {
         value: File | string | null,
         options?: { shouldValidate: boolean, shouldDirty: boolean }
     ) => void;
-    thumbnail: string;
+    thumbnail?: string;
 };
 
 type AudioContainerProps = {
