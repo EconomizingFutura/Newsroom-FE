@@ -29,37 +29,33 @@ export default function LoginPage() {
   } = useForm<FormData>();
 
   const onSubmit = async (data: FormData) => {
-    console.log("Form Data:", data);
     try {
       const response = await POST<LoginResponse>(API_LIST.LOGIN, {
         email: data.email,
         password: data.password,
       });
 
-      console.log(response)
-
-
       if (response.accessToken) {
         navigate("/news-feeds");
         localStorage.setItem("token", response.accessToken);
-        localStorage.setItem("role", "reporter");
         const [, payload] = response.accessToken.split(".");
         const decoded = JSON.parse(
           atob(payload.replace(/-/g, "+").replace(/_/g, "/"))
         );
-
-        console.log("accessToken:", decoded);
-
         if (decoded?.username) {
           localStorage.setItem("username", decoded.username);
         }
+        if (decoded?.role) {
+          localStorage.setItem("role", decoded.role);
+        }
+
       } else {
         toast.error('Invalid Credentials')
         reset()
       }
     } catch (error: unknown) {
       console.error("Login error:", error);
-        reset()
+      reset()
       const err = error as { message?: string };
       toast.error(err.message || "Invalid Credentials");
     }

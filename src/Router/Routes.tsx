@@ -78,7 +78,7 @@ const Layout: React.FC = () => {
               path="/dashboard"
               element={
                 <AuthRoute>
-                  <ProtectedRoutes allowedRoles="reporter">
+                  <ProtectedRoutes allowedRoles="REPORTER">
                     <Dashboard />
                   </ProtectedRoutes>
                 </AuthRoute>
@@ -88,7 +88,7 @@ const Layout: React.FC = () => {
               path="/textArticle"
               element={
                 <AuthRoute>
-                  <ProtectedRoutes allowedRoles="reporter">
+                  <ProtectedRoutes allowedRoles="REPORTER">
                     <ContentUploader />
                   </ProtectedRoutes>
                 </AuthRoute>
@@ -98,7 +98,7 @@ const Layout: React.FC = () => {
               path="/audio"
               element={
                 <AuthRoute>
-                  <ProtectedRoutes allowedRoles="reporter">
+                  <ProtectedRoutes allowedRoles="REPORTER">
                     <ContentUploader />
                   </ProtectedRoutes>
                 </AuthRoute>
@@ -108,7 +108,7 @@ const Layout: React.FC = () => {
               path="/video"
               element={
                 <AuthRoute>
-                  <ProtectedRoutes allowedRoles="reporter">
+                  <ProtectedRoutes allowedRoles="REPORTER">
                     <ContentUploader />
                   </ProtectedRoutes>
                 </AuthRoute>
@@ -118,7 +118,7 @@ const Layout: React.FC = () => {
               path="/drafts"
               element={
                 <AuthRoute>
-                  <ProtectedRoutes allowedRoles="reporter">
+                  <ProtectedRoutes allowedRoles="REPORTER">
                     <DraftsPage />
                   </ProtectedRoutes>
                 </AuthRoute>
@@ -129,7 +129,7 @@ const Layout: React.FC = () => {
               path="/reverted"
               element={
                 <AuthRoute>
-                  <ProtectedRoutes allowedRoles="reporter">
+                  <ProtectedRoutes allowedRoles="REPORTER">
                     <RevertedPostPage />
                   </ProtectedRoutes>
                 </AuthRoute>
@@ -140,7 +140,7 @@ const Layout: React.FC = () => {
               path="/history"
               element={
                 <AuthRoute>
-                  <ProtectedRoutes allowedRoles="reporter">
+                  <ProtectedRoutes allowedRoles="REPORTER">
                     <HistoryLogPage />
                   </ProtectedRoutes>
                 </AuthRoute>
@@ -151,7 +151,7 @@ const Layout: React.FC = () => {
               path="/news-feeds"
               element={
                 <AuthRoute>
-                  <ProtectedRoutes allowedRoles="reporter">
+                  <ProtectedRoutes allowedRoles="REPORTER">
                     <NewsFeedsPage />
                   </ProtectedRoutes>
                 </AuthRoute>
@@ -162,7 +162,7 @@ const Layout: React.FC = () => {
               path="/:textArticle/:id"
               element={
                 <AuthRoute>
-                  <ProtectedRoutes allowedRoles="reporter">
+                  <ProtectedRoutes allowedRoles="REPORTER">
                     <EditArticle />
                   </ProtectedRoutes>
                 </AuthRoute>
@@ -174,7 +174,7 @@ const Layout: React.FC = () => {
               path="/editor/dashboard"
               element={
                 <AuthRoute>
-                  <ProtectedRoutes allowedRoles="editor">
+                  <ProtectedRoutes allowedRoles="EDITOR">
                     <EditorDashboard />
                   </ProtectedRoutes>
                 </AuthRoute>
@@ -185,7 +185,7 @@ const Layout: React.FC = () => {
               path="/editor/calendarView"
               element={
                 <AuthRoute>
-                  <ProtectedRoutes allowedRoles="editor">
+                  <ProtectedRoutes allowedRoles="EDITOR">
                     <CalendarView />
                   </ProtectedRoutes>
                 </AuthRoute>
@@ -196,7 +196,7 @@ const Layout: React.FC = () => {
               path="/editor/history"
               element={
                 <AuthRoute>
-                  <ProtectedRoutes allowedRoles="editor">
+                  <ProtectedRoutes allowedRoles="EDITOR">
                     <HistoryLog />
                   </ProtectedRoutes>
                 </AuthRoute>
@@ -207,7 +207,7 @@ const Layout: React.FC = () => {
               path="/editor/publishCenter"
               element={
                 <AuthRoute>
-                  <ProtectedRoutes allowedRoles="editor">
+                  <ProtectedRoutes allowedRoles="EDITOR">
                     <PublishCenter />
                   </ProtectedRoutes>
                 </AuthRoute>
@@ -218,7 +218,7 @@ const Layout: React.FC = () => {
               path="/editor/reviewQueue"
               element={
                 <AuthRoute>
-                  <ProtectedRoutes allowedRoles="editor">
+                  <ProtectedRoutes allowedRoles="EDITOR">
                     <ReviewQueue />
                   </ProtectedRoutes>
                 </AuthRoute>

@@ -11,10 +11,10 @@ const PublicRoute: React.FC<PublicRouteProps> = ({ children }) => {
   const role = USER_ROLE();
 
   if (token && role) {
-    if (role === "reporter") {
+    if (role === "REPORTER") {
       return <Navigate to="/news-feeds" replace />;
     }
-    if (role === "editor") {
+    if (role === "EDITOR") {
       return <Navigate to="/editor/dashboard" replace />;
     }
   }

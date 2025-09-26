@@ -4,7 +4,7 @@ import { USER_ROLE } from "@/utils/utils";
 
 interface ProtectedRouteProps {
   children: React.ReactElement;
-  allowedRoles: "editor" | "reporter";
+  allowedRoles: "EDITOR" | "REPORTER";
 }
 document.title = "CIJ NewsRoom - Login";
 const ProtectedRoutes: React.FC<ProtectedRouteProps> = ({

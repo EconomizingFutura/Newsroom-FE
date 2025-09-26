@@ -14,8 +14,9 @@ import {
 import { Separator } from "@radix-ui/react-separator";
 import type { currentPageType } from "../types/sidebarTypes";
 import { cn } from "./ui/utils";
+import { USER_ROLE } from "@/utils/utils";
 
-export type UserRole = "reporter" | "editor";
+export type UserRole = "REPORTER" | "EDITOR";
 
 export interface SidebarTypes {
   onNavigateToNewsFeeds: () => void;
@@ -35,7 +36,7 @@ export interface SidebarTypes {
 }
 
 const menuConfig = {
-  reporter: [
+  REPORTER: [
     {
       key: "newsFeeds",
       label: "Agency Feeds",
@@ -69,7 +70,7 @@ const menuConfig = {
       action: "onNavigateToHistory",
     },
   ],
-  editor: [
+  EDITOR: [
     {
       key: "newsFeeds",
       label: "Agency Feeds",
@@ -118,7 +119,9 @@ const SideBar: React.FC<SidebarTypes> = (props) => {
     onCreateNewVideoArticle,
     currentView,
   } = props;
-  const currentRole: UserRole = "reporter";
+  const currentRole: UserRole = USER_ROLE() as UserRole || 'REPORTER';
+
+  // const currentRole: UserRole = "reporter";
   const [multiWindow, setMultiWindow] = useState({
     newsFeeds: false,
     createArticle: false,
@@ -144,12 +147,12 @@ const SideBar: React.FC<SidebarTypes> = (props) => {
       <div className="flex-1 px-2">
         {/* Top Menu */}
         <div className="space-y-1  p-2 ">
-          {menuConfig[currentRole].map((item,index) => {
-            const active =   isActive(item.key as currentPageType);
-             const isAfterActive = menuConfig[currentRole].slice(0, index).some(
+          {menuConfig[currentRole].map((item, index) => {
+            const active = isActive(item.key as currentPageType);
+            const isAfterActive = menuConfig[currentRole].slice(0, index).some(
               (prevItem) => isActive(prevItem.key as currentPageType))
 
-              console.log(active,isAfterActive)
+            console.log(currentRole, isAfterActive)
             return (
               <div className="">
                 <Button
@@ -185,7 +188,7 @@ const SideBar: React.FC<SidebarTypes> = (props) => {
         </div>
 
         {/* Quick Create */}
-        {currentRole === "reporter" && (
+        {currentRole === "REPORTER" && (
           <div className="px-2">
             <Separator className="my-4 bg-gray-200 h-px" />
             <div className="space-y-2">
