@@ -17,6 +17,7 @@ import {
 } from "./RevertedPost/Components";
 import Pagination from "@/components/Pagination";
 import { usePagination } from "@/hooks/usePagination";
+import Loader from "@/components/Loader";
 
 export default function DraftsPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -41,6 +42,7 @@ export default function DraftsPage() {
     "hasNextPage": true,
     "hasPrevPage": false
   });
+  const [loading, setLoading] = useState<boolean>(false);
 
   const navigate = useNavigate();
   const filterOptions = ["All Type", "TEXT", "AUDIO", "VIDEO"];
@@ -129,6 +131,7 @@ export default function DraftsPage() {
 
     const getDraftArticle = async () => {
       try {
+        setLoading(true)
         const response: any = await GET(
           `${API_LIST.BASE_URL}${API_LIST.DRAFT_ARTICLE
           }?page=${currentPage}&pageSize=${pageSize}`,
@@ -136,11 +139,13 @@ export default function DraftsPage() {
         );
         setData(response.drafts);
         setPageMetaData(response.pagination)
-        console.log("repose", response);
+        setLoading(false)
       } catch (error: any) {
         if (error.name !== "AbortError") {
           console.error("Error fetching reverted posts:", error);
         }
+        setLoading(false)
+
       }
     };
 
@@ -148,6 +153,11 @@ export default function DraftsPage() {
     return () => controller.abort();
   }, [currentPage, pageSize]);
 
+  if (loading) {
+    return (<div style={{ display: 'flex', flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <Loader width="96" />
+    </div>)
+  }
   return (
     <div className="flex-1 py-16 h-screen bg-gray-50">
       <div

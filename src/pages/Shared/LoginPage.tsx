@@ -12,6 +12,7 @@ import { POST } from "@/api/apiMethods";
 import { API_LIST } from "@/api/endpoints";
 import loginbg from "@/assets/loginbg.svg";
 import { toast, Toaster } from "sonner";
+import Loader from "@/components/Loader";
 
 type FormData = {
   email: string;
@@ -20,6 +21,8 @@ type FormData = {
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
   const {
     register,
@@ -30,6 +33,7 @@ export default function LoginPage() {
 
   const onSubmit = async (data: FormData) => {
     try {
+      setLoading(true);
       const response = await POST<LoginResponse>(API_LIST.LOGIN, {
         email: data.email,
         password: data.password,
@@ -53,11 +57,15 @@ export default function LoginPage() {
         toast.error('Invalid Credentials')
         reset()
       }
+      setLoading(false);
+
     } catch (error: unknown) {
       console.error("Login error:", error);
       reset()
       const err = error as { message?: string };
       toast.error(err.message || "Invalid Credentials");
+      setLoading(false);
+
     }
 
 
@@ -191,18 +199,21 @@ export default function LoginPage() {
                   )}
                 </div>
 
-                {/* Login Button */}
-                <Button
-                  type="submit"
-                  className="w-full bg-[#008001] hover:bg-green-700 text-white font-semibold py-3 px-4 mt-2 rounded-lg transition-colors duration-200"
-                >
-                  Login
-                </Button>
+                {loading ? <div>
+                  <Loader width="12"></Loader>
+                </div> :
+                  < Button
+                    type="submit"
+                    className="w-full bg-[#008001] hover:bg-green-700 text-white font-semibold py-3 px-4 mt-2 rounded-lg transition-colors duration-200"
+                  >
+                    Login
+                  </Button>
+                }
               </form>
             </div>
           </div>
         </div>
-      </main>
-    </div>
+      </main >
+    </div >
   );
 }

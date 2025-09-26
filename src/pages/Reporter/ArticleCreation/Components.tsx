@@ -35,7 +35,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({ video, setValue,
                 Drag & drop your video file or click to browse
             </p>
             <p className="text-sm text-gray-500">
-                Supports MP4, MOV, AVI (Max 500MB)
+                Supports MP4, MOV, AVI (Max 1MB)
             </p>
             <label className="inline-flex items-center gap-2 mt-6 bg-orange-700 text-white px-4 py-2 rounded-xl cursor-pointer">
                 <Upload className="h-4 w-4" />
@@ -44,12 +44,19 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({ video, setValue,
                     type="file"
                     accept=".mp4,.mov,.avi"
                     hidden
-                    onChange={(e) =>
-                        setValue("video", e.target.files?.[0] || null, {
-                            shouldValidate: true,
-                            shouldDirty: true
-                        })
-                    }
+                    onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                            if (file.size > 1 * 1024 * 1024) { // 1 MB
+                                alert("Video must be less than 1 MB");
+                                e.target.value = ""; // reset input so user can re-select
+                                return;
+                            }
+                            setValue("video", file, { shouldValidate: true, shouldDirty: true });
+                        } else {
+                            setValue("video", null, { shouldValidate: true, shouldDirty: true });
+                        }
+                    }}
                 />
             </label>
         </div>
@@ -92,8 +99,6 @@ export const AudioContainer: React.FC<AudioContainerProps> = ({ audio, setValue 
         setValue('audio', null)
     }
 
-    console.log(isUrl)
-
     return (
         <div className="mt-6">
             {!audio ? (
@@ -103,7 +108,7 @@ export const AudioContainer: React.FC<AudioContainerProps> = ({ audio, setValue 
                     </div>
                     <p className="mt-6 font-medium">Upload audio file</p>
                     <p className="text-sm text-gray-500 mt-1">
-                        Supports MP3, WAV, M4A (Max 100MB)
+                        Supports MP3, WAV, M4A (Max 1MB)
                     </p>
                     <label className="inline-flex items-center gap-2 mt-6 bg-green-100 text-green-800 px-4 py-2 rounded-xl cursor-pointer">
                         <Upload className="h-4 w-4" />
@@ -112,11 +117,20 @@ export const AudioContainer: React.FC<AudioContainerProps> = ({ audio, setValue 
                             type="file"
                             accept=".mp3,.wav,.m4a,.mpeg"
                             hidden
-                            onChange={(e) =>
-                                setValue("audio", e.target.files?.[0] || null, {
-                                    shouldValidate: true,
-                                })
-                            }
+
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                    if (file.size > 1 * 1024 * 1024) { // 1 MB
+                                        alert("File size must be less than 1 MB");
+                                        e.target.value = ""; // reset input
+                                        return;
+                                    }
+                                    setValue("audio", file, { shouldValidate: true });
+                                } else {
+                                    setValue("audio", null, { shouldValidate: true });
+                                }
+                            }}
                         />
                     </label>
                 </div>
@@ -128,7 +142,7 @@ export const AudioContainer: React.FC<AudioContainerProps> = ({ audio, setValue 
                             onClick={handleRomoveAudio}
                             className="  bg-red-400 flex items-center gap-2 ml-auto mx-8 my-4 w-min text-white text-sm px-3 py-1 rounded-lg shadow"
                         >
-                         <Trash size={12}/>    Remove
+                            <Trash size={12} />    Remove
                         </button>
                     </div>
                     <div className="p-2">
