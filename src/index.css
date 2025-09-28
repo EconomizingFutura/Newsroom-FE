@@ -1,6 +1,19 @@
 @import "tailwindcss";
 @custom-variant dark (&:is(.dark *));
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap');
+@layer utilities {
+  /* For Chrome / Safari / Edge */
+  .date-picker-icon-right::-webkit-calendar-picker-indicator {
+    position: absolute;
+    right: 0.75rem; /* like pr-3 */
+  }
+
+  /* For Firefox */
+  .date-picker-icon-right::-moz-calendar-picker-indicator {
+    position: absolute;
+    right: 0.75rem;
+  }
+};
 
 :root {
   --font-size: 14px;

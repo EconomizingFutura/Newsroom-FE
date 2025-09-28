@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,6 +17,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  SelectedTab,
 } from "@/components/ui/select";
 import { BookOpen, Clock, X, Search } from "lucide-react";
 import { getPriorityColor } from "@/utils/PublishCenter";
@@ -123,6 +125,7 @@ export function PublishCenter() {
   const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
   const [selectedStoryForScheduling, setSelectedStoryForScheduling] =
     useState<any>(null);
+  const [SelectedTab, setSelectedTab] = useState("")
   const [scheduledDate, setScheduledDate] = useState("");
   const [scheduledTime, setScheduledTime] = useState("");
   const [scheduleRepeat, setScheduleRepeat] = useState("");
@@ -256,145 +259,142 @@ export function PublishCenter() {
           )}
         </main>
       </div>
-
+      
       {/* Schedule Modal */}
       <Dialog open={scheduleModalOpen} onOpenChange={setScheduleModalOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+       <DialogContent className="">
+
+
+          <DialogHeader className="flex flex-row items-center justify-between space-y-0 pb-4 ">
             <div>
               <DialogTitle className="text-lg font-semibold text-gray-900">
-                Schedule Publication
+                Schedule a article
               </DialogTitle>
-              <DialogDescription className="text-sm text-gray-600 mt-1">
-                Set a specific date and time for this article to be published
-                automatically.
-              </DialogDescription>
+              
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setScheduleModalOpen(false)}
-              className="h-auto p-1 shrink-0"
-            >
-              <X className="w-4 h-4" />
-            </Button>
+          
           </DialogHeader>
+          
+          <hr className="-mt-4 border-b"/>
 
-          <div className="space-y-6">
+          <div> 
+            
             {/* Article Title */}
-            <div>
-              <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                Article
-              </Label>
-              <p className="text-sm text-gray-900 bg-gray-50 p-3 rounded-md">
-                {selectedStoryForScheduling?.title}
-              </p>
-            </div>
+            <div className="flex border-1 rounded-md p-2 -mt-4 w-115 justify-center">
+              <div className="bg-gray-100 h-10 space-x-2 rounded-md content-center">
+            {["All Platform", "Web", "Instagram", "Twitter", "Facebook"].map((tab) => (
+            <button
+              key={tab}
+              className={` text-sm px-3 py-1 rounded cursor-pointer ${
+                SelectedTab === tab
+                  ? " space-x-1 bg-white text-black font-bold ml-1 mr-1 "
+                  : " text-gray-600"
+              }`}
+              onClick={() => setSelectedTab(tab)}
+            >
+              {tab}
+            </button>
+            
+          ))}
+          </div>
+        </div>
+            
+             
+        
 
+
+            <div className="flex py-4 items-center space-x-5">
             {/* Date Selection */}
             <div>
               <Label
                 htmlFor="schedule-date"
-                className="text-sm font-medium text-gray-700 mb-2 block"
+                className="text-sm font-bold text-gray-700 mb-2 block"
               >
-                Publication Date
+                Select Date
               </Label>
               <Input
                 id="schedule-date"
                 type="date"
                 value={scheduledDate}
                 onChange={(e) => setScheduledDate(e.target.value)}
-                className="w-full"
+                className="border border-gray w-87 bg-green-50"
               />
+               
             </div>
-
+            
             {/* Time Selection */}
             <div>
               <Label
                 htmlFor="schedule-time"
-                className="text-sm font-medium text-gray-700 mb-2 block"
+                className="text-sm font-bold text-gray-700 mb-2 block"
+          
               >
-                Publication Time
+                Enter Time
               </Label>
               <Input
                 id="schedule-time"
                 type="time"
                 value={scheduledTime}
                 onChange={(e) => setScheduledTime(e.target.value)}
-                className="w-full"
+                className="border border-gray  w-87 bg-green-50"
+              
               />
             </div>
+            </div>
+            
 
             {/* Repeat Options */}
             <div>
               <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                Repeat
+                Same as:
               </Label>
-              <Select value={scheduleRepeat} onValueChange={setScheduleRepeat}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select repeat option" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Don't repeat</SelectItem>
-                  <SelectItem value="daily">Daily</SelectItem>
-                  <SelectItem value="weekly">Weekly</SelectItem>
-                  <SelectItem value="monthly">Monthly</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="space-x-3">
+              {["Instagram","Twitter", "Facebook"].map((tab) => (
+              <button
+              key={tab}
+              className={` text-sm px-3 py-1 rounded bg-gray-100 cursor-pointer ${
+                SelectedTab === tab
+                  ? "bg-green-700 text-white"
+                  : " text-gray-600 hover:bg-whit-100"
+              }`}
+              onClick={() => setSelectedTab(tab)}
+            >
+              {tab}
+            </button>
+            
+            
+          ))}
+          </div>
+          
+              
             </div>
-
-            {/* Notification Options */}
-            <div className="space-y-3 ">
-              <div className="flex items-center space-x-3">
-                <Checkbox
-                  id="notify-subscribers"
-                  checked={notifySubscribers}
-                  onCheckedChange={(c) => setNotifySubscribers(c === true)}
-                />
-                <Label
-                  htmlFor="notify-subscribers"
-                  className="text-sm text-gray-700"
-                >
-                  Notify subscribers via email
-                </Label>
-              </div>
-
-              <div className="flex items-center space-x-3">
-                <Checkbox
-                  id="priority-publish"
-                  checked={priorityPublish}
-                  onCheckedChange={(c) => setPriorityPublish(c === true)}
-                />
-                <Label
-                  htmlFor="priority-publish"
-                  className="text-sm text-gray-700"
-                >
-                  Mark as priority publication
-                </Label>
-              </div>
-            </div>
-
+            <hr className="mt-4 border-b"/>
+            
             {/* Action Buttons */}
-            <div className="flex space-x-3 pt-4">
+            <div className="flex justify-end space-x-4 pt-4 ">
               <Button
                 variant="outline"
                 onClick={() => setScheduleModalOpen(false)}
-                className="flex-1"
+                className="w-30 border-green-600 cursor-pointer"
               >
                 Cancel
               </Button>
               <Button
+                variant='outline'
                 onClick={handleConfirmSchedule}
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                disabled={!scheduledDate || !scheduledTime}
+                className="w-30 bg-green-700  text-white hover:bg-green-800 hover:text-white cursor-pointer"
+                
               >
-                <Clock className="w-4 h-4 mr-2" />
+                
                 Schedule
               </Button>
+              </div>
             </div>
-          </div>
+          
+          
         </DialogContent>
       </Dialog>
-    </div>
+    
+</div>
   );
 }
