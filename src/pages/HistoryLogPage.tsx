@@ -21,6 +21,7 @@ import { API_LIST } from "@/api/endpoints";
 import { GET } from "@/api/apiMethods";
 import moment from "moment";
 import type { RevertedArticleTypes } from "@/types/draftPageTypes";
+import Loader from "@/components/Loader";
 
 const HistoryLogPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -28,6 +29,8 @@ const HistoryLogPage: React.FC = () => {
   const [typeFilter, setTypeFilter] = useState("All Type");
   const [dateRange, setDateRange] = useState("Date Range");
   const navigate = useNavigate();
+  const [loading, setLoading] = useState<boolean>(false);
+
   const [pageMetaData, setPageMetaData] = useState<{
     "total": number,
     "page": number,
@@ -126,7 +129,7 @@ const HistoryLogPage: React.FC = () => {
       filteredArticles.find((article: any) => article.id === id)?.type ||
       "Text";
     const route = returnType(articleType);
-    navigate(`/${route}/${id}?from=history`, { state: {name: 'harish'} });
+    navigate(`/${route}/${id}?from=history`, { state: { name: 'harish' } });
   };
 
 
@@ -156,6 +159,7 @@ const HistoryLogPage: React.FC = () => {
 
     const getHistoryList = async () => {
       try {
+        setLoading(true)
         const response: any = await GET(
           `${API_LIST.BASE_URL}${API_LIST.HISTORY
           }?page=${currentPage}&pageSize=${pageSize}`,
@@ -163,7 +167,10 @@ const HistoryLogPage: React.FC = () => {
         );
         setHistoryArticles(response.articles ?? []);
         setPageMetaData(response.pagination)
+        setLoading(false)
+
       } catch (error: any) {
+        setLoading(false)
         if (error.name !== "AbortError") {
           console.error("Error fetching reverted posts:", error);
         }
@@ -188,6 +195,11 @@ const HistoryLogPage: React.FC = () => {
     return "text"; // default fallback
   }
 
+  if (loading) {
+    return (<div style={{ display: 'flex', flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <Loader width="96" />
+    </div>)
+  }
   return (
     <div className=" flex-1 py-16 h-screen bg-gray-50">
       {/* Main Content */}
@@ -310,8 +322,8 @@ const HistoryLogPage: React.FC = () => {
                   >
                     <div className="col-span-3 truncate">
                       <h3 className="text-sm font-normal text-[14px] text-[#1E2939] truncate">
-                        {article.title} 
-                      </h3> 
+                        {article.title}
+                      </h3>
                     </div>
 
                     <div className="col-span-2 px-4">
@@ -333,7 +345,7 @@ const HistoryLogPage: React.FC = () => {
 
                     <div className="col-span-1">
                       <div className="text-[14px] text-gray-900">
-                        {article.category} 
+                        {article.category}
                       </div>
                     </div>
 

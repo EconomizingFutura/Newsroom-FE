@@ -34,7 +34,6 @@ const Card: React.FC<CardProps> = ({
   handleDelete,
   handleEdit,
 }) => {
-  console.log(thumbnailUrl)
   return (
     <div className="w-full max-w-md bg-white rounded-2xl shadow-md border border-gray-200 max-h-[300px] p-[24px] flex flex-col justify-between">
       {/* Title */}

@@ -1,6 +1,7 @@
 import { GET } from "@/api/apiMethods";
 import { API_LIST } from "@/api/endpoints";
 import ContentHeader from "@/components/ContentHeader";
+import Loader from "@/components/Loader";
 import { StatCard, DashboardListCard } from "@/components/ui/card";
 import type { RevertedArticleTypes } from "@/types/draftPageTypes";
 import { Clock, CheckCircle, RotateCcw, FilePen } from "lucide-react";
@@ -27,6 +28,7 @@ export default function Dashboard() {
   const username = useMemo(() => localStorage.getItem("username"), []);
   const [stats, setStats] = useState<StatCardProps[]>(INITIAL_STATS);
   const [revertedPost, setRevertedPost] = useState<RevertedArticleTypes[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleNavigate = (id: number) => {
     navigate(`/textArticle/${id}?from=dashboard`);
@@ -71,21 +73,39 @@ export default function Dashboard() {
 
     const getRevertedPost = async () => {
       try {
+        setLoading(true);
         const response: any = await GET(
           API_LIST.BASE_URL + API_LIST.REVERTED_POST,
           { signal: controller.signal }
         );
         setRevertedPost(response.data);
+        setLoading(false);
       } catch (error: any) {
         if (error.name !== "AbortError") {
           console.error("Error fetching reverted posts:", error);
         }
+        setLoading(false);
       }
     };
 
     getRevertedPost();
     return () => controller.abort();
   }, []);
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Loader width="96" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 py-16 h-screen bg-[#F6FAF6] ">
@@ -112,6 +132,7 @@ export default function Dashboard() {
         </div>
 
         {/* Urgent Actions Section */}
+
         {revertedPost.length == 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <div className="mb-4 p-4  rounded-full">

@@ -56,6 +56,7 @@ const EditArticle: React.FC = () => {
   }>({ type: null, isSubmit: false });
 
   const [newTag, setNewTag] = useState("");
+  const [remarks, setRemarks] = useState("");
 
   const headerConfig: Record<string, { label: string; color: string; icon: HeaderKey }> = {
     textArticle: { label: "Text Article", color: "#2B7FFF", icon: "Text Article" },
@@ -204,6 +205,8 @@ const EditArticle: React.FC = () => {
           Object.entries(mapped).forEach(([key, value]) => {
             setValue(key as keyof ArticleFormValues, value, { shouldValidate: true, shouldDirty: false });
           });
+
+          setRemarks(response.remarks);
         }
       } catch (error: any) {
         if (error.name !== "AbortError") console.error("Error fetching article:", error);
@@ -235,13 +238,14 @@ const EditArticle: React.FC = () => {
     );
   };
 
-  const onSubmit = (data: ArticleFormValues, status: "SUBMIT" | "DRAFT") => {
+  const onSubmit = (data: ArticleFormValues, status: "SUBMIT" | "DRAFT" | "REVERTED") => {
+    console.log(status)
     submitForReview(data, status)
   };
 
 
-  const submitForReview = async (data: ArticleFormValues, status: "SUBMIT" | "DRAFT") => {
-    if (status === 'DRAFT') {
+  const submitForReview = async (data: ArticleFormValues, status: "SUBMIT" | "DRAFT" | "REVERTED") => {
+    if (status === 'DRAFT' || 'REVERTED') {
 
       const changedKeys = Object.keys(dirtyFields) as (keyof ArticleFormValues)[];
       if (changedKeys.length === 0) {
@@ -272,6 +276,7 @@ const EditArticle: React.FC = () => {
         );
       }
 
+      changes.status = 'DRAFT'
       await PATCH(`${API_LIST.BASE_URL}${API_LIST.DRAFT_BY_ARTICLE}${id}`, changes);
       handleSubmitUI("DRAFT");
       navigate("/drafts");
@@ -322,8 +327,8 @@ const EditArticle: React.FC = () => {
                 type="button"
                 onClick={handleSubmit((data) => {
                   // save draft -> update status and show UI
-                  setValue("status", "DRAFT");
-                  onSubmit(data, "DRAFT");
+                  // setValue("status", "DRAFT");
+                  onSubmit(data, getValues('status'));
                 })}
                 variant="outline"
                 size="sm"
@@ -371,7 +376,7 @@ const EditArticle: React.FC = () => {
                 </div>
               </div>
 
-              {getValues("status") === "REVERTED" && <EditorRemarks />}
+              {getValues("status") === "REVERTED" && <EditorRemarks remarks={remarks} />}
 
               <div className="flex flex-col gap-[24px]">
                 {/* Title */}
