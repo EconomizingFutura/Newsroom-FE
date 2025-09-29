@@ -37,21 +37,25 @@ export default function Dashboard() {
 
     const getStatsData = async () => {
       try {
-        const response: any = await GET(API_LIST.BASE_URL + API_LIST.STATS, {
-          signal: controller.signal,
-        });
+        const response: unknown = await GET(
+          API_LIST.BASE_URL + API_LIST.STATS,
+          {
+            signal: controller.signal,
+          }
+        );
 
+        const statsResponse = response as Record<string, number>;
         const updatedStats = INITIAL_STATS.map((item) => {
           const key =
             item.title.toUpperCase() === "NEED REVISION"
               ? "REVERTED"
               : item.title.toUpperCase();
 
-          return { ...item, count: response[key] ?? 0 };
+          return { ...item, count: statsResponse[key] ?? 0 };
         });
 
         setStats(updatedStats);
-      } catch (error: any) {
+      } catch (error: never) {
         if (error.name !== "AbortError") {
           console.error("Error fetching stats:", error);
         }
@@ -107,24 +111,22 @@ export default function Dashboard() {
           ))}
         </div>
 
-
         {/* Urgent Actions Section */}
-
-      
-        
-
         {revertedPost.length == 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <div className="mb-4 p-4  rounded-full">
               <CheckCircle className="w-12 h-12 text-green-500" />
             </div>
-            <h3 className="text-4xl font-semibold text-gray-900 mb-2">All caught up!</h3>
+            <h3 className="text-4xl font-semibold text-gray-900 mb-2">
+              All caught up!
+            </h3>
             <p className="text-gray-500 text-lg max-w-md">
-              Great news! You don't have any articles that need revision right now. Keep up the excellent work!
+              Great news! You don't have any articles that need revision right
+              now. Keep up the excellent work!
             </p>
           </div>
         ) : (
-             < div className="space-y-3">
+          <div className="space-y-3">
             <div
               style={{ borderLeftWidth: "2px" }}
               className="border-red-500 bg-white rounded-2xl px-[24px] py-[16px] shadow-md"
@@ -159,6 +161,6 @@ export default function Dashboard() {
           </div>
         )}
       </div>
-    </div >
+    </div>
   );
 }

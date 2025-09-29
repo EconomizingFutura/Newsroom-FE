@@ -4,7 +4,7 @@ import { cn } from "./utils";
 type StatCardProps = {
   title: string;
   count: number;
-  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>; // 👈 type for icon
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   color: string;
 };
 
@@ -107,7 +107,7 @@ function StatCard({ title, count, icon: Icon, color }: StatCardProps) {
     <div className="flex items-center justify-between rounded-2xl shadow-md bg-white p-5 max-w-[230px] w-full">
       {/* Left Section */}
       <div>
-        <p className="text-gray-500 text-sm font-medium">{title}</p>
+        <p className="text-gray-500 text-sm max-w-28 font-medium">{title}</p>
         <p className="text-2xl font-semibold text-gray-900 mt-1">{count}</p>
       </div>
 
@@ -163,6 +163,41 @@ function HistoryCard({
   );
 }
 
+import { Button } from "@/components/ui/button";
+
+interface StoryCardProps {
+  title: string;
+  description: string;
+  onView: () => void;
+}
+
+export default function StoryCard({
+  title,
+  description,
+  onView,
+}: StoryCardProps) {
+  return (
+    <div className="flex items-center justify-between rounded-md bg-green-50 px-6 py-4">
+      <div className="flex flex-col gap-2">
+        <h4 className="text-sm font-semibold text-[#1E2939]">
+          Article For Review
+        </h4>
+        <p className="text-sm text-[#6A7282]">
+          Your article "{title}: {description}"
+        </p>
+      </div>
+
+      <Button
+        size="sm"
+        onClick={onView}
+        className="rounded-md bg-[#008001] hover:bg-[#008001] cursor-pointer px-4 py-1 text-sm font-medium text-white "
+      >
+        View Story
+      </Button>
+    </div>
+  );
+}
+
 export {
   Card,
   CardHeader,
@@ -174,4 +209,5 @@ export {
   StatCard,
   DashboardListCard,
   HistoryCard,
+  StoryCard,
 };

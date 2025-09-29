@@ -18,6 +18,7 @@ export type CurrentPageType =
 export function useCurrentView(): CurrentPageType {
   const location = useLocation();
   const [searchParams] = useSearchParams();
+  const queryParams = new URLSearchParams(location.search);
 
   const from = searchParams.get("from") as CurrentPageType | null;
 
@@ -50,5 +51,8 @@ export function useCurrentView(): CurrentPageType {
     return "review-queue";
   if (location.pathname.startsWith("/editor/history")) return "editor-history";
 
+  if (queryParams.get("from") === "reviewQueue") {
+    return "review-queue";
+  }
   return "newsFeeds";
 }
