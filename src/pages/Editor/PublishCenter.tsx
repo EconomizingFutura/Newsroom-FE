@@ -1,25 +1,25 @@
 import { useState } from "react";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+// import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
+  
 
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  SelectedTab,
+  // Select,
+  // SelectContent,
+  // SelectItem,
+  // SelectTrigger,
+  // SelectValue,
+  // SelectedTab,
 } from "@/components/ui/select";
-import { BookOpen, Clock, X, Search } from "lucide-react";
+import { BookOpen, Search } from "lucide-react";
 import { getPriorityColor } from "@/utils/PublishCenter";
 import ContentHeader from "@/components/ContentHeader";
 import StoryCard, { type Story } from "@/components/StoryCard";
@@ -123,15 +123,16 @@ export function PublishCenter() {
   const [activeTab, setActiveTab] = useState("All");
   const [activeFilterTab, setActiveFilterTab] = useState("Politics");
   const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
-  const [selectedStoryForScheduling, setSelectedStoryForScheduling] =
-    useState<any>(null);
-  const [SelectedTab, setSelectedTab] = useState("")
+  const [selectedStoryForScheduling, setSelectedStoryForScheduling] = useState<any>(null);
+  const [SelectedTab, setSelectedTab] = useState("");
   const [scheduledDate, setScheduledDate] = useState("");
   const [scheduledTime, setScheduledTime] = useState("");
   const [scheduleRepeat, setScheduleRepeat] = useState("");
   const [notifySubscribers, setNotifySubscribers] = useState(true);
   const [priorityPublish, setPriorityPublish] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedRepeat, setSelectedRepeat] = useState<string[]>([]); 
+
 
   const getCurrentStories = () => {
     const result = ALL_STORIES.filter(story => story.category === activeFilterTab);
@@ -263,9 +264,7 @@ export function PublishCenter() {
       {/* Schedule Modal */}
       <Dialog open={scheduleModalOpen} onOpenChange={setScheduleModalOpen}>
        <DialogContent className="">
-
-
-          <DialogHeader className="flex flex-row items-center justify-between space-y-0 pb-4 ">
+        <DialogHeader className="flex flex-row items-center justify-between space-y-0 pb-4 ">
             <div>
               <DialogTitle className="text-lg font-semibold text-gray-900">
                 Schedule a article
@@ -273,23 +272,23 @@ export function PublishCenter() {
               
             </div>
           
-          </DialogHeader>
+        </DialogHeader>
           
-          <hr className="-mt-4 border-b"/>
+        <hr className="-mt-4 border-b"/>
 
-          <div> 
+        <div> 
             
-            {/* Article Title */}
+        {/* Article Title */}
             <div className="flex border-1 rounded-md p-2 -mt-4 w-115 justify-center">
               <div className="bg-gray-100 h-10 space-x-2 rounded-md content-center">
-            {["All Platform", "Web", "Instagram", "Twitter", "Facebook"].map((tab) => (
-            <button
-              key={tab}
-              className={` text-sm px-3 py-1 rounded cursor-pointer ${
-                SelectedTab === tab
-                  ? " space-x-1 bg-white text-black font-bold ml-1 mr-1 "
-                  : " text-gray-600"
-              }`}
+                 {["All Platform", "Web", "Instagram", "Twitter", "Facebook"].map((tab) => (
+                  <button
+                    key={tab}
+                    className={` text-sm px-3 py-1 rounded cursor-pointer ${
+                     SelectedTab === tab
+                     ? " space-x-1 bg-white text-black font-bold ml-1 mr-1 "
+                     : " text-gray-600"
+                 }`}
               onClick={() => setSelectedTab(tab)}
             >
               {tab}
@@ -298,11 +297,6 @@ export function PublishCenter() {
           ))}
           </div>
         </div>
-            
-             
-        
-
-
             <div className="flex py-4 items-center space-x-5">
             {/* Date Selection */}
             <div>
@@ -341,33 +335,42 @@ export function PublishCenter() {
               />
             </div>
             </div>
-            
-
             {/* Repeat Options */}
             <div>
-              <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                Same as:
-              </Label>
               <div className="space-x-3">
-              {["Instagram","Twitter", "Facebook"].map((tab) => (
-              <button
-              key={tab}
-              className={` text-sm px-3 py-1 rounded bg-gray-100 cursor-pointer ${
-                SelectedTab === tab
-                  ? "bg-green-700 text-white"
-                  : " text-gray-600 hover:bg-whit-100"
-              }`}
-              onClick={() => setSelectedTab(tab)}
-            >
-              {tab}
-            </button>
-            
-            
-          ))}
-          </div>
-          
-              
-            </div>
+             
+              <div>
+              <Label className="text-sm font-medium text-gray-700 mb-2 block">
+               Same as:
+              </Label>
+              <div className="space-x-3 min-h-[40px] flex items-center">
+                 {SelectedTab !== "All Platform" &&
+                 ["Web", "Instagram", "Twitter", "Facebook"]
+                 .filter((tab) => tab !== SelectedTab)
+                 .map((tab) => {
+                   const isSelected = selectedRepeat.includes(tab);
+                   return (
+                    <button
+                     key={tab}
+                     className={`text-sm px-3 py-1 rounded cursor-pointer ${
+                     isSelected
+                     ? "bg-green-700 text-white"
+                     : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                   }`}
+                 onClick={() =>
+                 setSelectedRepeat((prev) =>
+                  isSelected
+                    ? prev.filter((item) => item !== tab)
+                    : [...prev, tab]
+                   )}>
+                      {tab}
+                    </button>  );
+        })}
+  </div>
+</div>
+
+                </div>
+                </div>
             <hr className="mt-4 border-b"/>
             
             {/* Action Buttons */}
