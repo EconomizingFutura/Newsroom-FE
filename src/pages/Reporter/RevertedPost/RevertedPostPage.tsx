@@ -12,6 +12,7 @@ import DeleteConfirmation from "@/components/DeleteConfirmation";
 import { GET } from "@/api/apiMethods";
 import { API_LIST } from "@/api/endpoints";
 import { RenderGridView, RenderListView } from "./Components";
+import Loading from "@/pages/Shared/agency-feeds/loading";
 
 const RevertedPostPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -20,6 +21,7 @@ const RevertedPostPage: React.FC = () => {
   >("All Type");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [data, setData] = useState<RevertedArticleTypes[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [deletePost, setDeletePost] = useState<DeleteArticleProps>({
     id: null,
@@ -44,15 +46,18 @@ const RevertedPostPage: React.FC = () => {
 
     const getRevertedPost = async () => {
       try {
+        setLoading(true);
         const response: any = await GET(
           API_LIST.BASE_URL + API_LIST.REVERTED_POST,
           { signal: controller.signal }
         );
         setData(response.data);
+        setLoading(false);
       } catch (error: any) {
         if (error.name !== "AbortError") {
           console.error("Error fetching data:", error);
         }
+        setLoading(false);
       }
     };
 
@@ -87,6 +92,9 @@ const RevertedPostPage: React.FC = () => {
     navigate(`/${articleType}/${id}?from=reverted`);
   };
 
+  if (loading) {
+    return <Loading />;
+  }
   return (
     <div className=" flex-1 py-16 h-screen bg-gray-50">
       {/* Main Content */}
@@ -131,7 +139,8 @@ const RevertedPostPage: React.FC = () => {
               <RenderListView
                 handleDeletePost={(id) => setDeletePost({ id, isOpen: true })}
                 handleEdit={handleEdit}
-                filteredArticles={filteredArticles} />
+                filteredArticles={filteredArticles}
+              />
             )
           ) : (
             <div className="flex flex-col items-center justify-center py-20">

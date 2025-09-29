@@ -11,13 +11,10 @@ import EmptyStateComponent from "@/components/EmptyStateComponent";
 import DeleteConfirmation from "@/components/DeleteConfirmation";
 import { API_LIST } from "@/api/endpoints";
 import { GET } from "@/api/apiMethods";
-import {
-  RenderGridView,
-  RenderListViewDraft,
-} from "./RevertedPost/Components";
+import { RenderGridView, RenderListViewDraft } from "./RevertedPost/Components";
 import Pagination from "@/components/Pagination";
 import { usePagination } from "@/hooks/usePagination";
-import Loader from "@/components/Loader";
+import Loading from "../Shared/agency-feeds/loading";
 
 export default function DraftsPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -27,20 +24,19 @@ export default function DraftsPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [data, setData] = useState<RevertedArticleTypes[]>([]);
   const [pageMetaData, setPageMetaData] = useState<{
-    "total": number,
-    "page": number,
-    "pageSize": number,
-    "totalPages": number,
-    "hasNextPage": boolean,
-    "hasPrevPage": boolean
-
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
   }>({
-    "total": 11,
-    "page": 1,
-    "pageSize": 10,
-    "totalPages": 2,
-    "hasNextPage": true,
-    "hasPrevPage": false
+    total: 11,
+    page: 1,
+    pageSize: 10,
+    totalPages: 2,
+    hasNextPage: true,
+    hasPrevPage: false,
   });
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -74,8 +70,6 @@ export default function DraftsPage() {
     initialPageSize: 10,
   });
 
-
-
   const handlePageSize = (val: string) => {
     const size = val.split(" ")[0];
     setPageSize(Number(size));
@@ -85,8 +79,8 @@ export default function DraftsPage() {
       activeFilter === "AUDIO"
         ? "audio"
         : activeFilter === "VIDEO"
-          ? "video"
-          : "textArticle";
+        ? "video"
+        : "textArticle";
     const handleNav = () => {
       navigate(`/${isAudio}`);
     };
@@ -131,21 +125,19 @@ export default function DraftsPage() {
 
     const getDraftArticle = async () => {
       try {
-        setLoading(true)
+        setLoading(true);
         const response: any = await GET(
-          `${API_LIST.BASE_URL}${API_LIST.DRAFT_ARTICLE
-          }?page=${currentPage}&pageSize=${pageSize}`,
+          `${API_LIST.BASE_URL}${API_LIST.DRAFT_ARTICLE}?page=${currentPage}&pageSize=${pageSize}`,
           { signal: controller.signal }
         );
         setData(response.drafts);
-        setPageMetaData(response.pagination)
-        setLoading(false)
+        setPageMetaData(response.pagination);
+        setLoading(false);
       } catch (error: any) {
         if (error.name !== "AbortError") {
           console.error("Error fetching reverted posts:", error);
         }
-        setLoading(false)
-
+        setLoading(false);
       }
     };
 
@@ -154,9 +146,7 @@ export default function DraftsPage() {
   }, [currentPage, pageSize]);
 
   if (loading) {
-    return (<div style={{ display: 'flex', flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Loader width="96" />
-    </div>)
+    return <Loading />;
   }
   return (
     <div className="flex-1 py-16 h-screen bg-gray-50">
@@ -202,7 +192,8 @@ export default function DraftsPage() {
             <RenderListViewDraft
               handleDeletePost={(id) => setDeletePost({ id, isOpen: true })}
               handleEdit={handleEdit}
-              filteredArticles={filteredArticles} />
+              filteredArticles={filteredArticles}
+            />
           )}
         </div>
 
@@ -225,8 +216,6 @@ export default function DraftsPage() {
           }
         />
       )}
-
-
     </div>
   );
 }

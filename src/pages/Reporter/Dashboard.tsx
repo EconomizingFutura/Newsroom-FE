@@ -1,12 +1,12 @@
 import { GET } from "@/api/apiMethods";
 import { API_LIST } from "@/api/endpoints";
 import ContentHeader from "@/components/ContentHeader";
-import Loader from "@/components/Loader";
 import { StatCard, DashboardListCard } from "@/components/ui/card";
 import type { RevertedArticleTypes } from "@/types/draftPageTypes";
 import { Clock, CheckCircle, RotateCcw, FilePen } from "lucide-react";
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router";
+import Loading from "../Shared/agency-feeds/loading";
 
 type StatCardProps = {
   title: string;
@@ -93,18 +93,7 @@ export default function Dashboard() {
   }, []);
 
   if (loading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Loader width="96" />
-      </div>
-    );
+    return <Loading />;
   }
 
   return (
