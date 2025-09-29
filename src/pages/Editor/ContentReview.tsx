@@ -1,14 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  Rss,
-  Home,
-  FileStack,
-  BookOpen,
   Calendar,
-  History,
-  Search,
-  Bell,
   User,
   ArrowLeft,
   Clock,
@@ -147,11 +140,10 @@ export function ContentReview({
                   <Badge
                     key={index}
                     variant={category.active ? "default" : "outline"}
-                    className={`px-3 py-1 ${
-                      category.active
+                    className={`px-3 py-1 ${category.active
                         ? "bg-green-600 text-white"
                         : "text-gray-600 border-gray-300"
-                    }`}
+                      }`}
                   >
                     Tag {index + 1}
                   </Badge>

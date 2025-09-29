@@ -1,5 +1,8 @@
 import React from "react";
 import { Trash, MessageSquare, PenLine, Clock } from "lucide-react";
+import { formatDate } from "@/utils/utils";
+import { cn } from "../ui/utils";
+import { ImageWithFallback } from "../ImageWithFallback";
 
 type CardProps = {
   id: string;
@@ -9,9 +12,10 @@ type CardProps = {
   updatedDate: string;
   wordCount?: number;
   savedTime?: string;
-  type?: "Text" | "All Type" | "Audio" | "Video" | undefined;
-  status?: "Auto-saved" | "Reverted";
+  type?: "TEXT" | "All Type" | "AUDIO" | "VIDEO";
+  status?: "Auto-saved" | "REVERTED" | "DRAFT";
   remarkMessage?: string;
+  thumbnailUrl?: string; // 👈 supports both AUDIO + VIDEO
   handleDelete: (id: string) => void;
   handleEdit: (id: string) => void;
 };
@@ -21,49 +25,84 @@ const Card: React.FC<CardProps> = ({
   title,
   contentPreview,
   updatedDate,
-  wordCount,
+  wordCount = 0,
   savedTime,
-  type = "Text",
+  type = "TEXT",
   status = "Auto-saved",
   remarkMessage,
+  thumbnailUrl,
   handleDelete,
   handleEdit,
 }) => {
-  // const EDITNAVIGATE = (id: string) => {
-  //   console.log("Edit article with ID:", id);
-  // };
   return (
-    <div className="w-full max-w-sm bg-white rounded-2xl shadow-md border border-gray-200 p-[24px] flex flex-col justify-between">
+    <div className="w-full max-w-md bg-white rounded-2xl shadow-md border border-gray-200 max-h-[300px] p-[24px] flex flex-col justify-between">
       {/* Title */}
       <h2 className="text-base font-semibold text-gray-900">{title}</h2>
 
       {/* Tags */}
       <div className="flex items-center gap-2 mt-2">
         <span
-          className={`px-2 py-0.5 text-xs font-medium rounded-md ${
-            type === "Text"
-              ? "bg-[#DBEAFE] border border-[#BEDBFF] text-[#193CB8]"
-              : type === "Audio"
+          className={`px-2 py-0.5 text-xs font-medium rounded-md ${type === "TEXT"
+            ? "bg-[#DBEAFE] border border-[#BEDBFF] text-[#193CB8]"
+            : type === "AUDIO"
               ? "bg-[#F3E8FF] border border-[#EAD4FF] text-[#6D11B0]"
-              : "bg-[#FFEDD4] border border-[#FFD6A7] text-[#9F2E00]"
-          }`}
+              : type === "VIDEO"
+                ? "bg-[#FFEDD4] border border-[#FFD6A7] text-[#9F2E00]"
+                : "bg-gray-200 border border-gray-300 text-gray-700"
+            }`}
         >
           {type}
         </span>
-        <span className="px-2 py-0.5 text-xs font-medium rounded-md  border border-[#B3E6B3] text-[#006601] bg-[#f0f9f0]">
-          Auto-saved
+        <span className="px-2 py-0.5 text-xs font-medium rounded-md border border-[#B3E6B3] text-[#006601] bg-[#f0f9f0]">
+          {status}
         </span>
       </div>
 
-      {/* Content Preview */}
-      {status === "Auto-saved" && (
-        <p className="text-sm text-gray-600 mt-2 line-clamp-2">
-          {contentPreview}
-        </p>
-      )}
+      {/* Dynamic Preview Section */}
+      <div className="mt-2">
+        {/* TEXT */}
+        {type === "TEXT" && (
+          <p className="text-sm text-gray-600  min-h-20 line-clamp-2">{contentPreview}</p>
+        )}
+
+        {/* AUDIO */}
+        {type === "AUDIO" && (
+          <div className="flex justify-center items-center">
+            <ImageWithFallback
+              mediaType="audio"
+              src={thumbnailUrl || "/images/audio-placeholder.png"}
+              alt="Audio Thumbnail"
+              className="w-full h-32 object-cover rounded-lg"
+            />
+          </div>
+        )}
+
+        {/* VIDEO */}
+        {type === "VIDEO" && (
+          <div className="flex justify-center items-center relative">
+            <ImageWithFallback
+            mediaType="video"
+              src={thumbnailUrl || "/images/video-placeholder.png"}
+              alt="Video Thumbnail"
+              className="w-full h-32 object-cover rounded-lg"
+            />
+            {/* Play overlay */}
+            {/* <div className="absolute inset-0 flex items-center justify-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-10 h-10 text-white bg-black bg-opacity-50 rounded-full p-2"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div> */}
+          </div>
+        )}
+      </div>
 
       {/* Remark Block */}
-      {status === "Reverted" && (
+      {status === "REVERTED" && (
         <div className="mt-3 p-3 border border-red-300 bg-red-50 rounded-lg text-sm text-red-700">
           <div className="flex gap-[8px]">
             <MessageSquare size={18} />
@@ -78,17 +117,21 @@ const Card: React.FC<CardProps> = ({
       )}
 
       {/* Footer */}
-      {savedTime && status === "Auto-saved" && (
-        <div className="flex items-center justify-between mt-3 text-[14px] text-gray-500">
-          <div className="flex items-center gap-2">
+      {savedTime && status === "DRAFT" && (
+        <div
+          className={cn(
+            "grid items-center justify-between mt-3 text-[14px] text-gray-500",
+            wordCount > 0 ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-2"
+          )}        >
+          <div className="flex items-center  gap-2">
             <Clock className="w-5 h-5" />
-            <p>Updated {updatedDate}</p>
+            <p>Updated {formatDate(updatedDate)} </p>
           </div>
-          <div>{wordCount && <p>{wordCount} words</p>}</div>
-
+          {wordCount > 0 && <div className="text-center ">{wordCount && <p>{wordCount} words</p>}</div>}
           <p className="text-green-600 ">{savedTime}</p>
         </div>
       )}
+
       {/* Actions */}
       <div className="flex items-center gap-3 mt-3">
         <button

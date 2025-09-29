@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Trash2, Play, Pause } from "lucide-react";
+import { ImageWithFallback } from "../ImageWithFallback";
 
 export default function VideoPreview({
   src,
@@ -92,7 +93,7 @@ export default function VideoPreview({
           <video
             ref={videoRef}
             src={srcBlob}
-            className="w-full h-auto rounded-xl"
+            className="w-full max-h-80 object-contain rounded-xl"
             controls={false}
           />
 
@@ -148,7 +149,7 @@ export default function VideoPreview({
           </div>
         </>
       ) : (
-        <img
+        <ImageWithFallback
           src={thumbnailUrl || thumbnail || "/default-thumbnail.jpg"}
           alt="Video thumbnail"
           className="w-full h-auto rounded-xl"

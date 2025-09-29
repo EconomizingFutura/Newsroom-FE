@@ -6,9 +6,9 @@ import {
   AxiosHeaders,
 } from "axios";
 import { API_LIST } from "./endpoints";
+import { LOGOUT } from "@/utils/utils";
 
 const API_BASE_URL = API_LIST.BASE_URL;
-
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -33,6 +33,9 @@ axiosInstance.interceptors.request.use(
 const handleResponseError = (error: unknown): never => {
   console.error("API request error:", error instanceof Error ? error : error);
   if (axios.isAxiosError(error)) {
+    if (error.status == 401) {
+      LOGOUT();
+    }
     throw error.response?.data || error;
   }
   throw error;
@@ -65,6 +68,7 @@ const request = async <T>(
       url,
       ...axiosConfig,
     });
+    console.log(response);
 
     return response.data;
   } catch (error) {

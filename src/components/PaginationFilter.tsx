@@ -14,7 +14,7 @@ const PaginationFilter: React.FC<PaginationFilterProps> = ({ onClick }) => {
     "100 per page",
     "150 per page",
   ];
-  const [selectedOption, setSelectedOption] = useState(OPTIONS[0]);
+  const [selectedOption, setSelectedOption] = useState(OPTIONS[1]);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 

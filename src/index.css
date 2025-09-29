@@ -1,5 +1,7 @@
 @import "tailwindcss";
 @custom-variant dark (&:is(.dark *));
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap');
+
 :root {
   --font-size: 14px;
   --background: #ffffff;
@@ -39,6 +41,13 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --history-select-border: #ececec;
+  --history-search-shadow: "0px 2px 10px 0px #959DA533";
+  --screen-2xl: 1536px; /* large desktops */
+  --screen-3xl: 1920px; /* Full HD */
+  --screen-4xl: 2560px; /* 2K */
+  --screen-5xl: 3840px; /* 4K UHD */
+  --screen-6xl: 6016px;  /*Imac*/
 }
 
 .dark {
@@ -117,6 +126,8 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  /* --shadow-history-search: var(--history-search-shadow); */
+  --shadow-history-search: var(--history-search-shadow);
 }
 
 @layer base {
@@ -189,7 +200,11 @@ html {
 }
 
 .warning-color {
-  color:#C10007 !important;
+  color: #c10007 !important;
+}
+
+body{
+  font-family: 'Open Sans', sans-serif;
 }
 
 .ql-toolbar {
@@ -207,4 +222,21 @@ html {
 
 .ql-editor {
   height: calc(100% - 53px) !important;
+}
+
+
+@layer base {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  label,
+  div,
+  span,
+  p {
+    @apply cursor-default select-none;
+  }
 }

@@ -1,6 +1,9 @@
 import { MessageSquare } from "lucide-react";
+interface RemarkTypes {
+  remarks: string
+}
 
-export default function EditorRemarks() {
+export default function EditorRemarks({ remarks }: RemarkTypes) {
   return (
     <div className="border border-[#C1000866] bg-[#FEF3F2] px-4 py-2 my-4 rounded-[12px]">
       <div className=" flex space-x-2 ">
@@ -11,8 +14,7 @@ export default function EditorRemarks() {
             Editor Remarks
           </h3>
           <p className="text-[#C10008] text-sm">
-            Needs fact verification for the statistics mentioned in paragraph 3.
-            Please add sources for the economic data.
+            {remarks}
           </p>
         </div>
       </div>

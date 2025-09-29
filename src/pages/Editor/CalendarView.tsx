@@ -19,14 +19,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Rss,
-  Home,
-  FileStack,
-  BookOpen,
   Calendar,
-  History,
-  Search,
-  Bell,
   User,
   ChevronLeft,
   ChevronRight,

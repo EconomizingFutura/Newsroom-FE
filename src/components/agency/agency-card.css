@@ -1,0 +1,55 @@
+/* Only animate when users have not requested reduced motion */
+@media (prefers-reduced-motion: no-preference) {
+  .agency-card-anim {
+    animation: card-pop 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+@keyframes card-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Optional: keep the glow behavior predictable without Tailwind tricks */
+.agency-card {
+  background-color: #fff; /* clean white background */
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease-in-out;
+}
+
+.agency-card:hover {
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); /* emerald-ish hover */
+  transform: translateY(-2px);
+}
+
+.agency-card p:first-child {
+  color: #10b981; /* default near-black */
+  font-weight: 600;
+  transition: color 0.2s ease-in-out;
+}
+.agency-card:hover p:first-child {
+  color: #10b981; /* emerald-500 on hover */
+}
+.agency-card p:last-child {
+  color: #6b7280; /* muted gray for domain */
+}
+
+.agency-card__glow {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+  border-radius: 0.75rem;
+}
+
+.agency-card:hover .agency-card__glow {
+  opacity: 1;
+}
