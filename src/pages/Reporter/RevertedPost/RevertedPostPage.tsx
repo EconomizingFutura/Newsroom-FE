@@ -13,6 +13,8 @@ import { GET } from "@/api/apiMethods";
 import { API_LIST } from "@/api/endpoints";
 import { RenderGridView, RenderListView } from "./Components";
 import Loading from "@/pages/Shared/agency-feeds/loading";
+import { usePagination } from "@/hooks/usePagination";
+import Pagination from "@/components/Pagination";
 
 const RevertedPostPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -29,6 +31,33 @@ const RevertedPostPage: React.FC = () => {
   });
   const filterOptions = ["All Type", "TEXT", "AUDIO", "VIDEO"];
   const navigate = useNavigate();
+  const [pageMetaData, setPageMetaData] = useState<{
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  }>({
+    total: 11,
+    page: 1,
+    pageSize: 10,
+    totalPages: 2,
+    hasNextPage: true,
+    hasPrevPage: false,
+  });
+
+  const {
+    currentPage,
+    setPageSize,
+    setCurrentPage,
+    handlePageChange,
+    pageSize,
+  } = usePagination({
+    initialPage: 1,
+    totalPages: pageMetaData.totalPages,
+    initialPageSize: 10,
+  });
 
   const filteredArticles = useMemo(() => {
     return data.filter((article) => {
@@ -48,10 +77,12 @@ const RevertedPostPage: React.FC = () => {
       try {
         setLoading(true);
         const response: any = await GET(
-          API_LIST.BASE_URL + API_LIST.REVERTED_POST,
+          `${API_LIST.BASE_URL}${API_LIST.REVERTED_POST}?page=${currentPage}&pageSize=${pageSize}`,
           { signal: controller.signal }
         );
         setData(response.data);
+        setPageMetaData(response.pagination);
+
         setLoading(false);
       } catch (error: any) {
         if (error.name !== "AbortError") {
@@ -63,7 +94,7 @@ const RevertedPostPage: React.FC = () => {
 
     getRevertedPost();
     return () => controller.abort();
-  }, []);
+  }, [currentPage, pageSize]);
 
   const handleDelete = () => {
     if (!deletePost.id) {
@@ -87,6 +118,10 @@ const RevertedPostPage: React.FC = () => {
     }));
   };
 
+  const handlePageSize = (val: string) => {
+    const size = val.split(" ")[0];
+    setPageSize(Number(size));
+  };
   const handleEdit = (id: string) => {
     const articleType = EDIT_DRAFT_NAVIGATE(id, filteredArticles);
     navigate(`/${articleType}/${id}?from=reverted`);
@@ -156,6 +191,14 @@ const RevertedPostPage: React.FC = () => {
             </div>
           )}
         </div>
+
+        <Pagination
+          currentPage={pageMetaData.page}
+          pageCount={pageMetaData.totalPages}
+          onPageChange={handlePageChange}
+          setCurrentPage={setCurrentPage}
+          setSortConfig={handlePageSize}
+        />
       </div>
       {deletePost.isOpen && (
         <DeleteConfirmation

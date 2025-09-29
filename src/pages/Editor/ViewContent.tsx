@@ -13,6 +13,7 @@ import SuccessUI from "@/components/SuccessUI";
 import RemarksModal from "@/components/RemarksModal";
 import Loading from "../Shared/agency-feeds/loading";
 import { useEditorReviewArticle } from "@/hooks/useEditorReviewArticle";
+import VideoUrlPlayer, { AudioUrlPlayer } from "../Reporter/ArticleCreation/Components";
 
 interface ContentForm {
   content: string;
@@ -163,7 +164,7 @@ const ViewContent: React.FC = () => {
               />
             )}
 
-            {contentData?.type === "VIDEO" && (
+            {/* {contentData?.type === "VIDEO" && (
               <div className="flex-1 flex flex-col p-8 bg-white rounded-lg shadow-sm">
                 <h3 className="text-lg font-medium mb-4">Video Content</h3>
                 {contentData.videoUrl ? (
@@ -181,9 +182,20 @@ const ViewContent: React.FC = () => {
                   </div>
                 )}
               </div>
+            )} */}
+
+            {contentData?.type === "VIDEO" && (
+              <>
+                <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl  p-3 text-center">
+                  <VideoUrlPlayer
+                    videoUrl={contentData.videoUrl}
+                    thumbnailUrl={contentData.thumbnailUrl as string | undefined}
+                  />
+                </div>
+              </>
             )}
 
-            {contentData?.type === "AUDIO" && (
+            {/* {contentData?.type === "AUDIO" && (
               <div className="flex-1 flex flex-col p-8 bg-white rounded-lg shadow-sm">
                 <h3 className="text-lg font-medium mb-4">Audio Content</h3>
                 {contentData.audioUrl ? (
@@ -198,7 +210,13 @@ const ViewContent: React.FC = () => {
                   </div>
                 )}
               </div>
-            )}
+            )} */}
+
+            {contentData?.type === "AUDIO" &&
+
+              <AudioUrlPlayer src={contentData.audioUrl} />
+
+            }
 
             <div className="space-y-3 mt-6">
               {enableEdit && (

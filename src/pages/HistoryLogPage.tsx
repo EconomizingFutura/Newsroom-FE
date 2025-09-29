@@ -21,7 +21,7 @@ import { API_LIST } from "@/api/endpoints";
 import { GET } from "@/api/apiMethods";
 import moment from "moment";
 import type { RevertedArticleTypes } from "@/types/draftPageTypes";
-import Loader from "@/components/Loader";
+import Loading from "./Shared/agency-feeds/loading";
 
 const HistoryLogPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -140,9 +140,10 @@ const HistoryLogPage: React.FC = () => {
         const response: any = await GET(API_LIST.BASE_URL + API_LIST.STATS);
         const updatedStats = stats.map((item) => {
           let key = item.title.toUpperCase();
+          let tempValue = key === 'APPROVED' ? response['REVIEWED'] : response[key] ?? 0
           return {
             ...item,
-            value: response[key] ?? 0,
+            value: tempValue,
           };
         });
         setStats(updatedStats);
@@ -196,9 +197,7 @@ const HistoryLogPage: React.FC = () => {
   }
 
   if (loading) {
-    return (<div style={{ display: 'flex', flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Loader width="96" />
-    </div>)
+    return (<Loading />)
   }
   return (
     <div className=" flex-1 py-16 h-screen bg-gray-50">
@@ -339,7 +338,7 @@ const HistoryLogPage: React.FC = () => {
                           article.status
                         )}`}
                       >
-                        <span>{article.status}</span>
+                        <span>{article.status === 'REVIEWED' ? 'APPROVED' : article.status}</span>
                       </Badge>
                     </div>
 
