@@ -13,7 +13,11 @@ import SuccessUI from "@/components/SuccessUI";
 import RemarksModal from "@/components/RemarksModal";
 import Loading from "../Shared/agency-feeds/loading";
 import { useEditorReviewArticle } from "@/hooks/useEditorReviewArticle";
-import VideoUrlPlayer, { AudioUrlPlayer } from "../Reporter/ArticleCreation/Components";
+import VideoUrlPlayer, {
+  AudioUrlPlayer,
+} from "../Reporter/ArticleCreation/Components";
+import InfoBadge from "@/components/ui/InfoBatch";
+import { formatToIST } from "@/utils/utils";
 
 interface ContentForm {
   content: string;
@@ -186,10 +190,27 @@ const ViewContent: React.FC = () => {
 
             {contentData?.type === "VIDEO" && (
               <>
-                <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl  p-3 text-center">
+                <div>
+                  <h1 className="text-[#101828] font-bold text-2xl">
+                    {contentData?.title || ""}
+                  </h1>
+                  <div className="flex items-center my-2 gap-1 ">
+                    <InfoBadge
+                      type="date"
+                      value={formatToIST(contentData?.updatedAt)}
+                    />
+                    <InfoBadge
+                      type="user"
+                      value={contentData?.reporter.username}
+                    />
+                  </div>
+                </div>
+                <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl  p-3 ">
                   <VideoUrlPlayer
                     videoUrl={contentData.videoUrl}
-                    thumbnailUrl={contentData.thumbnailUrl as string | undefined}
+                    thumbnailUrl={
+                      contentData.thumbnailUrl as string | undefined
+                    }
                   />
                 </div>
               </>
@@ -212,11 +233,28 @@ const ViewContent: React.FC = () => {
               </div>
             )} */}
 
-            {contentData?.type === "AUDIO" &&
-
-              <AudioUrlPlayer src={contentData.audioUrl} />
-
-            }
+            {contentData?.type === "AUDIO" && (
+              <>
+                <div>
+                  <h1 className="text-[#101828] font-bold text-2xl">
+                    {contentData?.title || ""}
+                  </h1>
+                  <div className="flex items-center my-2 gap-1 ">
+                    <InfoBadge
+                      type="date"
+                      value={formatToIST(contentData?.updatedAt)}
+                    />
+                    <InfoBadge
+                      type="user"
+                      value={contentData?.reporter.username}
+                    />
+                  </div>
+                </div>
+                <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl my-5  p-3 ">
+                  <AudioUrlPlayer src={contentData.audioUrl} />
+                </div>
+              </>
+            )}
 
             <div className="space-y-3 mt-6">
               {enableEdit && (

@@ -197,13 +197,15 @@ export default function DraftsPage() {
           )}
         </div>
 
-        <Pagination
-          currentPage={pageMetaData.page}
-          pageCount={pageMetaData.totalPages}
-          onPageChange={handlePageChange}
-          setCurrentPage={setCurrentPage}
-          setSortConfig={handlePageSize}
-        />
+        {pageMetaData.totalPages > 1 && (
+          <Pagination
+            currentPage={pageMetaData.page}
+            pageCount={pageMetaData.totalPages}
+            onPageChange={handlePageChange}
+            setCurrentPage={setCurrentPage}
+            setSortConfig={handlePageSize}
+          />
+        )}
       </div>
       {deletePost.isOpen && (
         <DeleteConfirmation

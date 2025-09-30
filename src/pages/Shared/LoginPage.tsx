@@ -28,7 +28,7 @@ export default function LoginPage() {
     register,
     handleSubmit,
     formState: { errors },
-    reset
+    reset,
   } = useForm<FormData>();
 
   const onSubmit = async (data: FormData) => {
@@ -52,23 +52,18 @@ export default function LoginPage() {
         if (decoded?.role) {
           localStorage.setItem("role", decoded.role);
         }
-
       } else {
-        toast.error('Invalid Credentials')
-        reset()
+        toast.error("Invalid Credentials");
+        reset();
       }
       setLoading(false);
-
     } catch (error: unknown) {
       console.error("Login error:", error);
-      reset()
+      reset();
       const err = error as { message?: string };
       toast.error(err.message || "Invalid Credentials");
       setLoading(false);
-
     }
-
-
   };
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -199,21 +194,18 @@ export default function LoginPage() {
                   )}
                 </div>
 
-                {loading ? <div>
-                  <Loader width="12"></Loader>
-                </div> :
-                  < Button
-                    type="submit"
-                    className="w-full bg-[#008001] hover:bg-green-700 text-white font-semibold py-3 px-4 mt-2 rounded-lg transition-colors duration-200"
-                  >
-                    Login
-                  </Button>
-                }
+                <Button
+                  disabled={loading}
+                  type="submit"
+                  className="w-full bg-[#008001] hover:bg-green-700 text-white font-semibold py-3 px-4 mt-2 rounded-lg transition-colors duration-200"
+                >
+                  Login {loading && <Loader width="12"></Loader>}
+                </Button>
               </form>
             </div>
           </div>
         </div>
-      </main >
-    </div >
+      </main>
+    </div>
   );
 }

@@ -37,8 +37,17 @@ export function Dashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleNavigate = (id: string) => {
-    navigate(`/textArticle/${id}?from=dashboard`);
+  // const handleNavigate = (id: string) => {
+  //   navigate(`/textArticle/${id}?from=dashboard`);
+  // };
+
+  const handleNavigate = (storyId: string) => {
+    const articleType =
+      pendingStories.find((article: contentResponse) => article.id === storyId)
+        ?.type || "Text";
+    navigate(`/editor/viewcontent/${storyId}?from=dashboard`, {
+      state: { articletype: articleType },
+    });
   };
 
   if (isLoading) {

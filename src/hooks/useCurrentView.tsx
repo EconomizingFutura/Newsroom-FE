@@ -54,5 +54,8 @@ export function useCurrentView(): CurrentPageType {
   if (queryParams.get("from") === "reviewQueue") {
     return "review-queue";
   }
+  if (queryParams.get("from") === "dashboard") {
+    return "editor-dashboard";
+  }
   return "newsFeeds";
 }

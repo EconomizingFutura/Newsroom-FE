@@ -32,26 +32,27 @@ const HistoryLogPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const [pageMetaData, setPageMetaData] = useState<{
-    "total": number,
-    "page": number,
-    "pageSize": number,
-    "totalPages": number,
-    "hasNextPage": boolean,
-    "hasPrevPage": boolean
-
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
   }>({
-    "total": 11,
-    "page": 1,
-    "pageSize": 10,
-    "totalPages": 2,
-    "hasNextPage": true,
-    "hasPrevPage": false
+    total: 11,
+    page: 1,
+    pageSize: 10,
+    totalPages: 2,
+    hasNextPage: true,
+    hasPrevPage: false,
   });
   const handlePageSize = (val: string) => {
     const size = val.split(" ")[0];
     setPageSize(Number(size));
   };
-  const [historyArticles, setHistoryArticles] = useState<RevertedArticleTypes[]>([]);
+  const [historyArticles, setHistoryArticles] = useState<
+    RevertedArticleTypes[]
+  >([]);
   const statusOptions = [
     "All Status",
     "APPROVED",
@@ -83,7 +84,6 @@ const HistoryLogPage: React.FC = () => {
     totalPages: pageMetaData.totalPages,
     initialPageSize: 10,
   });
-
 
   const initialStats = [
     {
@@ -129,9 +129,8 @@ const HistoryLogPage: React.FC = () => {
       filteredArticles.find((article: any) => article.id === id)?.type ||
       "Text";
     const route = returnType(articleType);
-    navigate(`/${route}/${id}?from=history`, { state: { name: 'harish' } });
+    navigate(`/${route}/${id}?from=history`, { state: { name: "harish" } });
   };
-
 
   const [stats, setStats] = useState(initialStats);
   useEffect(() => {
@@ -140,7 +139,8 @@ const HistoryLogPage: React.FC = () => {
         const response: any = await GET(API_LIST.BASE_URL + API_LIST.STATS);
         const updatedStats = stats.map((item) => {
           let key = item.title.toUpperCase();
-          let tempValue = key === 'APPROVED' ? response['REVIEWED'] : response[key] ?? 0
+          let tempValue =
+            key === "APPROVED" ? response["REVIEWED"] : response[key] ?? 0;
           return {
             ...item,
             value: tempValue,
@@ -160,18 +160,16 @@ const HistoryLogPage: React.FC = () => {
 
     const getHistoryList = async () => {
       try {
-        setLoading(true)
+        setLoading(true);
         const response: any = await GET(
-          `${API_LIST.BASE_URL}${API_LIST.HISTORY
-          }?page=${currentPage}&pageSize=${pageSize}`,
+          `${API_LIST.BASE_URL}${API_LIST.HISTORY}?page=${currentPage}&pageSize=${pageSize}`,
           { signal: controller.signal }
         );
         setHistoryArticles(response.articles ?? []);
-        setPageMetaData(response.pagination)
-        setLoading(false)
-
+        setPageMetaData(response.pagination);
+        setLoading(false);
       } catch (error: any) {
-        setLoading(false)
+        setLoading(false);
         if (error.name !== "AbortError") {
           console.error("Error fetching reverted posts:", error);
         }
@@ -181,7 +179,6 @@ const HistoryLogPage: React.FC = () => {
     getHistoryList();
     return () => controller.abort();
   }, [currentPage, pageSize]);
-
 
   function getArticleType(article: any): "text" | "audio" | "video" {
     if (article.content && article.content !== "") {
@@ -197,7 +194,7 @@ const HistoryLogPage: React.FC = () => {
   }
 
   if (loading) {
-    return (<Loading />)
+    return <Loading />;
   }
   return (
     <div className=" flex-1 py-16 h-screen bg-gray-50">
@@ -328,7 +325,10 @@ const HistoryLogPage: React.FC = () => {
                     <div className="col-span-2 px-4">
                       <div className="text-[14px] flex items-center gap-[8px]">
                         {typeIcons[getArticleType(article) as PostType]}
-                        <span className=" first-letter:uppercase">{getArticleType(article)}</span> {getArticleType(article) == 'text' ? 'Article' : 'Post'}
+                        <span className=" first-letter:uppercase">
+                          {getArticleType(article)}
+                        </span>{" "}
+                        {getArticleType(article) == "text" ? "Article" : "Post"}
                       </div>
                     </div>
 
@@ -338,7 +338,11 @@ const HistoryLogPage: React.FC = () => {
                           article.status
                         )}`}
                       >
-                        <span>{article.status === 'REVIEWED' ? 'APPROVED' : article.status}</span>
+                        <span>
+                          {article.status === "REVIEWED"
+                            ? "APPROVED"
+                            : article.status}
+                        </span>
                       </Badge>
                     </div>
 
@@ -377,13 +381,15 @@ const HistoryLogPage: React.FC = () => {
             </div>
           </div>
         </div>
-        <Pagination
-          currentPage={pageMetaData.page}
-          pageCount={pageMetaData.totalPages}
-          onPageChange={handlePageChange}
-          setCurrentPage={setCurrentPage}
-          setSortConfig={handlePageSize}
-        />
+        {pageMetaData.totalPages > 1 && (
+          <Pagination
+            currentPage={pageMetaData.page}
+            pageCount={pageMetaData.totalPages}
+            onPageChange={handlePageChange}
+            setCurrentPage={setCurrentPage}
+            setSortConfig={handlePageSize}
+          />
+        )}
       </div>
     </div>
   );
