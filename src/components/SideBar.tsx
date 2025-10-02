@@ -148,7 +148,7 @@ const SideBar: React.FC<SidebarTypes> = (props) => {
         {/* Top Menu */}
         <div className="space-y-1  p-2 ">
           {menuConfig[currentRole].map((item, index) => {
-            const active = isActive(item.key as currentPageType);
+            // const active = isActive(item.key as currentPageType);
             const isAfterActive = menuConfig[currentRole].slice(0, index).some(
               (prevItem) => isActive(prevItem.key as currentPageType))
 
