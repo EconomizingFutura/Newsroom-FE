@@ -27,7 +27,7 @@ const HistoryLogPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All Status");
   const [typeFilter, setTypeFilter] = useState("All Type");
-  const [dateRange, setDateRange] = useState("Date Range");
+  const [dateRange, setDateRange] = useState("All");
   const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -64,14 +64,41 @@ const HistoryLogPage: React.FC = () => {
 
   const filteredArticles = historyArticles?.filter((article: any) => {
     const matchesSearch = article.title
-      .toLowerCase()
+      ?.toLowerCase()
       .includes(searchQuery.toLowerCase());
+
     const matchesStatus =
-      statusFilter === "All Status" || article.status === statusFilter;
+      statusFilter === "All Status"
+        ? true
+        : statusFilter === "APPROVED"
+          ? article.status === "REVIEWED"
+          : article.status === statusFilter;
+
     const matchesType =
       typeFilter === "All Type" || article.type === typeFilter;
-    return matchesSearch && matchesStatus && matchesType;
+    // Date range filter
+    const articleDate = new Date(article.updatedAt);
+
+    let matchesDate = true;
+
+    if (dateRange !== "All") {
+      const days = Number(dateRange); // "7" → 7, "30" → 30, "90" → 90
+
+      // today (end of the day in local time)
+      const today = new Date();
+      today.setHours(23, 59, 59, 999);
+
+      // past date (start of the day N days ago)
+      const pastDate = new Date();
+      pastDate.setDate(pastDate.getDate() - days);
+      pastDate.setHours(0, 0, 0, 0);
+
+      matchesDate = articleDate >= pastDate && articleDate <= today;
+    }
+
+    return matchesSearch && matchesStatus && matchesType && matchesDate;
   });
+
 
   const {
     currentPage,
@@ -270,10 +297,10 @@ const HistoryLogPage: React.FC = () => {
                       <SelectValue placeholder="Date Range" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Date Range">Date Range</SelectItem>
-                      <SelectItem value="Last 7 days">Last 7 days</SelectItem>
-                      <SelectItem value="Last 30 days">Last 30 days</SelectItem>
-                      <SelectItem value="Last 3 months">
+                      <SelectItem value="All">Date Range</SelectItem>
+                      <SelectItem value="7">Last 7 days</SelectItem>
+                      <SelectItem value="30">Last 30 days</SelectItem>
+                      <SelectItem value="90">
                         Last 3 months
                       </SelectItem>
                     </SelectContent>

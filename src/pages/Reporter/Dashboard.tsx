@@ -7,6 +7,7 @@ import { Clock, CheckCircle, RotateCcw, FilePen } from "lucide-react";
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router";
 import Loading from "../Shared/agency-feeds/loading";
+import { EDIT_DRAFT_NAVIGATE } from "@/utils/draftUtils";
 
 type StatCardProps = {
   title: string;
@@ -30,8 +31,13 @@ export default function Dashboard() {
   const [revertedPost, setRevertedPost] = useState<RevertedArticleTypes[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const handleNavigate = (id: number) => {
-    navigate(`/textArticle/${id}?from=dashboard`);
+  // const handleNavigate = (id: number) => {
+  //   navigate(`/textArticle/${id}?from=dashboard`);
+  // };
+
+  const handleNavigate = (id: string) => {
+    const articleType = EDIT_DRAFT_NAVIGATE(id, revertedPost);
+    navigate(`/${articleType}/${id}?from=dashboard`);
   };
 
   useEffect(() => {
@@ -51,13 +57,13 @@ export default function Dashboard() {
           const key =
             item.title.toUpperCase() === "NEED REVISION"
               ? "REVERTED"
-              : item.title.toUpperCase();
+              : item.title.toUpperCase() === "APPROVED" ? "REVIEWED" : item.title.toUpperCase();
 
           return { ...item, count: statsResponse[key] ?? 0 };
         });
 
         setStats(updatedStats);
-      } catch (error: never) {
+      } catch (error: any) {
         if (error.name !== "AbortError") {
           console.error("Error fetching stats:", error);
         }
@@ -158,7 +164,7 @@ export default function Dashboard() {
                   {revertedPost.map((note, index) => (
                     <DashboardListCard
                       key={note.id ?? index}
-                      id={index}
+                      id={note.id}
                       title={note.title}
                       message={note.remarks}
                       buttonText="Edit Story"
