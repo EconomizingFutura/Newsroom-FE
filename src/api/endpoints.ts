@@ -10,5 +10,7 @@ export const API_LIST = Object.freeze({
   DRAFT_BY_ARTICLE: import.meta.env.VITE_DRAFT_BY_ID,
   REVERTED_POST: import.meta.env.VITE_REVERTED_POST,
   GET_ARTICLE: import.meta.env.VITE_GET_ARTICLE,
-  DELETE_ARTICLE: import.meta.env.VITE_DELETE_ARTICLE
+  DELETE_ARTICLE: import.meta.env.VITE_DELETE_ARTICLE,
+  EDITOR_REVIEW_ARTICLE: import.meta.env.VITE_EDITOR_ARTICLE_REVIEW,
+  EDITOR_STATS: import.meta.env.VITE_EDITOR_STATS,
 });

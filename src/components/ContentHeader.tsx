@@ -1,4 +1,4 @@
-import { Grid3x3, List, MoveLeft, Save, Send } from "lucide-react";
+import { Grid3x3, List, MoveLeft, PenLine, Save, Send } from "lucide-react";
 import React from "react";
 import { Button } from "./ui/button";
 import { HeaderIcon, type HeaderKey } from "@/utils/HeaderIcons";
@@ -17,6 +17,8 @@ interface ContentHeaderProps {
   showBackButton?: boolean;
   showArticle?: boolean;
   iconName?: HeaderKey;
+  showEdit?: boolean;
+  handleEdit?: () => void;
 }
 
 const ContentHeader: React.FC<ContentHeaderProps> = ({
@@ -30,6 +32,8 @@ const ContentHeader: React.FC<ContentHeaderProps> = ({
   iconName,
   onClickGridList,
   onClickBack,
+  showEdit,
+  handleEdit,
 }) => {
   return (
     <div className="flex justify-between">
@@ -102,6 +106,17 @@ const ContentHeader: React.FC<ContentHeaderProps> = ({
             <List className="w-4 h-4" />
           </Button>
         </div>
+      )}
+
+      {showEdit && (
+        <Button
+          variant="outline"
+          onClick={handleEdit}
+          className="text-[#1E2939] cursor-pointer hover:text-[#1E2939]  border-[#E5E7EB] hover:bg-[#F8FAF9]"
+        >
+          <PenLine color="#1E2939" className="w-4 h-4 mr-2" />
+          Edit
+        </Button>
       )}
 
       {showSaveSubmit && (

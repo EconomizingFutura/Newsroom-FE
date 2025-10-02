@@ -12,6 +12,7 @@ import { POST } from "@/api/apiMethods";
 import { API_LIST } from "@/api/endpoints";
 import loginbg from "@/assets/loginbg.svg";
 import { toast, Toaster } from "sonner";
+import Loader from "@/components/Loader";
 
 type FormData = {
   email: string;
@@ -20,16 +21,19 @@ type FormData = {
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset
+    reset,
   } = useForm<FormData>();
 
   const onSubmit = async (data: FormData) => {
     try {
+      setLoading(true);
       const response = await POST<LoginResponse>(API_LIST.LOGIN, {
         email: data.email,
         password: data.password,
@@ -48,19 +52,18 @@ export default function LoginPage() {
         if (decoded?.role) {
           localStorage.setItem("role", decoded.role);
         }
-
       } else {
-        toast.error('Invalid Credentials')
-        reset()
+        toast.error("Invalid Credentials");
+        reset();
       }
+      setLoading(false);
     } catch (error: unknown) {
       console.error("Login error:", error);
-      reset()
+      reset();
       const err = error as { message?: string };
       toast.error(err.message || "Invalid Credentials");
+      setLoading(false);
     }
-
-
   };
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -191,12 +194,12 @@ export default function LoginPage() {
                   )}
                 </div>
 
-                {/* Login Button */}
                 <Button
+                  disabled={loading}
                   type="submit"
                   className="w-full bg-[#008001] hover:bg-green-700 text-white font-semibold py-3 px-4 mt-2 rounded-lg transition-colors duration-200"
                 >
-                  Login
+                  Login {loading && <Loader width="12"></Loader>}
                 </Button>
               </form>
             </div>

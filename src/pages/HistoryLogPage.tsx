@@ -21,34 +21,38 @@ import { API_LIST } from "@/api/endpoints";
 import { GET } from "@/api/apiMethods";
 import moment from "moment";
 import type { RevertedArticleTypes } from "@/types/draftPageTypes";
+import Loading from "./Shared/agency-feeds/loading";
 
 const HistoryLogPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All Status");
   const [typeFilter, setTypeFilter] = useState("All Type");
-  const [dateRange, setDateRange] = useState("Date Range");
+  const [dateRange, setDateRange] = useState("All");
   const navigate = useNavigate();
-  const [pageMetaData, setPageMetaData] = useState<{
-    "total": number,
-    "page": number,
-    "pageSize": number,
-    "totalPages": number,
-    "hasNextPage": boolean,
-    "hasPrevPage": boolean
+  const [loading, setLoading] = useState<boolean>(false);
 
+  const [pageMetaData, setPageMetaData] = useState<{
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
   }>({
-    "total": 11,
-    "page": 1,
-    "pageSize": 10,
-    "totalPages": 2,
-    "hasNextPage": true,
-    "hasPrevPage": false
+    total: 11,
+    page: 1,
+    pageSize: 10,
+    totalPages: 2,
+    hasNextPage: true,
+    hasPrevPage: false,
   });
   const handlePageSize = (val: string) => {
     const size = val.split(" ")[0];
     setPageSize(Number(size));
   };
-  const [historyArticles, setHistoryArticles] = useState<RevertedArticleTypes[]>([]);
+  const [historyArticles, setHistoryArticles] = useState<
+    RevertedArticleTypes[]
+  >([]);
   const statusOptions = [
     "All Status",
     "APPROVED",
@@ -60,14 +64,41 @@ const HistoryLogPage: React.FC = () => {
 
   const filteredArticles = historyArticles?.filter((article: any) => {
     const matchesSearch = article.title
-      .toLowerCase()
+      ?.toLowerCase()
       .includes(searchQuery.toLowerCase());
+
     const matchesStatus =
-      statusFilter === "All Status" || article.status === statusFilter;
+      statusFilter === "All Status"
+        ? true
+        : statusFilter === "APPROVED"
+          ? article.status === "REVIEWED"
+          : article.status === statusFilter;
+
     const matchesType =
       typeFilter === "All Type" || article.type === typeFilter;
-    return matchesSearch && matchesStatus && matchesType;
+    // Date range filter
+    const articleDate = new Date(article.updatedAt);
+
+    let matchesDate = true;
+
+    if (dateRange !== "All") {
+      const days = Number(dateRange); // "7" → 7, "30" → 30, "90" → 90
+
+      // today (end of the day in local time)
+      const today = new Date();
+      today.setHours(23, 59, 59, 999);
+
+      // past date (start of the day N days ago)
+      const pastDate = new Date();
+      pastDate.setDate(pastDate.getDate() - days);
+      pastDate.setHours(0, 0, 0, 0);
+
+      matchesDate = articleDate >= pastDate && articleDate <= today;
+    }
+
+    return matchesSearch && matchesStatus && matchesType && matchesDate;
   });
+
 
   const {
     currentPage,
@@ -80,7 +111,6 @@ const HistoryLogPage: React.FC = () => {
     totalPages: pageMetaData.totalPages,
     initialPageSize: 10,
   });
-
 
   const initialStats = [
     {
@@ -126,9 +156,8 @@ const HistoryLogPage: React.FC = () => {
       filteredArticles.find((article: any) => article.id === id)?.type ||
       "Text";
     const route = returnType(articleType);
-    navigate(`/${route}/${id}?from=history`, { state: {name: 'harish'} });
+    navigate(`/${route}/${id}?from=history`, { state: { name: "harish" } });
   };
-
 
   const [stats, setStats] = useState(initialStats);
   useEffect(() => {
@@ -137,9 +166,11 @@ const HistoryLogPage: React.FC = () => {
         const response: any = await GET(API_LIST.BASE_URL + API_LIST.STATS);
         const updatedStats = stats.map((item) => {
           let key = item.title.toUpperCase();
+          let tempValue =
+            key === "APPROVED" ? response["REVIEWED"] : response[key] ?? 0;
           return {
             ...item,
-            value: response[key] ?? 0,
+            value: tempValue,
           };
         });
         setStats(updatedStats);
@@ -156,14 +187,16 @@ const HistoryLogPage: React.FC = () => {
 
     const getHistoryList = async () => {
       try {
+        setLoading(true);
         const response: any = await GET(
-          `${API_LIST.BASE_URL}${API_LIST.HISTORY
-          }?page=${currentPage}&pageSize=${pageSize}`,
+          `${API_LIST.BASE_URL}${API_LIST.HISTORY}?page=${currentPage}&pageSize=${pageSize}`,
           { signal: controller.signal }
         );
         setHistoryArticles(response.articles ?? []);
-        setPageMetaData(response.pagination)
+        setPageMetaData(response.pagination);
+        setLoading(false);
       } catch (error: any) {
+        setLoading(false);
         if (error.name !== "AbortError") {
           console.error("Error fetching reverted posts:", error);
         }
@@ -173,7 +206,6 @@ const HistoryLogPage: React.FC = () => {
     getHistoryList();
     return () => controller.abort();
   }, [currentPage, pageSize]);
-
 
   function getArticleType(article: any): "text" | "audio" | "video" {
     if (article.content && article.content !== "") {
@@ -188,6 +220,9 @@ const HistoryLogPage: React.FC = () => {
     return "text"; // default fallback
   }
 
+  if (loading) {
+    return <Loading />;
+  }
   return (
     <div className=" flex-1 py-16 h-screen bg-gray-50">
       {/* Main Content */}
@@ -262,10 +297,10 @@ const HistoryLogPage: React.FC = () => {
                       <SelectValue placeholder="Date Range" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Date Range">Date Range</SelectItem>
-                      <SelectItem value="Last 7 days">Last 7 days</SelectItem>
-                      <SelectItem value="Last 30 days">Last 30 days</SelectItem>
-                      <SelectItem value="Last 3 months">
+                      <SelectItem value="All">Date Range</SelectItem>
+                      <SelectItem value="7">Last 7 days</SelectItem>
+                      <SelectItem value="30">Last 30 days</SelectItem>
+                      <SelectItem value="90">
                         Last 3 months
                       </SelectItem>
                     </SelectContent>
@@ -310,14 +345,17 @@ const HistoryLogPage: React.FC = () => {
                   >
                     <div className="col-span-3 truncate">
                       <h3 className="text-sm font-normal text-[14px] text-[#1E2939] truncate">
-                        {article.title} 
-                      </h3> 
+                        {article.title}
+                      </h3>
                     </div>
 
                     <div className="col-span-2 px-4">
                       <div className="text-[14px] flex items-center gap-[8px]">
                         {typeIcons[getArticleType(article) as PostType]}
-                        <span className=" first-letter:uppercase">{getArticleType(article)}</span> {getArticleType(article) == 'text' ? 'Article' : 'Post'}
+                        <span className=" first-letter:uppercase">
+                          {getArticleType(article)}
+                        </span>{" "}
+                        {getArticleType(article) == "text" ? "Article" : "Post"}
                       </div>
                     </div>
 
@@ -327,13 +365,17 @@ const HistoryLogPage: React.FC = () => {
                           article.status
                         )}`}
                       >
-                        <span>{article.status}</span>
+                        <span>
+                          {article.status === "REVIEWED"
+                            ? "APPROVED"
+                            : article.status}
+                        </span>
                       </Badge>
                     </div>
 
                     <div className="col-span-1">
                       <div className="text-[14px] text-gray-900">
-                        {article.category} 
+                        {article.category}
                       </div>
                     </div>
 
@@ -366,13 +408,15 @@ const HistoryLogPage: React.FC = () => {
             </div>
           </div>
         </div>
-        <Pagination
-          currentPage={pageMetaData.page}
-          pageCount={pageMetaData.totalPages}
-          onPageChange={handlePageChange}
-          setCurrentPage={setCurrentPage}
-          setSortConfig={handlePageSize}
-        />
+        {pageMetaData.totalPages > 1 && (
+          <Pagination
+            currentPage={pageMetaData.page}
+            pageCount={pageMetaData.totalPages}
+            onPageChange={handlePageChange}
+            setCurrentPage={setCurrentPage}
+            setSortConfig={handlePageSize}
+          />
+        )}
       </div>
     </div>
   );

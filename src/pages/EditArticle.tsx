@@ -29,10 +29,12 @@ import { uploadToS3 } from "@/config/s3Config";
 import { base64ToFile } from "@/utils/compression";
 import { v4 as uuidv4 } from "uuid";
 import { HISTORY_STATUS } from "@/utils/draftUtils";
+import Loading from "./Shared/agency-feeds/loading";
+import { toast, Toaster } from "sonner";
 
 type ArticleFormValues = {
   category: string;
-  name: string;
+  title: string;
   content: string;
   tags: string[];
   video: File | string | null;
@@ -56,6 +58,8 @@ const EditArticle: React.FC = () => {
   }>({ type: null, isSubmit: false });
 
   const [newTag, setNewTag] = useState("");
+  const [remarks, setRemarks] = useState("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   const headerConfig: Record<string, { label: string; color: string; icon: HeaderKey }> = {
     textArticle: { label: "Text Article", color: "#2B7FFF", icon: "Text Article" },
@@ -66,7 +70,7 @@ const EditArticle: React.FC = () => {
 
   const schema = yup.object().shape({
     category: yup.string().required("Category is required"),
-    name: yup.string().required("Name is required"),
+    title: yup.string().required("Name is required"),
     content:
       path === "textArticle"
         ? yup.string().test("non-empty", "Content is required", (val) => {
@@ -144,7 +148,7 @@ const EditArticle: React.FC = () => {
     resolver: yupResolver(schema),
     defaultValues: {
       category: "Politics",
-      name: "",
+      title: "",
       content: "",
       tags: [],
       video: null,
@@ -183,6 +187,7 @@ const EditArticle: React.FC = () => {
 
     const getDraftArticle = async () => {
       try {
+        setLoading(true);
         const response: any = await GET(
           `${API_LIST.BASE_URL}${API_LIST.GET_ARTICLE}/${id}`,
           { signal: controller.signal }
@@ -191,7 +196,7 @@ const EditArticle: React.FC = () => {
         if (response) {
           const mapped: ArticleFormValues = {
             category: response.category ?? "",
-            name: response.title ?? "",
+            title: response.title ?? "",
             content: response.content ?? "",
             tags: Array.isArray(response.tags) ? response.tags : [],
             video: response.videoUrl ?? null,
@@ -204,9 +209,17 @@ const EditArticle: React.FC = () => {
           Object.entries(mapped).forEach(([key, value]) => {
             setValue(key as keyof ArticleFormValues, value, { shouldValidate: true, shouldDirty: false });
           });
+
+          setRemarks(response.remarks);
         }
+
+        setLoading(false);
+
       } catch (error: any) {
         if (error.name !== "AbortError") console.error("Error fetching article:", error);
+
+        setLoading(false);
+
       }
     };
 
@@ -235,13 +248,14 @@ const EditArticle: React.FC = () => {
     );
   };
 
-  const onSubmit = (data: ArticleFormValues, status: "SUBMIT" | "DRAFT") => {
+  const onSubmit = (data: ArticleFormValues, status: "SUBMIT" | "DRAFT" | "REVERTED") => {
     submitForReview(data, status)
   };
 
 
-  const submitForReview = async (data: ArticleFormValues, status: "SUBMIT" | "DRAFT") => {
-    if (status === 'DRAFT') {
+  const submitForReview = async (data: ArticleFormValues, status: "SUBMIT" | "DRAFT" | "REVERTED") => {
+
+    if (status === 'DRAFT' || status === 'REVERTED') {
 
       const changedKeys = Object.keys(dirtyFields) as (keyof ArticleFormValues)[];
       if (changedKeys.length === 0) {
@@ -272,28 +286,38 @@ const EditArticle: React.FC = () => {
         );
       }
 
+      changes.status = 'DRAFT'
       await PATCH(`${API_LIST.BASE_URL}${API_LIST.DRAFT_BY_ARTICLE}${id}`, changes);
-      handleSubmitUI("DRAFT");
-      navigate("/drafts");
+      toast.success("Saved as draft please keep editing");
+
+      // navigate("/drafts");
     }
     else if (status === "SUBMIT") {
+      setLoading(true);
 
       const API_DATA = {
         ...data,
-        articleId: id
+        articleId: id,
+        status: 'SUBMITTED'
       };
+
       await POST(API_LIST.SUBMIT_ARTICLE, API_DATA);
-      handleSubmitUI("SUBMIT");
-      navigate("/drafts");
+      setLoading(false);
+      // handleSubmitUI("SUBMIT");
+      navigate("/history");
 
     }
   };
 
-
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <div className="min-h-screen bg-[#f6faf6]">
       {/* Header */}
+      <Toaster position="top-center" richColors />
+
       <header className="sticky top-0 z-10 bg-[#f6faf6]  pt-[60px]">
         <div className="px-4 py-3 flex flex-col gap-[24px]">
           <div className="flex flex-row items-center gap-4">
@@ -322,8 +346,8 @@ const EditArticle: React.FC = () => {
                 type="button"
                 onClick={handleSubmit((data) => {
                   // save draft -> update status and show UI
-                  setValue("status", "DRAFT");
-                  onSubmit(data, "DRAFT");
+                  // setValue("status", "DRAFT");
+                  onSubmit(data, getValues('status'));
                 })}
                 variant="outline"
                 size="sm"
@@ -336,7 +360,7 @@ const EditArticle: React.FC = () => {
                 form="myForm"
                 type="button"
                 onClick={handleSubmit((data) => {
-                  setValue("status", "SUBMIT");
+                  // setValue("status", "SUBMIT");
                   onSubmit(data, "SUBMIT");
                 })}
                 size="sm"
@@ -371,7 +395,7 @@ const EditArticle: React.FC = () => {
                 </div>
               </div>
 
-              {getValues("status") === "REVERTED" && <EditorRemarks />}
+              {getValues("status") === "REVERTED" && <EditorRemarks remarks={remarks} />}
 
               <div className="flex flex-col gap-[24px]">
                 {/* Title */}
@@ -382,12 +406,12 @@ const EditArticle: React.FC = () => {
                   </div>
                   <Input
                     disabled={isPreviewMode}
-                    {...register("name")}
-                    placeholder="Name"
+                    {...register("title")}
+                    placeholder="title"
                     className="bg-[#f7fbf8] border-[#ECECEC] border"
                   />
                   {errors.name && (
-                    <p className="text-sm text-red-500">{errors.name.message}</p>
+                    <p className="text-sm text-red-500">{errors.title.message}</p>
                   )}
                 </div>
 

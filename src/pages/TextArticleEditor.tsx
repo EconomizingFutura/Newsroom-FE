@@ -17,11 +17,10 @@ export default function TextArticleEditor({
   article,
   onBack,
 }: TextArticleEditorProps) {
-  console.log('coming inside edit artivle')
   const [title, setTitle] = useState(article?.title || "");
   const [content, setContent] = useState(
     article?.content ||
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nDuis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\nSed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo."
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\nDuis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\nSed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo."
   );
   const [selectedCategory, setSelectedCategory] = useState("Politics");
   const [tags, setTags] = useState(["Tag 1", "Tag 2", "Tag 3"]);
@@ -88,8 +87,7 @@ export default function TextArticleEditor({
                     Editor Remarks
                   </h3>
                   <p className="text-sm text-red-700">
-                    Needs fact verification for the statistics mentioned in
-                    paragraph 3. Please add sources for the economic data.
+                   {article.remarks}
                   </p>
                 </div>
               </div>

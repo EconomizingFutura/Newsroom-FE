@@ -19,7 +19,6 @@ type ListViewProps = {
   filteredArticles: RevertedArticleTypes[];
   handleEdit?: (id: string) => void;
   handleDeletePost: (id: string) => void;
-
 };
 export const RenderGridView: React.FC<GridViewProps> = ({
   filteredArticles,
@@ -34,13 +33,13 @@ export const RenderGridView: React.FC<GridViewProps> = ({
         key={article.id}
         title={article.title}
         updatedDate={article.updatedAt}
-        wordCount={extractTextSummary(article.content ?? '', 30).wordCount}
+        wordCount={extractTextSummary(article.content ?? "", 30).wordCount}
         savedTime={formatRelativeTime(article.updatedAt)}
         type={article.type}
         status={status}
         thumbnailUrl={article.thumbnailUrl}
         remarkMessage={article.remarks}
-        contentPreview={extractTextSummary(article.content ?? '', 30).text}
+        contentPreview={extractTextSummary(article.content ?? "", 30).text}
         handleDelete={() => handleDeletePost(article.id)}
         handleEdit={() => handleEdit(article.id)}
       />
@@ -83,7 +82,7 @@ export const RenderListView: React.FC<ListViewProps> = ({
               <Button
                 size="sm"
                 className="bg-red-600 hover:bg-red-700 text-white gap-2 ml-4"
-              // onClick={() => onEditReverted && onEditReverted(article)}
+                // onClick={() => onEditReverted && onEditReverted(article)}
               >
                 <Eye className="w-3 h-3" />
                 View Details
@@ -124,21 +123,30 @@ export const RenderListViewDraft: React.FC<ListViewProps> = ({
                   {article.title}
                 </h3>
                 <div className="flex gap-2 flex-shrink-0">
-                  <Badge className={`text-xs ${getTypeColor(article.type.toLowerCase())}`}>
+                  <Badge
+                    className={`text-xs ${getTypeColor(
+                      article.type.toLowerCase()
+                    )}`}
+                  >
                     {article.type}
                   </Badge>
-                  <Badge className={`text-xs ${getStatusColor(article.status)}`}>
+                  <Badge
+                    className={`text-xs ${getStatusColor(article.status)}`}
+                  >
                     {article.status}
                   </Badge>
                 </div>
               </div>
-             <div className="flex items-center gap-4 text-xs font-normal text-gray-500">
-              <span>Updated {formatDate(article.updatedAt)}</span>
-              {extractTextSummary(article.content ?? "", 30).wordCount > 0 && (
-                <p>{extractTextSummary(article.content ?? "", 30).wordCount} words</p>
-              )}
-            </div>
-
+              <div className="flex items-center gap-4 text-xs font-normal text-gray-500">
+                <span>Updated {formatDate(article.updatedAt)}</span>
+                {extractTextSummary(article.content ?? "", 30).wordCount >
+                  0 && (
+                  <p>
+                    {extractTextSummary(article.content ?? "", 30).wordCount}{" "}
+                    words
+                  </p>
+                )}
+              </div>
             </div>
 
             <div className="flex items-center gap-2 ml-4">

@@ -90,25 +90,25 @@ const menuConfig = {
       action: "onNavigateEditorReviewQueue",
       badge: 4,
     },
-    {
-      key: "publish-center",
-      label: "Publish Center",
-      icon: <RotateCcw className="w-4 h-4" />,
-      action: "onNavigateEditorPublishCenter",
-      badge: 4,
-    },
-    {
-      key: "calendar",
-      label: "Calendar",
-      icon: <Users className="w-4 h-4" />,
-      action: "onNavigateEditorCalendarView",
-    },
-    {
-      key: "editor-history",
-      label: "History Log",
-      icon: <History className="w-4 h-4" />,
-      action: "onNavigateEditorHistory",
-    },
+    // {
+    //   key: "publish-center",
+    //   label: "Publish Center",
+    //   icon: <RotateCcw className="w-4 h-4" />,
+    //   action: "onNavigateEditorPublishCenter",
+    //   badge: 4,
+    // },
+    // {
+    //   key: "calendar",
+    //   label: "Calendar",
+    //   icon: <Users className="w-4 h-4" />,
+    //   action: "onNavigateEditorCalendarView",
+    // },
+    // {
+    //   key: "editor-history",
+    //   label: "History Log",
+    //   icon: <History className="w-4 h-4" />,
+    //   action: "onNavigateEditorHistory",
+    // },
   ],
 };
 
@@ -119,7 +119,7 @@ const SideBar: React.FC<SidebarTypes> = (props) => {
     onCreateNewVideoArticle,
     currentView,
   } = props;
-  const currentRole: UserRole = USER_ROLE() as UserRole || 'REPORTER';
+  const currentRole: UserRole = (USER_ROLE() as UserRole) || "REPORTER";
 
   // const currentRole: UserRole = "reporter";
   const [multiWindow, setMultiWindow] = useState({
@@ -147,14 +147,15 @@ const SideBar: React.FC<SidebarTypes> = (props) => {
       <div className="flex-1 px-2">
         {/* Top Menu */}
         <div className="space-y-1  p-2 ">
-          {menuConfig[currentRole].map((item, index) => {
+          {menuConfig[currentRole]?.map((item, index) => {
             // const active = isActive(item.key as currentPageType);
-            const isAfterActive = menuConfig[currentRole].slice(0, index).some(
-              (prevItem) => isActive(prevItem.key as currentPageType))
+            const isAfterActive = menuConfig[currentRole]
+              .slice(0, index)
+              .some((prevItem) => isActive(prevItem.key as currentPageType));
 
-            console.log(currentRole, isAfterActive)
+            console.log(currentRole, isAfterActive);
             return (
-              <div className="">
+              <div key={item.key} className="">
                 <Button
                   key={item.key}
                   variant="ghost"
@@ -162,7 +163,9 @@ const SideBar: React.FC<SidebarTypes> = (props) => {
                   className={`w-full justify-between px-3 py-2 ${isActive(
                     item.key as currentPageType
                   )}`}
-                  onClick={props[item.action as keyof SidebarTypes] as () => void}
+                  onClick={
+                    props[item.action as keyof SidebarTypes] as () => void
+                  }
                 >
                   <span className="flex items-center gap-2">
                     {item.icon}
@@ -182,7 +185,6 @@ const SideBar: React.FC<SidebarTypes> = (props) => {
                   )}
                 </Button>
               </div>
-
             );
           })}
         </div>
@@ -292,7 +294,6 @@ const SideBar: React.FC<SidebarTypes> = (props) => {
             </div>
           </div>
         )}
-
       </div>
     </div>
   );

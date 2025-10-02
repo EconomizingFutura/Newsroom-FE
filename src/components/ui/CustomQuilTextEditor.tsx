@@ -1,21 +1,24 @@
 import React, { useEffect, useState } from "react";
 import ReactQuill from "react-quill-new"; // ✅ use react-quill-new for React 19
 import "react-quill-new/dist/quill.snow.css";
+import { cn } from "./utils";
 
 type CustomQuilTextEditorProps = {
   placeholder?: string;
   onChange?: (json: any) => void;
   selectedValue?: string;
   readOnly?: boolean;
+  className?: string;
 };
 
 const CustomQuilTextEditor: React.FC<CustomQuilTextEditorProps> = ({
   placeholder = "Start typing...",
   onChange,
   selectedValue,
-  readOnly
+  readOnly,
+  className,
 }) => {
-  const [content, setContent] = useState<any>(selectedValue);
+  const [content, setContent] = useState<string | undefined>(selectedValue);
 
   useEffect(() => {
     setContent(selectedValue || "");
@@ -23,32 +26,27 @@ const CustomQuilTextEditor: React.FC<CustomQuilTextEditorProps> = ({
 
   // Minimal toolbar
   const modules = {
-    toolbar: [
-      ["bold", "italic", "underline", "strike"],
-      ["image"],
-    ],
+    toolbar: [["bold", "italic", "underline", "strike"], ["image"]],
   };
 
-  const formats = [
-    "bold",
-    "italic",
-    "underline",
-    "strike",
-    "image",
-  ];
+  const formats = ["bold", "italic", "underline", "strike", "image"];
 
   return (
-    <div className="w-full">
-      <div className="relative border rounded-lg bg-[#f9fdfa] overflow-hidden">
+    <div className="w-full h-full">
+      <div
+        className={cn(
+          "relative  rounded-lg bg-[#F7FBF7] overflow-hidden",
+          readOnly ? "border border-transparent" : "border border-[#ECECEC]"
+        )}
+      >
         <ReactQuill
           readOnly={readOnly}
           value={content}
-          modules={modules}
-
-          //   modules={readOnly ? modules : { toolbar: false }}
+          // modules={modules}
+          modules={!readOnly ? modules : { toolbar: false }}
           formats={formats}
           placeholder={placeholder}
-          className="h-40"
+          className={cn("pb-20 max-h-48", className)}
           onChange={(_, __, ___, editor) => {
             const delta = editor.getHTML(); // Delta JSON
             setContent(delta);

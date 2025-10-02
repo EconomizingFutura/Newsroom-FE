@@ -11,12 +11,10 @@ import EmptyStateComponent from "@/components/EmptyStateComponent";
 import DeleteConfirmation from "@/components/DeleteConfirmation";
 import { API_LIST } from "@/api/endpoints";
 import { GET } from "@/api/apiMethods";
-import {
-  RenderGridView,
-  RenderListViewDraft,
-} from "./RevertedPost/Components";
+import { RenderGridView, RenderListViewDraft } from "./RevertedPost/Components";
 import Pagination from "@/components/Pagination";
 import { usePagination } from "@/hooks/usePagination";
+import Loading from "../Shared/agency-feeds/loading";
 
 export default function DraftsPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -26,21 +24,21 @@ export default function DraftsPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [data, setData] = useState<RevertedArticleTypes[]>([]);
   const [pageMetaData, setPageMetaData] = useState<{
-    "total": number,
-    "page": number,
-    "pageSize": number,
-    "totalPages": number,
-    "hasNextPage": boolean,
-    "hasPrevPage": boolean
-
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
   }>({
-    "total": 11,
-    "page": 1,
-    "pageSize": 10,
-    "totalPages": 2,
-    "hasNextPage": true,
-    "hasPrevPage": false
+    total: 11,
+    page: 1,
+    pageSize: 10,
+    totalPages: 2,
+    hasNextPage: true,
+    hasPrevPage: false,
   });
+  const [loading, setLoading] = useState<boolean>(false);
 
   const navigate = useNavigate();
   const filterOptions = ["All Type", "TEXT", "AUDIO", "VIDEO"];
@@ -72,8 +70,6 @@ export default function DraftsPage() {
     initialPageSize: 10,
   });
 
-
-
   const handlePageSize = (val: string) => {
     const size = val.split(" ")[0];
     setPageSize(Number(size));
@@ -83,8 +79,8 @@ export default function DraftsPage() {
       activeFilter === "AUDIO"
         ? "audio"
         : activeFilter === "VIDEO"
-          ? "video"
-          : "textArticle";
+        ? "video"
+        : "textArticle";
     const handleNav = () => {
       navigate(`/${isAudio}`);
     };
@@ -129,18 +125,19 @@ export default function DraftsPage() {
 
     const getDraftArticle = async () => {
       try {
+        setLoading(true);
         const response: any = await GET(
-          `${API_LIST.BASE_URL}${API_LIST.DRAFT_ARTICLE
-          }?page=${currentPage}&pageSize=${pageSize}`,
+          `${API_LIST.BASE_URL}${API_LIST.DRAFT_ARTICLE}?page=${currentPage}&pageSize=${pageSize}`,
           { signal: controller.signal }
         );
         setData(response.drafts);
-        setPageMetaData(response.pagination)
-        console.log("repose", response);
+        setPageMetaData(response.pagination);
+        setLoading(false);
       } catch (error: any) {
         if (error.name !== "AbortError") {
           console.error("Error fetching reverted posts:", error);
         }
+        setLoading(false);
       }
     };
 
@@ -148,6 +145,9 @@ export default function DraftsPage() {
     return () => controller.abort();
   }, [currentPage, pageSize]);
 
+  if (loading) {
+    return <Loading />;
+  }
   return (
     <div className="flex-1 py-16 h-screen bg-gray-50">
       <div
@@ -192,17 +192,20 @@ export default function DraftsPage() {
             <RenderListViewDraft
               handleDeletePost={(id) => setDeletePost({ id, isOpen: true })}
               handleEdit={handleEdit}
-              filteredArticles={filteredArticles} />
+              filteredArticles={filteredArticles}
+            />
           )}
         </div>
 
-        <Pagination
-          currentPage={pageMetaData.page}
-          pageCount={pageMetaData.totalPages}
-          onPageChange={handlePageChange}
-          setCurrentPage={setCurrentPage}
-          setSortConfig={handlePageSize}
-        />
+        {pageMetaData.totalPages > 1 && (
+          <Pagination
+            currentPage={pageMetaData.page}
+            pageCount={pageMetaData.totalPages}
+            onPageChange={handlePageChange}
+            setCurrentPage={setCurrentPage}
+            setSortConfig={handlePageSize}
+          />
+        )}
       </div>
       {deletePost.isOpen && (
         <DeleteConfirmation
@@ -215,8 +218,6 @@ export default function DraftsPage() {
           }
         />
       )}
-
-
     </div>
   );
 }
