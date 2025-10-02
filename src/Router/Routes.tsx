@@ -20,6 +20,7 @@ import EditArticle from "@/pages/EditArticle";
 import AuthRoute from "./AuthRoutes";
 import ProtectedRoutes from "./ProtectedRoutes";
 import PublicRoute from "./PublicRoutes";
+import ViewContent from "@/pages/Editor/ViewContent";
 const Layout: React.FC = () => {
   const navigate = useNavigate();
   const getCurrentView = useCurrentView();
@@ -35,6 +36,7 @@ const Layout: React.FC = () => {
     "/audio": "Audio",
     "/video": "Video",
     "/login": "Login",
+    "/reviewQueue": "Review Queue",
   };
 
   useEffect(() => {
@@ -220,6 +222,16 @@ const Layout: React.FC = () => {
                 <AuthRoute>
                   <ProtectedRoutes allowedRoles="EDITOR">
                     <ReviewQueue />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
+            <Route
+              path="/editor/viewcontent/:id"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="EDITOR">
+                    <ViewContent />
                   </ProtectedRoutes>
                 </AuthRoute>
               }

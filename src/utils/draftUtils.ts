@@ -61,7 +61,7 @@ export const EDIT_DRAFT_NAVIGATE = (
 
 export const HISTORY_STATUS = (status: string) => {
   switch (status.toLowerCase()) {
-    case "approved":
+    case "reviewed":
     case "submitted":
       return "bg-green-100 text-green-800";
     case "review":

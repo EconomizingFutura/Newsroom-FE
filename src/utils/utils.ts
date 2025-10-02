@@ -1,4 +1,3 @@
-
 export const returnType = (type: string) => {
   let route: string;
 
@@ -50,9 +49,12 @@ export const formatRelativeTime = (dateString: string): string => {
   const diffDays = Math.floor(diffHours / 24);
 
   if (diffMins < 1) return "Saved just now";
-  if (diffMins < 60) return `Saved ${diffMins} min${diffMins > 1 ? "s" : ""} ago`;
-  if (diffHours < 24) return `Saved ${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
-  if (diffDays < 7) return `Saved ${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
+  if (diffMins < 60)
+    return `Saved ${diffMins} min${diffMins > 1 ? "s" : ""} ago`;
+  if (diffHours < 24)
+    return `Saved ${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
+  if (diffDays < 7)
+    return `Saved ${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
 
   // fallback absolute date
   return `Saved on ${date.toLocaleDateString("en-GB")}`;
@@ -68,3 +70,29 @@ export const getWordCount = (content: string): number => {
 
   return text.split(/\s+/).length;
 };
+
+export function formatToIST(dateString: string): string {
+  const date = new Date(dateString);
+
+  const options: Intl.DateTimeFormatOptions = {
+    timeZone: "Asia/Kolkata",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  };
+
+  const formatter = new Intl.DateTimeFormat("en-GB", options);
+  const parts = formatter.formatToParts(date);
+
+  const day = parts.find((p) => p.type === "day")?.value;
+  const month = parts.find((p) => p.type === "month")?.value;
+  const year = parts.find((p) => p.type === "year")?.value;
+  const hour = parts.find((p) => p.type === "hour")?.value;
+  const minute = parts.find((p) => p.type === "minute")?.value;
+  const dayPeriod = parts.find((p) => p.type === "dayPeriod")?.value;
+
+  return `${day}/${month}/${year} at ${hour}:${minute} ${dayPeriod}`;
+}

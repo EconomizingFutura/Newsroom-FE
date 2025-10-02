@@ -15,6 +15,8 @@ import { uploadToS3 } from "@/config/s3Config";
 import { base64ToFile } from "@/utils/compression";
 import { v4 as uuidv4 } from "uuid";
 import processAndUploadImages from "../utils";
+import Loading from "@/pages/Shared/agency-feeds/loading";
+import { toast, Toaster } from "sonner";
 
 type FormData = {
   title: string;
@@ -40,6 +42,7 @@ const ContentUploader = () => {
     type: null,
     isSubmit: false,
   });
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleSubmitUI = (type: "DRAFT" | "SUBMIT") => {
     setSubmit({
@@ -53,6 +56,8 @@ const ContentUploader = () => {
       type: null,
       isSubmit: false,
     });
+
+    navigate('/history');
   };
 
   const path = location.pathname.replace("/", "");
@@ -123,7 +128,6 @@ const ContentUploader = () => {
     let articleType = "TEXT";
     let thumbnailStr = "";
     let modifiedContent = "";
-
     try {
       // Determine article type based on active tab (path)
       if (path === "audio" && data.audio) {
@@ -135,7 +139,6 @@ const ContentUploader = () => {
       } else {
         articleType = "TEXT";
         modifiedContent = await processAndUploadImages(data.content)
-        console.log(modifiedContent)
       }
 
       // upload thumbnail
@@ -162,12 +165,13 @@ const ContentUploader = () => {
         if (reporterId) {
           const response: any = await PATCH(
             API_LIST.BASE_URL + API_LIST.DRAFT_BY_ARTICLE + reporterId,
-            API_DATA
+            { ...API_DATA, status: 'DRAFT' }
           );
           if (response.id) {
             setValue("reporterId", response.id);
-            navigate("/drafts");
+            //navigate("/drafts");
           }
+
         } else {
           const response: any = await POST(
             API_LIST.BASE_URL + API_LIST.DRAFT_ARTICLE,
@@ -175,20 +179,25 @@ const ContentUploader = () => {
           );
           if (response.id) {
             setValue("reporterId", response.id);
-            navigate("/drafts");
+            //navigate("/history");
           }
         }
-        handleSubmitUI("DRAFT");
+
+        toast.success("Saved as draft please keep editing");
+
+        // handleSubmitUI("DRAFT");
       } else if (actionName.toLowerCase() === "save") {
-        const response: any = await POST(API_LIST.SUBMIT_ARTICLE, API_DATA);
-        console.log(response, "POST1");
+        setLoading(true)
+        await POST(API_LIST.SUBMIT_ARTICLE, API_DATA);
+        setLoading(false)
+
         handleSubmitUI("SUBMIT");
       }
 
-      console.log(API_DATA);
     } catch (err) {
       console.error(err);
     }
+
   };
 
   /** Tags */
@@ -207,9 +216,6 @@ const ContentUploader = () => {
   };
 
 
-
-
-
   /** Reset form when tab changes */
   useEffect(() => {
     reset({
@@ -226,9 +232,15 @@ const ContentUploader = () => {
     });
   }, [path, reset]);
 
+  if (loading) {
+    return <Loading />;
+  }
+
   return (
     <div className="min-h-screen bg-[#f6faf6]">
       {/* Header */}
+      <Toaster position="top-center" richColors />
+
       <header className="sticky top-0 z-10 bg-[#f6faf6] border-b pt-[60px]">
         <div className="px-4 py-3 flex flex-col gap-[24px]">
           {/* Top row */}

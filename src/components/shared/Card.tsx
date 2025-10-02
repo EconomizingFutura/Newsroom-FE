@@ -34,23 +34,23 @@ const Card: React.FC<CardProps> = ({
   handleDelete,
   handleEdit,
 }) => {
-  console.log(thumbnailUrl)
   return (
-    <div className="w-full max-w-md bg-white rounded-2xl shadow-md border border-gray-200 max-h-[300px] p-[24px] flex flex-col justify-between">
+    <div className="w-full max-w-md bg-white rounded-2xl shadow-md border border-gray-200 max-h-[300px] p-[20px] flex flex-col justify-between">
       {/* Title */}
-      <h2 className="text-base font-semibold text-gray-900">{title}</h2>
+      <h2 className="text-base  font-semibold text-gray-900">{title}</h2>
 
       {/* Tags */}
-      <div className="flex items-center gap-2 mt-2">
+      <div className="flex items-center gap-2 mt-1">
         <span
-          className={`px-2 py-0.5 text-xs font-medium rounded-md ${type === "TEXT"
-            ? "bg-[#DBEAFE] border border-[#BEDBFF] text-[#193CB8]"
-            : type === "AUDIO"
+          className={`px-2 py-0.5 text-xs font-medium rounded-md ${
+            type === "TEXT"
+              ? "bg-[#DBEAFE] border border-[#BEDBFF] text-[#193CB8]"
+              : type === "AUDIO"
               ? "bg-[#F3E8FF] border border-[#EAD4FF] text-[#6D11B0]"
               : type === "VIDEO"
-                ? "bg-[#FFEDD4] border border-[#FFD6A7] text-[#9F2E00]"
-                : "bg-gray-200 border border-gray-300 text-gray-700"
-            }`}
+              ? "bg-[#FFEDD4] border border-[#FFD6A7] text-[#9F2E00]"
+              : "bg-gray-200 border border-gray-300 text-gray-700"
+          }`}
         >
           {type}
         </span>
@@ -63,7 +63,9 @@ const Card: React.FC<CardProps> = ({
       <div className="mt-2">
         {/* TEXT */}
         {type === "TEXT" && (
-          <p className="text-sm text-gray-600  min-h-20 line-clamp-2">{contentPreview}</p>
+          <p className="text-sm text-gray-600  min-h-20 line-clamp-2">
+            {contentPreview}
+          </p>
         )}
 
         {/* AUDIO */}
@@ -80,10 +82,10 @@ const Card: React.FC<CardProps> = ({
 
         {/* VIDEO */}
         {type === "VIDEO" && (
-          <div className="flex justify-center items-center relative">
+          <div className="flex justify-center  items-center relative">
             <ImageWithFallback
-            mediaType="video"
-              src={thumbnailUrl || "/images/video-placeholder.png"}
+              mediaType="video"
+              src={thumbnailUrl}
               alt="Video Thumbnail"
               className="w-full h-32 object-cover rounded-lg"
             />
@@ -104,11 +106,11 @@ const Card: React.FC<CardProps> = ({
 
       {/* Remark Block */}
       {status === "REVERTED" && (
-        <div className="mt-3 p-3 border border-red-300 bg-red-50 rounded-lg text-sm text-red-700">
+        <div className="mt-2 p-2 border border-red-300 bg-red-50 rounded-lg text-sm text-red-700">
           <div className="flex gap-[8px]">
             <MessageSquare size={18} />
             <div>
-              <div className="flex items-center font-semibold">
+              <div className="flex items-center text-sm font-semibold">
                 Editor Remarks
               </div>
               <p className="text-xs leading-snug">{remarkMessage}</p>
@@ -123,12 +125,17 @@ const Card: React.FC<CardProps> = ({
           className={cn(
             "grid items-center justify-between mt-3 text-[14px] text-gray-500",
             wordCount > 0 ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-2"
-          )}        >
+          )}
+        >
           <div className="flex items-center  gap-2">
             <Clock className="w-5 h-5" />
             <p>Updated {formatDate(updatedDate)} </p>
           </div>
-          {wordCount > 0 && <div className="text-center ">{wordCount && <p>{wordCount} words</p>}</div>}
+          {wordCount > 0 && (
+            <div className="text-center ">
+              {wordCount && <p>{wordCount} words</p>}
+            </div>
+          )}
           <p className="text-green-600 ">{savedTime}</p>
         </div>
       )}

@@ -6,6 +6,8 @@ import type { RevertedArticleTypes } from "@/types/draftPageTypes";
 import { Clock, CheckCircle, RotateCcw, FilePen } from "lucide-react";
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router";
+import Loading from "../Shared/agency-feeds/loading";
+import { EDIT_DRAFT_NAVIGATE } from "@/utils/draftUtils";
 
 type StatCardProps = {
   title: string;
@@ -27,9 +29,15 @@ export default function Dashboard() {
   const username = useMemo(() => localStorage.getItem("username"), []);
   const [stats, setStats] = useState<StatCardProps[]>(INITIAL_STATS);
   const [revertedPost, setRevertedPost] = useState<RevertedArticleTypes[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const handleNavigate = (id: number) => {
-    navigate(`/textArticle/${id}?from=dashboard`);
+  // const handleNavigate = (id: number) => {
+  //   navigate(`/textArticle/${id}?from=dashboard`);
+  // };
+
+  const handleNavigate = (id: string) => {
+    const articleType = EDIT_DRAFT_NAVIGATE(id, revertedPost);
+    navigate(`/${articleType}/${id}?from=dashboard`);
   };
 
   useEffect(() => {
@@ -37,17 +45,21 @@ export default function Dashboard() {
 
     const getStatsData = async () => {
       try {
-        const response: any = await GET(API_LIST.BASE_URL + API_LIST.STATS, {
-          signal: controller.signal,
-        });
+        const response: unknown = await GET(
+          API_LIST.BASE_URL + API_LIST.STATS,
+          {
+            signal: controller.signal,
+          }
+        );
 
+        const statsResponse = response as Record<string, number>;
         const updatedStats = INITIAL_STATS.map((item) => {
           const key =
             item.title.toUpperCase() === "NEED REVISION"
               ? "REVERTED"
-              : item.title.toUpperCase();
+              : item.title.toUpperCase() === "APPROVED" ? "REVIEWED" : item.title.toUpperCase();
 
-          return { ...item, count: response[key] ?? 0 };
+          return { ...item, count: statsResponse[key] ?? 0 };
         });
 
         setStats(updatedStats);
@@ -67,21 +79,28 @@ export default function Dashboard() {
 
     const getRevertedPost = async () => {
       try {
+        setLoading(true);
         const response: any = await GET(
           API_LIST.BASE_URL + API_LIST.REVERTED_POST,
           { signal: controller.signal }
         );
         setRevertedPost(response.data);
+        setLoading(false);
       } catch (error: any) {
         if (error.name !== "AbortError") {
           console.error("Error fetching reverted posts:", error);
         }
+        setLoading(false);
       }
     };
 
     getRevertedPost();
     return () => controller.abort();
   }, []);
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <div className="flex-1 py-16 h-screen bg-[#F6FAF6] ">
@@ -107,24 +126,23 @@ export default function Dashboard() {
           ))}
         </div>
 
-
         {/* Urgent Actions Section */}
-
-      
-        
 
         {revertedPost.length == 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <div className="mb-4 p-4  rounded-full">
               <CheckCircle className="w-12 h-12 text-green-500" />
             </div>
-            <h3 className="text-4xl font-semibold text-gray-900 mb-2">All caught up!</h3>
+            <h3 className="text-4xl font-semibold text-gray-900 mb-2">
+              All caught up!
+            </h3>
             <p className="text-gray-500 text-lg max-w-md">
-              Great news! You don't have any articles that need revision right now. Keep up the excellent work!
+              Great news! You don't have any articles that need revision right
+              now. Keep up the excellent work!
             </p>
           </div>
         ) : (
-             < div className="space-y-3">
+          <div className="space-y-3">
             <div
               style={{ borderLeftWidth: "2px" }}
               className="border-red-500 bg-white rounded-2xl px-[24px] py-[16px] shadow-md"
@@ -146,7 +164,7 @@ export default function Dashboard() {
                   {revertedPost.map((note, index) => (
                     <DashboardListCard
                       key={note.id ?? index}
-                      id={index}
+                      id={note.id}
                       title={note.title}
                       message={note.remarks}
                       buttonText="Edit Story"
@@ -159,6 +177,6 @@ export default function Dashboard() {
           </div>
         )}
       </div>
-    </div >
+    </div>
   );
 }

@@ -12,10 +12,13 @@ import {
   type FieldPath,
   type FieldValues,
 } from "react-hook-form";
-
-import { cn } from "./utils";
 import { Label } from "./label";
 
+import { cn } from "./utils";
+interface FormLabelProps {
+  label: string;
+  required?: boolean;
+}
 const Form = FormProvider;
 
 type FormFieldContextValue<
@@ -86,6 +89,15 @@ function FormItem({ className, ...props }: React.ComponentProps<"div">) {
     </FormItemContext.Provider>
   );
 }
+
+const InputLabel: React.FC<FormLabelProps> = ({ label, required = false }) => {
+  return (
+    <div className="flex text-[#1E2939] my-2 items-center gap-2">
+      <label className="text-sm font-semibold">{label}</label>
+      {required && <span className="text-red-500">*</span>}
+    </div>
+  );
+};
 
 function FormLabel({
   className,
@@ -165,4 +177,5 @@ export {
   FormDescription,
   FormMessage,
   FormField,
+  InputLabel,
 };
