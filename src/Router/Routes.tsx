@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from "react";
-import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { Routes, Route, useNavigate, useLocation, Navigate } from "react-router-dom";
 
 import Dashboard from "@/pages/Reporter/Dashboard";
 import ContentUploader from "@/pages/Reporter/ArticleCreation/ContentUploader";
@@ -254,6 +254,8 @@ export default function AppRoutes() {
           </PublicRoute>
         }
       />
+      <Route path="/" element={<Navigate to="/login" replace />} />
+
       <Route path="/*" element={<Layout />} />
     </Routes>
   );

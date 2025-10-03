@@ -62,43 +62,6 @@ const HistoryLogPage: React.FC = () => {
   ];
   const typeOptions = ["All Type", "TEXT", "AUDIO", "VIDEO"];
 
-  const filteredArticles = historyArticles?.filter((article: any) => {
-    const matchesSearch = article.title
-      ?.toLowerCase()
-      .includes(searchQuery.toLowerCase());
-
-    const matchesStatus =
-      statusFilter === "All Status"
-        ? true
-        : statusFilter === "APPROVED"
-          ? article.status === "REVIEWED"
-          : article.status === statusFilter;
-
-    const matchesType =
-      typeFilter === "All Type" || article.type === typeFilter;
-    // Date range filter
-    const articleDate = new Date(article.updatedAt);
-
-    let matchesDate = true;
-
-    if (dateRange !== "All") {
-      const days = Number(dateRange); // "7" → 7, "30" → 30, "90" → 90
-
-      // today (end of the day in local time)
-      const today = new Date();
-      today.setHours(23, 59, 59, 999);
-
-      // past date (start of the day N days ago)
-      const pastDate = new Date();
-      pastDate.setDate(pastDate.getDate() - days);
-      pastDate.setHours(0, 0, 0, 0);
-
-      matchesDate = articleDate >= pastDate && articleDate <= today;
-    }
-
-    return matchesSearch && matchesStatus && matchesType && matchesDate;
-  });
-
 
   const {
     currentPage,
@@ -153,7 +116,7 @@ const HistoryLogPage: React.FC = () => {
 
   const handleEdit = (id: string) => {
     const articleType =
-      filteredArticles.find((article: any) => article.id === id)?.type ||
+      historyArticles.find((article: any) => article.id === id)?.type ||
       "Text";
     const route = returnType(articleType);
     navigate(`/${route}/${id}?from=history`, { state: { name: "harish" } });
@@ -184,28 +147,46 @@ const HistoryLogPage: React.FC = () => {
 
   useEffect(() => {
     const controller = new AbortController();
-
-    const getHistoryList = async () => {
-      try {
-        setLoading(true);
-        const response: any = await GET(
-          `${API_LIST.BASE_URL}${API_LIST.HISTORY}?page=${currentPage}&pageSize=${pageSize}`,
-          { signal: controller.signal }
-        );
-        setHistoryArticles(response.articles ?? []);
-        setPageMetaData(response.pagination);
-        setLoading(false);
-      } catch (error: any) {
-        setLoading(false);
-        if (error.name !== "AbortError") {
-          console.error("Error fetching reverted posts:", error);
-        }
-      }
-    };
-
     getHistoryList();
     return () => controller.abort();
-  }, [currentPage, pageSize]);
+  }, [currentPage, pageSize, statusFilter, typeFilter, dateRange, searchQuery]);
+
+  const getHistoryList = async () => {
+    try {
+      setLoading(true);
+
+      const queryParams = new URLSearchParams({
+        page: currentPage.toString(),
+        pageSize: pageSize.toString(),
+      });
+
+      if (statusFilter !== "All Status") {
+        queryParams.append("status", statusFilter === "APPROVED" ? "REVIEWED" : statusFilter);
+      }
+      if (typeFilter !== "All Type") {
+        queryParams.append("type", typeFilter);
+      }
+      if (dateRange !== "All") {
+        queryParams.append("range", dateRange); // 7,30,90
+      }
+      if (searchQuery.trim()) {
+        queryParams.append("search", searchQuery.trim());
+      }
+
+      const response: any = await GET(
+        `${API_LIST.BASE_URL}${API_LIST.HISTORY}?${queryParams.toString()}`
+      );
+
+      setHistoryArticles(response.articles ?? []);
+      setPageMetaData(response.pagination);
+      setLoading(false);
+    } catch (error: any) {
+      setLoading(false);
+      if (error.name !== "AbortError") {
+        console.error("Error fetching history:", error);
+      }
+    }
+  };
 
   function getArticleType(article: any): "text" | "audio" | "video" {
     if (article.content && article.content !== "") {
@@ -337,8 +318,8 @@ const HistoryLogPage: React.FC = () => {
 
             {/* Table Rows */}
             <div className="divide-y divide-gray-200">
-              {filteredArticles.length > 0 ? (
-                filteredArticles.map((article: any) => (
+              {historyArticles.length > 0 ? (
+                historyArticles.map((article: any) => (
                   <div
                     key={article.id}
                     className="grid grid-cols-12 gap-4 p-6 hover:bg-gray-50 transition-colors items-center"

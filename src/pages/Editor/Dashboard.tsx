@@ -23,7 +23,7 @@ export function Dashboard() {
 
   useEffect(() => {
     const fetch = async () => {
-      const response = await reviewArticle("Politics", 1, 6);
+      const response = await reviewArticle("", 1, 6);
       const status = await getEditorArticleStats();
       const statdata = status.data as ApiStats;
       setPendingStories(response.data);
