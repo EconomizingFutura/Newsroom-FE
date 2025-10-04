@@ -200,6 +200,67 @@ const ContentUploader = () => {
 
   };
 
+  const saveDraft = async () => {
+    const data = getValues(); // get current form values
+    try {
+      let url = "";
+      let articleType = "TEXT";
+      let modifiedContent = "";
+      let thumbnailStr = "";
+
+      // Determine article type
+      if (path === "audio" && data.audio) {
+        articleType = "AUDIO";
+        url = await uploadToS3(data.audio, "audio", "draft");
+      } else if (path === "video" && data.video) {
+        articleType = "VIDEO";
+        url = await uploadToS3(data.video, "video", "draft");
+      } else {
+        articleType = "TEXT";
+        modifiedContent = await processAndUploadImages(data.content);
+      }
+
+      // Upload thumbnail if exists
+      if (data.thumbnail) {
+        thumbnailStr = await uploadToS3(
+          base64ToFile(data.thumbnail, `${uuidv4()}.png`),
+          "thumbnail",
+          "draft"
+        );
+      }
+
+      const API_DATA = {
+        ...data,
+        content: modifiedContent,
+        type: articleType,
+        audio: articleType === "AUDIO" ? url : "",
+        video: articleType === "VIDEO" ? url : "",
+        thumbnail: articleType === "VIDEO" ? thumbnailStr : "",
+        status: "DRAFT",
+      };
+
+      const reporterId = data.reporterId;
+
+      let response: any;
+      if (reporterId) {
+        response = await PATCH(
+          API_LIST.BASE_URL + API_LIST.DRAFT_BY_ARTICLE + reporterId,
+          API_DATA
+        );
+      } else {
+        response = await POST(API_LIST.BASE_URL + API_LIST.DRAFT_ARTICLE, API_DATA);
+      }
+
+      if (response?.id) setValue("reporterId", response.id);
+
+      toast.success("Saved as draft! You can continue editing.");
+    } catch (err) {
+      console.error(err);
+      toast.error("Error saving draft");
+    }
+  };
+
+
   /** Tags */
   const handleAddTag = () => {
     if (newTag.trim() && !tags.includes(newTag.trim())) {
@@ -258,11 +319,13 @@ const ContentUploader = () => {
             <div className="flex items-center gap-2 px-2 ml-auto">
               <Button
                 form="myForm"
-                type="submit"
+                type="button"
                 name="draft"
                 variant="outline"
                 size="sm"
                 className="gap-2 border-[#B3E6B3] bg-[#F0F9F0] text-[#008001] hover:bg-[#F0F9F0] hover:text-[#008001]"
+                onClick={() => saveDraft()}
+
               >
                 <Save className="w-4 h-4" />
                 Save Draft
@@ -405,7 +468,8 @@ const ContentUploader = () => {
                         handleAddTag();
                       }
                     }}
-                    className="py-[19px] border-[#ECECEC] bg-[#f7fbf8]"
+                    className={`py-[19px] border-[#ECECEC] bg-[#f7fbf8] ${errors.tags ? "border-red-500" : ""
+                      }`}
                   />
                   <Button
                     type="button"

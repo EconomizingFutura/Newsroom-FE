@@ -1,0 +1,15 @@
+/* Prevent toolbar overlap */
+.ql-toolbar {
+  border-radius: 6px 6px 0 0;
+  border: 1px solid #ececec;
+}
+
+/* Restrict editor content area below toolbar */
+.ql-container {
+  max-height: 9rem;   /* limit height */
+  overflow-y: auto;    /* scrollable */
+  border: 1px solid #ececec;
+  border-top: none;    /* seamless join with toolbar */
+  border-radius: 0 0 6px 6px;
+  background: #F7FBF7;
+}
