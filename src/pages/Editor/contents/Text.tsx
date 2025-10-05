@@ -23,22 +23,22 @@ const Text: React.FC<TextProps> = ({
     formState: { errors },
   } = useFormContext();
 
-  const validateContent = (value: string): boolean | string => {
-    if (!value || value.trim() === "" || value.trim() === "<p><br></p>") {
-      return "Content is required";
-    }
+  // const validateContent = (value: string): boolean | string => {
+  //   if (!value || value.trim() === "" || value.trim() === "<p><br></p>") {
+  //     return "Content is required";
+  //   }
 
-    const textContent = value.replace(/<[^>]*>/g, "").trim();
-    if (textContent.length < 10) {
-      return "Content should be at least 10 characters long";
-    }
+  //   const textContent = value.replace(/<[^>]*>/g, "").trim();
+  //   if (textContent.length < 10) {
+  //     return "Content should be at least 10 characters long";
+  //   }
 
-    if (textContent.length > 50000) {
-      return "Content should not exceed 50000 characters";
-    }
+  //   if (textContent.length > 50000) {
+  //     return "Content should not exceed 50000 characters";
+  //   }
 
-    return true;
-  };
+  //   return true;
+  // };
 
   return (
     <div className="flex-1 flex flex-col">
