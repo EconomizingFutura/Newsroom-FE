@@ -142,7 +142,7 @@ const ViewContent: React.FC = () => {
   }
 
   return (
-    <div className="flex-1 font-openSans py-16 h-screen bg-background">
+    <div className="flex-1 font-openSans py-8 min-h-screen bg-background overflow-auto">
       <div
         style={{ paddingTop: "32px" }}
         className="flex flex-col  px-[24px] bg-[#F6FAF6] h-full"
@@ -158,7 +158,7 @@ const ViewContent: React.FC = () => {
         <FormProvider {...methods}>
           <form
             onSubmit={methods.handleSubmit(onSubmit)}
-            className="flex-1 flex flex-col p-5 bg-[#FFFFFF] shadow-[0px_2px_10px_0px_#959DA533]"
+            className="flex flex-col flex-grow p-4 sm:p-6 bg-white rounded-lg shadow-md space-y-6"
           >
             {contentData?.type === "TEXT" && (
               <Text
@@ -205,13 +205,13 @@ const ViewContent: React.FC = () => {
                     />
                   </div>
                 </div>
-                <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl  p-3 ">
-                  <VideoUrlPlayer
-                    videoUrl={contentData.videoUrl}
-                    thumbnailUrl={
-                      contentData.thumbnailUrl as string | undefined
-                    }
-                  />
+                <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl p-4 sm:p-6 bg-[#FAFFFA] shadow-sm">
+                  <div className="rounded-xl overflow-hidden border border-[#D3F0D3] bg-white max-w-4xl mx-auto aspect-video">
+                    <VideoUrlPlayer
+                      videoUrl={contentData.videoUrl}
+                      thumbnailUrl={contentData.thumbnailUrl as string | undefined}
+                    />
+                  </div>
                 </div>
               </>
             )}
@@ -250,7 +250,7 @@ const ViewContent: React.FC = () => {
                     />
                   </div>
                 </div>
-                <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl my-5  p-3 ">
+                <div className="w-full max-w-3xl mx-auto rounded-lg border-2 border-dashed border-green-300 p-4">
                   <AudioUrlPlayer src={contentData.audioUrl} />
                 </div>
               </>
@@ -263,7 +263,7 @@ const ViewContent: React.FC = () => {
                     Tags <span className="text-red-500">*</span>
                   </label>
 
-                  <div className="relative w-full">
+                  <div className="relative w-full flex flex-col sm:flex-row gap-2">
                     <Input
                       {...register("newTag")}
                       placeholder="Add tag"
@@ -324,51 +324,57 @@ const ViewContent: React.FC = () => {
           </form>
         </FormProvider>
       </div>
-      {enableEdit ? (
-        <div className="flex justify-end gap-4 mx-6 mt-4">
-          <Button
-            type="button"
-            variant="outline"
-            className="text-[14px] w-28 font-semibold"
-            onClick={() => setEnableEdit(false)}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            className="bg-[#006601] text-[14px] w-28 font-semibold hover:bg-[#005001]"
-          >
-            Update
-          </Button>
-        </div>
-      ) : (
-        <div className="flex justify-end gap-4 mx-6 mt-4">
-          <Button
-            variant="outline"
-            onClick={toggleRemarks}
-            className="text-white bg-[#FB2C36] hover:text-white hover:bg-[#FB2C36] border-red-300 "
-          >
-            Reverted
-          </Button>
-          <Button
-            onClick={() => contentData && handleMoveToPublish(contentData?.id)}
-            className="bg-[#008001] font-semibold hover:bg-[#008001] text-white"
-          >
-            Approve & Move to publish{" "}
-          </Button>
-        </div>
-      )}
+      {
+        enableEdit ? (
+          <div className="flex flex-wrap justify-end gap-3 mx-4 mt-6">
+            <Button
+              type="button"
+              variant="outline"
+              className="text-[14px] w-28 font-semibold"
+              onClick={() => setEnableEdit(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              className="bg-[#006601] text-[14px] w-28 font-semibold hover:bg-[#005001]"
+            >
+              Update
+            </Button>
+          </div>
+        ) : (
+          <div className="flex flex-wrap justify-end gap-3 mx-4 mt-6">
+            <Button
+              variant="outline"
+              onClick={toggleRemarks}
+              className="text-white bg-[#FB2C36] hover:text-white hover:bg-[#FB2C36] border-red-300 "
+            >
+              Reverted
+            </Button>
+            <Button
+              onClick={() => contentData && handleMoveToPublish(contentData?.id)}
+              className="bg-[#008001] font-semibold hover:bg-[#008001] text-white"
+            >
+              Approve & Move to publish{" "}
+            </Button>
+          </div>
+        )
+      }
 
-      {show.success && (
-        <SuccessUI
-          onCancel={toggleSuccess}
-          label={"Article Approved and Moved to Publish Successfully!"}
-        />
-      )}
-      {show.remarks && (
-        <RemarksModal onCancel={toggleRemarks} onConfirm={handleRevert} />
-      )}
-    </div>
+      {
+        show.success && (
+          <SuccessUI
+            onCancel={toggleSuccess}
+            label={"Article Approved and Moved to Publish Successfully!"}
+          />
+        )
+      }
+      {
+        show.remarks && (
+          <RemarksModal onCancel={toggleRemarks} onConfirm={handleRevert} />
+        )
+      }
+    </div >
   );
 };
 
