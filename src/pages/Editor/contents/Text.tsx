@@ -74,7 +74,7 @@ const Text: React.FC<TextProps> = ({
           control={control}
           rules={{
             required: "Content is required",
-            validate: validateContent,
+           // validate: validateContent,
           }}
           defaultValue={content?.content || ""}
           render={({ field }) => (

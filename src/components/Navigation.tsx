@@ -3,13 +3,14 @@ import cijlogo from "../assets/cijlogo.png";
 import { Button } from "./ui/button";
 import { useNavigate } from "react-router";
 import { useEffect, useRef, useState } from "react";
+import { getInitials } from "@/utils/utils";
 
 const Navigation = () => {
   function capitalizeFirstLetter(str: string) {
     if (!str) return "";
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
-   const [showDropdown, setShowDropdown] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const username = localStorage.getItem('username');
   const displayRole = capitalizeFirstLetter(localStorage.getItem('role') ?? '');
@@ -21,7 +22,7 @@ const Navigation = () => {
     naviagate("/login")
   }
 
-    useEffect(() => {
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         dropdownRef.current &&
@@ -46,7 +47,7 @@ const Navigation = () => {
           />
         </div>
 
-     
+
 
         {/* Right Section */}
         <div className="flex items-center space-x-6">
@@ -59,9 +60,9 @@ const Navigation = () => {
           </div>)}
 
           {/* User Section */}
-          <div onClick={()=>setShowDropdown(p=>!p)} className="flex items-center space-x-2">
+          <div onClick={() => setShowDropdown(p => !p)} className="flex items-center space-x-2">
             <div className="h-8 w-8 rounded-full bg-green-700 flex items-center justify-center text-white font-semibold">
-              U
+              {getInitials(username || '')}
             </div>
             <div className="leading-tight">
               <p className="text-sm font-semibold text-gray-800">{username}</p>
@@ -71,18 +72,18 @@ const Navigation = () => {
         </div>
 
         {showDropdown && (
-              <div     ref={dropdownRef}
- className="absolute top-full right-5 p-1 max-h-min h-full w-28 bg-white border border-gray-200 rounded-md shadow-lg z-50">
-                <Button
-                  onClick={handleLogout}
-                  variant="ghost"
-                  size="sm"
-                  className="w-full justify-start px-3 py-2 text-gray-700 hover:bg-gray-100"
-                >
-                  <LogOutIcon className="w-4 h-4 mr-2" /> Logout
-                </Button>
-              </div>
-            )}
+          <div ref={dropdownRef}
+            className="absolute top-full right-5 p-1 max-h-min h-full w-28 bg-white border border-gray-200 rounded-md shadow-lg z-50">
+            <Button
+              onClick={handleLogout}
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start px-3 py-2 text-gray-700 hover:bg-gray-100"
+            >
+              <LogOutIcon className="w-4 h-4 mr-2" /> Logout
+            </Button>
+          </div>
+        )}
 
       </div>
     </header>

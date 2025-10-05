@@ -96,3 +96,23 @@ export function formatToIST(dateString: string): string {
 
   return `${day}/${month}/${year} at ${hour}:${minute} ${dayPeriod}`;
 }
+
+export function getInitials(name: string): string {
+  if (!name) return "";
+
+  // Remove extra spaces and special chars
+  const cleaned = name
+    .trim()
+    .replace(/[_\W]+/g, " ") // replace underscores or special chars with space
+    .split(" ")
+    .filter(Boolean);
+
+  if (cleaned.length === 0) return "";
+  if (cleaned.length === 1) return cleaned[0].charAt(0).toUpperCase();
+
+  // Take first letter of first and last words
+  const first = cleaned[0].charAt(0).toUpperCase();
+  const last = cleaned[cleaned.length - 1].charAt(0).toUpperCase();
+
+  return first + last;
+}

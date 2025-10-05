@@ -305,10 +305,10 @@ const HistoryLogPage: React.FC = () => {
               <div className="col-span-2  font-bold text-sm text-gray-500">
                 Status
               </div>
-              <div className="col-span-1 font-bold text-sm text-gray-500">
+              <div className="col-span-2 font-bold text-sm text-gray-500">
                 Category
               </div>
-              <div className="col-span-3 font-bold text-sm text-gray-500">
+              <div className="col-span-2 font-bold text-sm text-gray-500">
                 Last Updated
               </div>
               <div className="col-span-1 font-bold text-sm text-gray-500">
@@ -354,13 +354,13 @@ const HistoryLogPage: React.FC = () => {
                       </Badge>
                     </div>
 
-                    <div className="col-span-1">
+                    <div className="col-span-2">
                       <div className="text-[14px] text-gray-900">
                         {article.category}
                       </div>
                     </div>
 
-                    <div className="col-span-3 flex items-center gap-[8px]">
+                    <div className="col-span-2 flex items-center gap-[8px]">
                       <Calendar className="w-4 h-4" />
                       <div className="text-[14px] text-gray-900">
                         {moment(article.updatedAt).format(
