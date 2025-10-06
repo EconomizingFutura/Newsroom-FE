@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Plus, Save, Send, X } from "lucide-react";
+import { Loader2, Plus, Save, Send, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HeaderIcon, type HeaderKey } from "@/utils/HeaderIcons";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,7 @@ import CustomQuilTextEditor from "@/components/ui/CustomQuilTextEditor";
 import { Controller, useForm } from "react-hook-form";
 import { API_LIST } from "@/api/endpoints";
 import { PATCH, POST } from "@/api/apiMethods";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import SaveDraftsUI from "@/components/SaveDraftUI";
 import { AudioContainer, VideoContainer } from "./Components";
 import { uploadToS3 } from "@/config/s3Config";
@@ -17,6 +17,7 @@ import { v4 as uuidv4 } from "uuid";
 import processAndUploadImages from "../utils";
 import Loading from "@/pages/Shared/agency-feeds/loading";
 import { toast, Toaster } from "sonner";
+import { throttle } from "lodash";
 
 type FormData = {
   title: string;
@@ -43,6 +44,7 @@ const ContentUploader = () => {
     isSubmit: false,
   });
   const [loading, setLoading] = useState<boolean>(false);
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
 
   const handleSubmitUI = (type: "DRAFT" | "SUBMIT") => {
     setSubmit({
@@ -200,7 +202,16 @@ const ContentUploader = () => {
 
   };
 
+  // wrap inside useMemo to preserve the same throttled function instance
+  const throttledSaveDraft = useMemo(() => throttle(() => {
+    saveDraft();
+  }, 5000, { trailing: false }), []); // only once every 5 seconds
+
+
   const saveDraft = async () => {
+    if (isSavingDraft) return; // prevent duplicate calls
+    setIsSavingDraft(true);
+
     const data = getValues(); // get current form values
     try {
       let url = "";
@@ -257,6 +268,9 @@ const ContentUploader = () => {
     } catch (err) {
       console.error(err);
       toast.error("Error saving draft");
+    } finally {
+      setIsSavingDraft(false);
+
     }
   };
 
@@ -324,11 +338,20 @@ const ContentUploader = () => {
                 variant="outline"
                 size="sm"
                 className="gap-2 border-[#B3E6B3] bg-[#F0F9F0] text-[#008001] hover:bg-[#F0F9F0] hover:text-[#008001]"
-                onClick={() => saveDraft()}
+                onClick={() => throttledSaveDraft()}
 
               >
-                <Save className="w-4 h-4" />
-                Save Draft
+
+                {isSavingDraft ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" /> Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4" /> Save Draft
+                  </>
+                )}
+
               </Button>
               <Button
                 form="myForm"
