@@ -125,6 +125,7 @@ const ContentUploader = () => {
 
   /** Submit Handler */
   const submitForReview = async (data: FormData, e: any) => {
+
     const actionName = (e?.nativeEvent as any)?.submitter?.name || "";
     let url = "";
     let articleType = "TEXT";
@@ -202,11 +203,6 @@ const ContentUploader = () => {
 
   };
 
-  // wrap inside useMemo to preserve the same throttled function instance
-  const throttledSaveDraft = useMemo(() => throttle(() => {
-    saveDraft();
-  }, 5000, { trailing: false }), []); // only once every 5 seconds
-
 
   const saveDraft = async () => {
     if (isSavingDraft) return; // prevent duplicate calls
@@ -273,6 +269,11 @@ const ContentUploader = () => {
 
     }
   };
+  // wrap inside useMemo to preserve the same throttled function instance
+  const throttledSaveDraft = useMemo(
+    () => throttle(saveDraft, 5000, { trailing: false }),
+    [saveDraft]
+  );
 
 
   /** Tags */
@@ -338,7 +339,7 @@ const ContentUploader = () => {
                 variant="outline"
                 size="sm"
                 className="gap-2 border-[#B3E6B3] bg-[#F0F9F0] text-[#008001] hover:bg-[#F0F9F0] hover:text-[#008001]"
-                onClick={() => throttledSaveDraft()}
+                onClick={throttledSaveDraft}
 
               >
 
@@ -358,6 +359,7 @@ const ContentUploader = () => {
                 type="submit"
                 name="save"
                 size="sm"
+                disabled={isSavingDraft} // disable while saving draft
                 className="bg-green-700 hover:bg-green-700 text-white gap-2"
               >
                 <Send className="w-4 h-4" />
@@ -389,7 +391,12 @@ const ContentUploader = () => {
           </div>
 
           {/* Form */}
-          <form id="myForm" onSubmit={handleSubmit(submitForReview)}>
+          <form id="myForm" onKeyDown={(e) => {
+            if (e.key === "Enter" && e.target instanceof HTMLInputElement) {
+              // prevent Enter only for text inputs
+              e.preventDefault();
+            }
+          }} onSubmit={handleSubmit(submitForReview)}>
             <div className="bg-white border-b border-gray-200 px-6 py-4 rounded-2xl shadow-md">
               {/* Category */}
               <div>
