@@ -1,5 +1,6 @@
 import { X } from "lucide-react";
 import React, { useState } from "react";
+import { Button } from "./ui/button";
 
 interface RemarksModalProps {
   onCancel: () => void;
@@ -9,7 +10,7 @@ interface RemarksModalProps {
 const RemarksModal: React.FC<RemarksModalProps> = ({ onCancel, onConfirm }) => {
   const [remark, setRemark] = useState("");
   const handleConfirm = () => {
-    if (onConfirm) {
+    if (onConfirm && remark !== '') {
       onConfirm(remark);
     }
   };
@@ -55,13 +56,25 @@ const RemarksModal: React.FC<RemarksModalProps> = ({ onCancel, onConfirm }) => {
             >
               Cancel
             </button>
-            <button
+            {/* <button
               type="button"
+              disabled={remark === ''}
               onClick={handleConfirm}
               className="bg-[#008001] border font-circular-500 font-medium rounded-lg h-10 w-28 text-white"
             >
               Revert
-            </button>
+            </button> */}
+
+            <Button
+              type="button"
+              name="Revert"
+              size="sm"
+              disabled={remark === ''}
+              onClick={handleConfirm}
+              className="bg-[#008001] border font-circular-500 font-medium rounded-lg h-10 w-28 text-white"
+            >
+              Revert
+            </Button>
           </div>
         </div>
       </div>
