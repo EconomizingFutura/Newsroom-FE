@@ -153,9 +153,9 @@ const Layout: React.FC = () => {
               path="/news-feeds"
               element={
                 <AuthRoute>
-                  <ProtectedRoutes allowedRoles="REPORTER">
+                  {/* <ProtectedRoutes allowedRoles="REPORTER"> */}
                     <NewsFeedsPage />
-                  </ProtectedRoutes>
+                  {/* </ProtectedRoutes> */}
                 </AuthRoute>
               }
             />
@@ -183,6 +183,16 @@ const Layout: React.FC = () => {
               }
             />
 
+            <Route
+              path="/editor/news-feeds"
+              element={
+                <AuthRoute>
+                  <ProtectedRoutes allowedRoles="EDITOR">
+                    <NewsFeedsPage />
+                  </ProtectedRoutes>
+                </AuthRoute>
+              }
+            />
             <Route
               path="/editor/calendarView"
               element={
