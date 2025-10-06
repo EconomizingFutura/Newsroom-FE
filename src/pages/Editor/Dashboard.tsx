@@ -18,6 +18,7 @@ export function Dashboard() {
   const navigate = useNavigate();
   const [stats, setStats] = useState<(StatusType & { value: number })[]>([]);
   const [pendingStories, setPendingStories] = useState<contentResponse[]>([]);
+  const USERNAME = window.localStorage.getItem("username") ?? "";
   const { reviewArticle, isLoading, getEditorArticleStats } =
     useEditorReviewArticle();
 
@@ -61,7 +62,7 @@ export function Dashboard() {
         className="flex flex-col gap-[24px] px-[24px] bg-[#F6FAF6]"
       >
         <ContentHeader
-          text="Welcome back, Muthu!"
+          text={`Welcome back, ${USERNAME ?? "Editor"}!`}
           description="Here's what's happening in your newsroom today."
         />
         <div className="flex flex-col sm:flex-row sm:flex-wrap gap-6 mb-8">

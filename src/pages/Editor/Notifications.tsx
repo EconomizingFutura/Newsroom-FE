@@ -10,7 +10,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-
   Search,
   Bell,
   X,
@@ -124,7 +123,7 @@ export function Notifications() {
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case "success":
-        return <CheckCircle className="w-5 h-5 text-green-600" />;
+        return <CheckCircle className="w-5 h-5 text-[#008001]" />;
       case "warning":
         return <AlertCircle className="w-5 h-5 text-yellow-600" />;
       case "error":
@@ -196,7 +195,7 @@ export function Notifications() {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <div className="flex items-center space-x-3 mb-2">
-                  <Bell className="w-6 h-6 text-green-600" />
+                  <Bell className="w-6 h-6 text-[#008001]" />
                   <h1 className="text-2xl font-bold text-gray-900">
                     Notifications
                   </h1>

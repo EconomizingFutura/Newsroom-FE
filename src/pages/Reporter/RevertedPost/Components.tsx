@@ -3,10 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import type { RevertedArticleTypes } from "@/types/draftPageTypes";
 import { getStatusColor, getTypeColor } from "@/utils/draftUtils";
-import { AlertCircle, Edit, Eye, Trash2 } from "lucide-react";
+import { PenLine, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatDate, formatRelativeTime } from "@/utils/utils";
 import { extractTextSummary } from "../utils";
+import EditorRemarks from "@/components/EditorRemarks";
 
 type GridViewProps = {
   filteredArticles: RevertedArticleTypes[];
@@ -49,46 +50,56 @@ export const RenderGridView: React.FC<GridViewProps> = ({
 
 export const RenderListView: React.FC<ListViewProps> = ({
   filteredArticles,
+  handleEdit,
 }) => (
   <div className="space-y-3">
     {filteredArticles.map((article) => (
       <Card
         key={article.id}
-        className="p-4 bg-white border-red-200 hover:shadow-sm transition-shadow"
+        className="p-4 bg-white border-[#E5E7EB] border hover:shadow-sm transition-shadow"
       >
         <div className="flex items-start gap-4">
-          <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-1" />
-
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between mb-3">
               <div className="flex-1">
-                <h3 className="text-sm font-medium text-gray-900 mb-2">
+                <h3 className="text-sm font-semibold text-[16px] text-[#101828] mb-2">
                   {article.title}
                 </h3>
                 <div className="flex items-center gap-3 mb-2">
-                  <Badge className={`text-xs ${getTypeColor(article.type)}`}>
+                  <Badge
+                    className={`text-xs ${getTypeColor(
+                      article.type.toLowerCase()
+                    )}`}
+                  >
                     {article.type}
                   </Badge>
-                  <Badge className="text-xs bg-red-100 text-red-800">
-                    {article.status}
-                  </Badge>
-                  <span className="text-xs text-gray-500">
-                    Reverted {article.updatedAt} • {article.wordCount} words •
-                    Editor: {article.editor}
-                  </span>
+                  <div className="flex items-center gap-4 text-xs font-normal text-gray-500">
+                    <span>Updated {formatDate(article.updatedAt)}</span>
+                    {extractTextSummary(article.content ?? "", 30).wordCount >
+                      0 && (
+                      <p>
+                        {
+                          extractTextSummary(article.content ?? "", 30)
+                            .wordCount
+                        }{" "}
+                        words
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
 
               <Button
                 size="sm"
                 className="bg-red-600 hover:bg-red-700 text-white gap-2 ml-4"
-                // onClick={() => onEditReverted && onEditReverted(article)}
+                onClick={() => handleEdit?.(article.id)}
               >
-                <Eye className="w-3 h-3" />
-                View Details
+                <PenLine className="w-3 h-3" />
+                Edit Story
               </Button>
             </div>
-
+            {article.remarks && <EditorRemarks remarks={article.remarks} />}
+            {/* 
             <div className="p-3 bg-red-50 border border-red-200 rounded-md">
               <div className="text-xs font-medium text-red-800 mb-1">
                 Revision Required
@@ -96,7 +107,7 @@ export const RenderListView: React.FC<ListViewProps> = ({
               <div className="text-xs text-red-700 leading-relaxed">
                 {article.remarks}
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </Card>
@@ -114,11 +125,12 @@ export const RenderListViewDraft: React.FC<ListViewProps> = ({
       {filteredArticles.map((article) => (
         <Card
           key={article.id}
-          className="p-4 bg-white hover:shadow-sm transition-shadow"
+          onClick={() => handleEdit?.(article.id)}
+          className="p-4 bg-white hover:shadow-sm  !cursor-pointer transition-shadow"
         >
-          <div className="flex items-center justify-between">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-3 mb-2">
+          <div className="flex !cursor-pointer items-center   justify-between">
+            <div className="flex-1 !cursor-pointer  min-w-0">
+              <div className="flex items-center !cursor-pointer gap-3 mb-2">
                 <h3 className="text-[16px] font-medium text-[#101828] truncate">
                   {article.title}
                 </h3>
@@ -149,14 +161,14 @@ export const RenderListViewDraft: React.FC<ListViewProps> = ({
               </div>
             </div>
 
-            <div className="flex items-center gap-2 ml-4">
+            <div className="flex items-center gap-3 ml-4">
               <Button
                 size="sm"
-                className="bg-green-600 hover:bg-green-700 text-white gap-2"
+                className="bg-[#008001] py-2 px-4 w-[120px] hover:bg-green-700 text-white gap-2"
                 onClick={() => handleEdit?.(article.id)}
               >
-                <Edit className="w-3 h-3" />
-                Edit
+                <PenLine className="w-5 h-5" />
+                <span className="mx-1 text-[16px]">Edit</span>
               </Button>
               <Button
                 onClick={() => handleDeletePost(article.id)}

@@ -161,7 +161,7 @@ const RevertedPostPage: React.FC = () => {
           }
         />
         {/* Content Area */}
-        <div className="flex-1 bg-gray-50">
+        <div className="flex-1 pb-10">
           {filteredArticles.length > 0 ? (
             viewMode === "grid" ? (
               <RenderGridView

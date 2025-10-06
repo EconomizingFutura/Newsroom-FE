@@ -134,14 +134,14 @@ export function ReviewQueue() {
           />
 
           <div className="my-6 flex items-center justify-between bg-white py-2 px-6 rounded-lg">
-            <div className="flex space-x-2.5 bg-gray-100 p-1 rounded-lg w-fit">
+            <div className="flex space-x-2.5 bg-[#6A72821A] p-1 rounded-lg w-fit">
               {categories.map((category) => (
                 <button
                   key={category.name}
                   onClick={() => setActiveCategory(category.name)}
-                  className={`px-4 py-2  text-sm  transition-all ${
+                  className={`px-4 py-2 cursor-pointer text-sm  transition-all ${
                     activeCategory === category.name
-                      ? " text-black bg-[#F5FAFF] rounded-md font-bold "
+                      ? " text-black bg-[#FFFFFF] rounded-md font-bold "
                       : "text-[#999999]  hover:text-[#999999]"
                   }`}
                 >

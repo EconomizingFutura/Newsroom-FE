@@ -62,7 +62,6 @@ const HistoryLogPage: React.FC = () => {
   ];
   const typeOptions = ["All Type", "TEXT", "AUDIO", "VIDEO"];
 
-
   const {
     currentPage,
     setPageSize,
@@ -116,8 +115,7 @@ const HistoryLogPage: React.FC = () => {
 
   const handleEdit = (id: string) => {
     const articleType =
-      historyArticles.find((article: any) => article.id === id)?.type ||
-      "Text";
+      historyArticles.find((article: any) => article.id === id)?.type || "Text";
     const route = returnType(articleType);
     navigate(`/${route}/${id}?from=history`, { state: { name: "harish" } });
   };
@@ -161,7 +159,10 @@ const HistoryLogPage: React.FC = () => {
       });
 
       if (statusFilter !== "All Status") {
-        queryParams.append("status", statusFilter === "APPROVED" ? "REVIEWED" : statusFilter);
+        queryParams.append(
+          "status",
+          statusFilter === "APPROVED" ? "REVIEWED" : statusFilter
+        );
       }
       if (typeFilter !== "All Type") {
         queryParams.append("type", typeFilter);
@@ -281,9 +282,7 @@ const HistoryLogPage: React.FC = () => {
                       <SelectItem value="All">Date Range</SelectItem>
                       <SelectItem value="7">Last 7 days</SelectItem>
                       <SelectItem value="30">Last 30 days</SelectItem>
-                      <SelectItem value="90">
-                        Last 3 months
-                      </SelectItem>
+                      <SelectItem value="90">Last 3 months</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -322,15 +321,16 @@ const HistoryLogPage: React.FC = () => {
                 historyArticles.map((article: any) => (
                   <div
                     key={article.id}
-                    className="grid grid-cols-12 gap-4 p-6 hover:bg-gray-50 transition-colors items-center"
+                    onClick={() => handleEdit(article.id)}
+                    className="grid cursor-pointer grid-cols-12 gap-4 p-6 hover:bg-gray-50 transition-colors items-center"
                   >
-                    <div className="col-span-3 truncate">
+                    <div className="col-span-3  cursor-pointer truncate">
                       <h3 className="text-sm font-normal text-[14px] text-[#1E2939] truncate">
                         {article.title}
                       </h3>
                     </div>
 
-                    <div className="col-span-2 px-4">
+                    <div className="col-span-2 cursor-pointer px-4">
                       <div className="text-[14px] flex items-center gap-[8px]">
                         {typeIcons[getArticleType(article) as PostType]}
                         <span className=" first-letter:uppercase">
@@ -340,7 +340,7 @@ const HistoryLogPage: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="col-span-2">
+                    <div className="col-span-2 cursor-pointer">
                       <Badge
                         className={`px-[16px] font-medium py-[4px] !text-[14px] ${HISTORY_STATUS(
                           article.status
@@ -354,13 +354,13 @@ const HistoryLogPage: React.FC = () => {
                       </Badge>
                     </div>
 
-                    <div className="col-span-2">
+                    <div className="col-span-2 cursor-pointer">
                       <div className="text-[14px] text-gray-900">
                         {article.category}
                       </div>
                     </div>
 
-                    <div className="col-span-2 flex items-center gap-[8px]">
+                    <div className="col-span-2 cursor-pointer flex items-center gap-[8px]">
                       <Calendar className="w-4 h-4" />
                       <div className="text-[14px] text-gray-900">
                         {moment(article.updatedAt).format(
@@ -369,7 +369,7 @@ const HistoryLogPage: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="col-span-1">
+                    <div className="col-span-1 cursor-pointer">
                       <Button
                         size="sm"
                         variant="outline"

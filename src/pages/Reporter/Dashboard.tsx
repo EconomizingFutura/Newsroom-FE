@@ -57,7 +57,9 @@ export default function Dashboard() {
           const key =
             item.title.toUpperCase() === "NEED REVISION"
               ? "REVERTED"
-              : item.title.toUpperCase() === "APPROVED" ? "REVIEWED" : item.title.toUpperCase();
+              : item.title.toUpperCase() === "APPROVED"
+              ? "REVIEWED"
+              : item.title.toUpperCase();
 
           return { ...item, count: statsResponse[key] ?? 0 };
         });
@@ -142,16 +144,19 @@ export default function Dashboard() {
             </p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-3 mb-8">
             <div
               style={{ borderLeftWidth: "2px" }}
               className="border-red-500 bg-white rounded-2xl px-[24px] py-[16px] shadow-md"
             >
               <div className="flex flex-col gap-[16px]">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 warning-color font-semibold text-lg">
+                  <div className="flex items-center gap-2 warning-color font-semibold text-[16px]">
                     <RotateCcw className="w-5 h-5 warning-color" />
-                    Urgent Actions Required
+                    <span className="font-semibold">
+                      {" "}
+                      Urgent Actions Required
+                    </span>
                     <span className="ml-2 bg-red-100 warning-color text-sm px-2 py-0.5 rounded-full">
                       {revertedPost.length}
                     </span>

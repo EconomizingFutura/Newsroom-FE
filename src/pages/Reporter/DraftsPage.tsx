@@ -196,7 +196,8 @@ export default function DraftsPage() {
             />
           )}
         </div>
-
+      </div>
+      <div className="py-5">
         {pageMetaData.totalPages > 1 && (
           <Pagination
             currentPage={pageMetaData.page}
@@ -207,6 +208,7 @@ export default function DraftsPage() {
           />
         )}
       </div>
+
       {deletePost.isOpen && (
         <DeleteConfirmation
           onConfirm={handleDelete}

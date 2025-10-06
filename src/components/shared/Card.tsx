@@ -105,7 +105,7 @@ const Card: React.FC<CardProps> = ({
       </div>
 
       {/* Remark Block */}
-      {status === "REVERTED" && (
+      {status === "REVERTED" && remarkMessage && remarkMessage?.length > 0 && (
         <div className="mt-2 p-2 border border-red-300 bg-red-50 rounded-lg text-sm text-red-700">
           <div className="flex gap-[8px]">
             <MessageSquare size={18} />
@@ -136,7 +136,7 @@ const Card: React.FC<CardProps> = ({
               {wordCount && <p>{wordCount} words</p>}
             </div>
           )}
-          <p className="text-green-600 ">{savedTime}</p>
+          <p className="text-[#008001]">{savedTime}</p>
         </div>
       )}
 
@@ -144,7 +144,7 @@ const Card: React.FC<CardProps> = ({
       <div className="flex items-center gap-3 mt-3">
         <button
           onClick={() => handleEdit(id)}
-          className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-medium flex items-center justify-center gap-2 transition"
+          className="flex-1 bg-[#008001] hover:bg-[#008001] text-white py-2 rounded-lg font-medium flex items-center justify-center gap-2 transition"
         >
           <PenLine className="w-5 h-5" />
           Edit

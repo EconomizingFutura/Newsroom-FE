@@ -182,7 +182,7 @@ export default function AudioArticleEditor({
                 <Button
                   variant="outline"
                   size="sm"
-                  className="gap-2 text-green-600 border-green-200 hover:bg-green-50"
+                  className="gap-2 text-[#008001] border-green-200 hover:bg-green-50"
                 >
                   <Play className="w-4 h-4" />
                   Play Audio

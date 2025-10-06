@@ -85,7 +85,7 @@ export default function VideoArticleEditor() {
               <h2 className="text-lg font-medium">Content Editor</h2>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-500">Draft</span>
-                <span className="text-sm text-green-600">Auto-saved</span>
+                <span className="text-sm text-[#008001]">Auto-saved</span>
               </div>
             </div>
 

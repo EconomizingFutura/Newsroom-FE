@@ -137,7 +137,7 @@ function DashboardListCard({
       {/* Right Button */}
       <button
         onClick={() => onClick(id)}
-        className="px-4 py-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 text-white font-medium hover:from-red-600 hover:to-red-700 transition"
+        className="px-4 py-2 cursor-pointer rounded-lg bg-[linear-gradient(90deg,#FB2C36_0%,#E7000B_100%)] text-white font-semibold w-max text-[14px] transition"
       >
         {buttonText}
       </button>

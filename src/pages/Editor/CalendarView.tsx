@@ -340,7 +340,7 @@ export function CalendarView() {
               {/* Header */}
               <div className="mb-6">
                 <div className="flex items-center space-x-3 mb-2">
-                  <Calendar className="w-6 h-6 text-green-600" />
+                  <Calendar className="w-6 h-6 text-[#008001]" />
                   <h1 className="text-2xl font-bold text-gray-900">Calendar</h1>
                 </div>
                 <p className="text-gray-600">
@@ -372,9 +372,9 @@ export function CalendarView() {
                   <div className="flex items-center space-x-2">
                     <Badge
                       variant="outline"
-                      className="text-green-600 border-green-200 bg-green-50"
+                      className="text-[#008001] border-green-200 bg-green-50"
                     >
-                      <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                      <div className="w-2 h-2 text-[#008001] rounded-full mr-2"></div>
                       Publish
                     </Badge>
                     <Badge

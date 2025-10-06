@@ -141,7 +141,7 @@ export default function VideoPreview({
                   {isPlaying ? (
                     <Pause className="w-6 h-6 text-black" />
                   ) : (
-                    <Play className="w-6 h-6 text-green-600" />
+                    <Play className="w-6 h-6 text-[#008001]" />
                   )}
                 </button>
               </div>

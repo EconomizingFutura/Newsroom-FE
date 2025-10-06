@@ -139,7 +139,7 @@ const SideBar: React.FC<SidebarTypes> = (props) => {
 
   const isActive = (view: currentPageType) =>
     currentView === view
-      ? "bg-[#00A652] hover:bg-[#00A652] hover:text-white text-white rounded-md"
+      ? "bg-[#008001] hover:bg-[#008001] hover:text-white text-white rounded-md"
       : "text-gray-600 hover:bg-gray-100 hover:text-gray-900";
 
   return (

@@ -59,7 +59,7 @@ const ContentUploader = () => {
       isSubmit: false,
     });
 
-    navigate('/history');
+    navigate("/history");
   };
 
   const path = location.pathname.replace("/", "");
@@ -125,7 +125,6 @@ const ContentUploader = () => {
 
   /** Submit Handler */
   const submitForReview = async (data: FormData, e: any) => {
-
     const actionName = (e?.nativeEvent as any)?.submitter?.name || "";
     let url = "";
     let articleType = "TEXT";
@@ -141,13 +140,13 @@ const ContentUploader = () => {
         url = await uploadToS3(data.video, "video", actionName.toLowerCase());
       } else {
         articleType = "TEXT";
-        modifiedContent = await processAndUploadImages(data.content)
+        modifiedContent = await processAndUploadImages(data.content);
       }
 
       // upload thumbnail
       if (data.thumbnail) {
         thumbnailStr = await uploadToS3(
-          base64ToFile(data.thumbnail, `${uuidv4()}.png`),   // ensure it's a File
+          base64ToFile(data.thumbnail, `${uuidv4()}.png`), // ensure it's a File
           "thumbnail",
           actionName.toLowerCase()
         );
@@ -168,13 +167,12 @@ const ContentUploader = () => {
         if (reporterId) {
           const response: any = await PATCH(
             API_LIST.BASE_URL + API_LIST.DRAFT_BY_ARTICLE + reporterId,
-            { ...API_DATA, status: 'DRAFT' }
+            { ...API_DATA, status: "DRAFT" }
           );
           if (response.id) {
             setValue("reporterId", response.id);
             //navigate("/drafts");
           }
-
         } else {
           const response: any = await POST(
             API_LIST.BASE_URL + API_LIST.DRAFT_ARTICLE,
@@ -190,19 +188,16 @@ const ContentUploader = () => {
 
         // handleSubmitUI("DRAFT");
       } else if (actionName.toLowerCase() === "save") {
-        setLoading(true)
+        setLoading(true);
         await POST(API_LIST.SUBMIT_ARTICLE, API_DATA);
-        setLoading(false)
+        setLoading(false);
 
         handleSubmitUI("SUBMIT");
       }
-
     } catch (err) {
       console.error(err);
     }
-
   };
-
 
   const saveDraft = async () => {
     if (isSavingDraft) return; // prevent duplicate calls
@@ -255,7 +250,10 @@ const ContentUploader = () => {
           API_DATA
         );
       } else {
-        response = await POST(API_LIST.BASE_URL + API_LIST.DRAFT_ARTICLE, API_DATA);
+        response = await POST(
+          API_LIST.BASE_URL + API_LIST.DRAFT_ARTICLE,
+          API_DATA
+        );
       }
 
       if (response?.id) setValue("reporterId", response.id);
@@ -266,7 +264,6 @@ const ContentUploader = () => {
       toast.error("Error saving draft");
     } finally {
       setIsSavingDraft(false);
-
     }
   };
   // wrap inside useMemo to preserve the same throttled function instance
@@ -274,7 +271,6 @@ const ContentUploader = () => {
     () => throttle(saveDraft, 5000, { trailing: false }),
     [saveDraft]
   );
-
 
   /** Tags */
   const handleAddTag = () => {
@@ -290,7 +286,6 @@ const ContentUploader = () => {
       tags.filter((tag) => tag !== tagToRemove)
     );
   };
-
 
   /** Reset form when tab changes */
   useEffect(() => {
@@ -328,7 +323,10 @@ const ContentUploader = () => {
               className="border border-[#E5E7EB] h-10 w-10 rounded-[8.5px]"
               style={{ backgroundColor: activeConfig.color }}
             >
-              <HeaderIcon className="text-white" name={activeConfig.icon as HeaderKey} />
+              <HeaderIcon
+                className="text-white"
+                name={activeConfig.icon as HeaderKey}
+              />
             </Button>
             <p className="font-bold text-2xl">{activeConfig.label}</p>
             <div className="flex items-center gap-2 px-2 ml-auto">
@@ -340,9 +338,7 @@ const ContentUploader = () => {
                 size="sm"
                 className="gap-2 border-[#B3E6B3] bg-[#F0F9F0] text-[#008001] hover:bg-[#F0F9F0] hover:text-[#008001]"
                 onClick={throttledSaveDraft}
-
               >
-
                 {isSavingDraft ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" /> Saving...
@@ -352,7 +348,6 @@ const ContentUploader = () => {
                     <Save className="w-4 h-4" /> Save Draft
                   </>
                 )}
-
               </Button>
               <Button
                 form="myForm"
@@ -370,7 +365,7 @@ const ContentUploader = () => {
 
           {/* Tabs */}
           <div className="bg-white border-b border-gray-200 px-6 py-4 rounded-2xl shadow-md">
-            <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
+            <div className="flex space-x-1 bg-[#6A72821A] p-1 rounded-lg w-fit">
               {tabs.map((tab) => {
                 const isActive = path === tab.id;
                 return (
@@ -378,10 +373,11 @@ const ContentUploader = () => {
                     key={tab.id}
                     type="button"
                     onClick={() => navigate(`/${tab.id}`)}
-                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${isActive
-                      ? "bg-white text-gray-900 shadow-sm"
-                      : "text-gray-500 hover:text-gray-700"
-                      }`}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                      isActive
+                        ? "bg-white font-bold text-gray-900 shadow-sm"
+                        : "text-gray-500 hover:text-gray-700"
+                    }`}
                   >
                     {tab.name}
                   </button>
@@ -391,12 +387,16 @@ const ContentUploader = () => {
           </div>
 
           {/* Form */}
-          <form id="myForm" onKeyDown={(e) => {
-            if (e.key === "Enter" && e.target instanceof HTMLInputElement) {
-              // prevent Enter only for text inputs
-              e.preventDefault();
-            }
-          }} onSubmit={handleSubmit(submitForReview)}>
+          <form
+            id="myForm"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && e.target instanceof HTMLInputElement) {
+                // prevent Enter only for text inputs
+                e.preventDefault();
+              }
+            }}
+            onSubmit={handleSubmit(submitForReview)}
+          >
             <div className="bg-white border-b border-gray-200 px-6 py-4 rounded-2xl shadow-md">
               {/* Category */}
               <div>
@@ -414,10 +414,11 @@ const ContentUploader = () => {
                       }
                       size="sm"
                       onClick={() => setValue("category", category)}
-                      className={`px-[24px] py-[6px] ${watch("category") === category
-                        ? " bg-[#008001] hover:bg-green-700"
-                        : "bg-[#F8FAF9]"
-                        }`}
+                      className={`px-[24px] py-[6px] ${
+                        watch("category") === category
+                          ? " bg-[#008001] hover:bg-green-700"
+                          : "bg-[#F8FAF9]"
+                      }`}
                     >
                       {category}
                     </Button>
@@ -433,8 +434,9 @@ const ContentUploader = () => {
                 <Input
                   placeholder="Title"
                   {...register("title", { required: "Title is required" })}
-                  className={`bg-[#f7fbf8] border-[#ECECEC] ${errors.title ? "border-red-500" : ""
-                    }`}
+                  className={`bg-[#f7fbf8] border-[#ECECEC] ${
+                    errors.title ? "border-red-500" : ""
+                  }`}
                 />
               </div>
 
@@ -498,8 +500,9 @@ const ContentUploader = () => {
                         handleAddTag();
                       }
                     }}
-                    className={`py-[19px] border-[#ECECEC] bg-[#f7fbf8] ${errors.tags ? "border-red-500" : ""
-                      }`}
+                    className={`py-[19px] border-[#ECECEC] bg-[#f7fbf8] ${
+                      errors.tags ? "border-red-500" : ""
+                    }`}
                   />
                   <Button
                     type="button"
