@@ -90,19 +90,19 @@ const menuConfig = {
       action: "onNavigateEditorReviewQueue",
       badge: 4,
     },
-    // {
-    //   key: "publish-center",
-    //   label: "Publish Center",
-    //   icon: <RotateCcw className="w-4 h-4" />,
-    //   action: "onNavigateEditorPublishCenter",
-    //   badge: 4,
-    // },
-    // {
-    //   key: "calendar",
-    //   label: "Calendar",
-    //   icon: <Users className="w-4 h-4" />,
-    //   action: "onNavigateEditorCalendarView",
-    // },
+    {
+      key: "publish-center",
+      label: "Publish Center",
+      icon: <RotateCcw className="w-4 h-4" />,
+      action: "onNavigateEditorPublishCenter",
+      badge: 4,
+    },
+    {
+      key: "calendar",
+      label: "Calendar",
+      icon: <Users className="w-4 h-4" />,
+      action: "onNavigateEditorCalendarView",
+    },
     // {
     //   key: "editor-history",
     //   label: "History Log",
