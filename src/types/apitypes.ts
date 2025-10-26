@@ -9,7 +9,8 @@ export type contentResponse = {
   type: "TEXT" | "VIDEO" | "AUDIO";
   status: "SUBMITTED";
   remarks: string | null;
-  audioUrl: string;
+  audio: string | File | null;
+  audioUrl?: string | File | null;
   videoUrl: string;
   thumbnailUrl: string;
   category: string;
@@ -59,3 +60,53 @@ export type EditorStatsResponse = {
   success: boolean;
   data: EditorStatsData;
 };
+
+export type scheduledPost = {
+  id: string;
+  title: string;
+  createdAt: string;
+  schuduledAt: string;
+  author: string;
+  articleType: "TEXT" | "VIDEO" | "AUDIO";
+  audiourl: string;
+  videourl: string;
+  thumbnailurl: string;
+  category: string;
+  type: "SCHEDULED" | "REVIEWED";
+};
+
+export type scheduledPostsResponse = {
+  success: boolean;
+  data: {
+    articles: scheduledPost[];
+  };
+  status: number;
+  pagination: PaginationTypes;
+};
+
+export interface PublishCenterArticle {
+  id: number;
+  title: string;
+  createdAt: string;
+  author: string;
+  articleType: string;
+}
+
+export interface calendarEvent {
+  id: number;
+  title: string;
+  scheduledDate: string;
+  scheduledTime: string;
+  scheduledPlatforms: string[];
+  audioUrl: string;
+  videoUrl: string;
+  thumbnailUrl: string;
+  status: "SCHEDULED" | "POSTED";
+  content: string;
+  type: "TEXT" | "VIDEO" | "AUDIO";
+}
+
+export interface CalendarEventsResponse {
+  data: calendarEvent[];
+  success: boolean;
+}

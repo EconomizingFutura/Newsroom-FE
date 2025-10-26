@@ -116,3 +116,36 @@ export function getInitials(name: string): string {
 
   return first + last;
 }
+
+export const CALENDAR_COLOR = Object.freeze({
+  scheduled: "#03528F1A",
+  scheduledBorder: "#03528F",
+  posted: "#2DA94F1A",
+  postedBorder: "#2DA94F",
+});
+
+export const CALENDAR_BG = (type: "posted" | "scheduled") => {
+  return CALENDAR_COLOR[type];
+};
+
+export const CALENDAR_BORDER = (type: "posted" | "scheduled") => {
+  return CALENDAR_COLOR[`${type}Border` as keyof typeof CALENDAR_COLOR];
+};
+
+export const formatDateForInput = (dateString: string): string => {
+  const date = new Date(dateString);
+
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  };
+
+  const formattedDate = date.toLocaleString("en-US", options);
+  const uiDate = formattedDate.replace(",", " at");
+  return uiDate;
+};

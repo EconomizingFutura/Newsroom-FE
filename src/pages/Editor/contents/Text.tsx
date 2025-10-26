@@ -74,7 +74,7 @@ const Text: React.FC<TextProps> = ({
           control={control}
           rules={{
             required: "Content is required",
-           // validate: validateContent,
+            // validate: validateContent,
           }}
           defaultValue={content?.content || ""}
           render={({ field }) => (
@@ -84,7 +84,7 @@ const Text: React.FC<TextProps> = ({
                 onChange={(value) => {
                   field.onChange(value);
                 }}
-                className="!min-h-[220px] max-h-[500px] "
+                className=" max-h-56 pb-12"
                 placeholder="Write something..."
                 readOnly={readOnly || !enableEdit}
               />

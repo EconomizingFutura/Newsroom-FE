@@ -1,43 +1,26 @@
 import React, { useState, useRef, useEffect } from "react";
 
-import {
-  Clock,
-  User,
-  Eye,
-  PenLine,
-  Send,
-  Calendar,
-  Printer,
-} from "lucide-react";
+import { Clock, User, PenLine, Send, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SocialMediaPublishCard } from "./TextEditor/SocialMediaPublishCard";
-
-export type Story = {
-  id: string;
-  title: string;
-  priority: string;
-  status: "ready" | "published" | "scheduled" | "approved";
-  publishedDate?: string;
-  scheduledDate?: string;
-  approvedDate?: string;
-  author: string;
-  views?: number;
-  content?: string;
-  category: string;
-};
+import type { scheduledPost } from "@/types/apitypes";
+import { formatDateForInput } from "@/utils/utils";
 
 interface StoryCardProps {
-  story: Story;
+  story: scheduledPost;
   getPriorityColor: (priority: string) => string;
-  handlePublishNow: (id: string) => void;
-  handleSchedulePublish: (story: Story) => void;
+  handlePublishNow: (id: string, platforms: string[]) => void;
+  handleSchedulePublish: (story: scheduledPost) => void;
+  handleCancel: (id: string) => void;
+  handleViewStory: (id: string, text: "TEXT" | "VIDEO" | "AUDIO") => void;
 }
 const StoryCard: React.FC<StoryCardProps> = ({
   story,
-  getPriorityColor,
   handlePublishNow,
   handleSchedulePublish,
+  handleCancel,
+  handleViewStory,
 }) => {
   const [showPublishCard, setShowPublishCard] = useState(false);
   const publishCardRef = useRef<HTMLDivElement>(null);
@@ -56,11 +39,11 @@ const StoryCard: React.FC<StoryCardProps> = ({
     };
 
     if (showPublishCard) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showPublishCard]);
 
@@ -73,8 +56,8 @@ const StoryCard: React.FC<StoryCardProps> = ({
   };
 
   const handlePublishCardPublish = (selectedPlatforms: string[]) => {
-    handlePublishNow(story.id);
-    console.log('Publishing to platforms:', selectedPlatforms);
+    handlePublishNow(story.id, selectedPlatforms);
+    console.log("Publishing to platforms:", selectedPlatforms);
     setShowPublishCard(false);
   };
 
@@ -86,40 +69,21 @@ const StoryCard: React.FC<StoryCardProps> = ({
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center space-x-3 mb-2">
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 className="text-lg font-semibold text-[#101828] ">
               {story.title}
             </h3>
-            <Badge
-              className={`text-xs px-2 py-1 hidden ${getPriorityColor(
-                story.priority
-              )}`}
-            >
-              {story.priority}
-            </Badge>
           </div>
           <div className="flex items-center space-x-4 text-sm text-gray-500 mb-3">
             <div className="flex items-center space-x-1">
               <Clock className="w-4 h-4" />
-              <span>
-                {story.status === "published"
-                  ? story.publishedDate
-                  : story.status === "scheduled"
-                  ? story.scheduledDate
-                  : story.approvedDate}
-              </span>
+              <span>{new Date(story.createdAt).toLocaleString()} </span>
             </div>
             <div className="flex items-center space-x-1">
               <User className="w-4 h-4" />
               <span>{story.author}</span>
             </div>
-            {story.views && (
-              <div className="flex items-center space-x-1">
-                <Eye className="w-4 h-4" />
-                <span>{story.views} views</span>
-              </div>
-            )}
           </div>
-          <p className="text-gray-700 leading-relaxed mb-4">{story.content}</p>
+          {/* <p className="text-gray-700 leading-relaxed mb-4">{story.content}</p> */}
         </div>
       </div>
 
@@ -134,58 +98,58 @@ const StoryCard: React.FC<StoryCardProps> = ({
         <div className="flex items-center space-x-3">
           <Button
             variant="outline"
-            className="text-gray-700 border-gray-300 hover:bg-gray-50"
+            onClick={() => handleViewStory(story.id, story.articleType)}
+            className="text-gray-700 cursor-pointer border-gray-300 hover:bg-gray-50"
           >
             <PenLine className="w-4 h-4 mr-2" />
             Final Edit
           </Button>
 
-          {story.status === "ready" && (
-            <>
-              <div className="relative">
-                <Button
-                  ref={publishButtonRef}
-                  onClick={handlePublishNowClick}
-                  className="bg-[#008001] hover:bg-green-700 text-white"
+          <>
+            <div className="relative">
+              <Button
+                ref={publishButtonRef}
+                onClick={handlePublishNowClick}
+                className="bg-[#008001] cursor-pointer hover:bg-green-700 text-white"
+              >
+                <Send className="w-4 h-4 mr-2" />
+                Publish Now
+              </Button>
+
+              {showPublishCard && (
+                <div
+                  ref={publishCardRef}
+                  className="absolute bottom-full right-0 mb-2 z-10"
                 >
-                  <Send className="w-4 h-4 mr-2" />
-                  Publish Now
-                </Button>
-                
-                {showPublishCard && (
-                  <div 
-                    ref={publishCardRef}
-                    className="absolute bottom-full right-0 mb-2 z-10"
-                  >
-                    <SocialMediaPublishCard 
-                      isOpen={showPublishCard} 
-                      onClose={handlePublishCardClose} 
-                      onPublish={handlePublishCardPublish} 
-                    />
-                  </div>
-                )}
-              </div>
-              
+                  <SocialMediaPublishCard
+                    isOpen={showPublishCard}
+                    onClose={handlePublishCardClose}
+                    onPublish={handlePublishCardPublish}
+                  />
+                </div>
+              )}
+            </div>
+            {story.type == "REVIEWED" && (
               <Button
                 variant="outline"
                 onClick={() => handleSchedulePublish(story)}
-                className="bg-[#f0f9f0] text-[#006601] border border-[#B3E6B3]"
+                className="bg-[#f0f9f0] text-[#006601] border hover:bg-[#f0f9f0] hover:text-[#006601] cursor-pointer border-[#B3E6B3]"
               >
                 <Calendar className="w-4 h-4 mr-2" />
                 Schedule
               </Button>
-            </>
-          )}
-
-          {story.status === "published" && (
-            <Button
-              variant="outline"
-              className="text-gray-600 border-gray-300 hover:bg-gray-50"
-            >
-              <Printer className="w-4 h-4 mr-2" />
-              Print Version
-            </Button>
-          )}
+            )}
+            {story.type == "SCHEDULED" && (
+              <Button
+                variant="outline"
+                onClick={() => handleCancel(story.id)}
+                className="bg-[#ffffff] text-[#FB2C36] border hover:bg-[#ffffff] hover:text-[#FB2C36] cursor-pointer border-[#FB2C36]"
+              >
+                <Calendar className="w-4 h-4 mr-2" color="#FB2C36" />
+                cancel ({formatDateForInput(story.schuduledAt)})
+              </Button>
+            )}
+          </>
         </div>
       </div>
     </div>

@@ -9,11 +9,11 @@ export type CurrentPageType =
   | "audio"
   | "video"
   | "editor-dashboard"
-  | "calendar"
   | "publish-center"
   | "review-queue"
   | "editor-history"
-  | "newsFeeds";
+  | "newsFeeds"
+  | "calendar";
 
 export function useCurrentView(): CurrentPageType {
   const location = useLocation();
@@ -57,5 +57,9 @@ export function useCurrentView(): CurrentPageType {
   if (queryParams.get("from") === "dashboard") {
     return "editor-dashboard";
   }
+  if (queryParams.get("from") === "calendar") {
+    return "calendar";
+  }
+  if (queryParams.get("from") == "publishCenter") return "publish-center";
   return "newsFeeds";
 }

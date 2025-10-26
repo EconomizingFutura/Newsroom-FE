@@ -1,6 +1,10 @@
-// @ts-nocheck
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import {
   Mic,
   MoveLeft,
@@ -24,7 +28,10 @@ import { API_LIST } from "@/api/endpoints";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import VideoUrlPlayer, { AudioUrlPlayer, VideoContainer } from "./Reporter/ArticleCreation/Components";
+import VideoUrlPlayer, {
+  AudioUrlPlayer,
+  VideoContainer,
+} from "./Reporter/ArticleCreation/Components";
 import { uploadToS3 } from "@/config/s3Config";
 import { base64ToFile } from "@/utils/compression";
 import { v4 as uuidv4 } from "uuid";
@@ -61,8 +68,15 @@ const EditArticle: React.FC = () => {
   const [remarks, setRemarks] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
 
-  const headerConfig: Record<string, { label: string; color: string; icon: HeaderKey }> = {
-    textArticle: { label: "Text Article", color: "#2B7FFF", icon: "Text Article" },
+  const headerConfig: Record<
+    string,
+    { label: string; color: string; icon: HeaderKey }
+  > = {
+    textArticle: {
+      label: "Text Article",
+      color: "#2B7FFF",
+      icon: "Text Article",
+    },
     audio: { label: "Audio Post", color: "#ab3fff", icon: "audio" },
     video: { label: "Video Post", color: "#9f2e00", icon: "video" },
   };
@@ -74,65 +88,70 @@ const EditArticle: React.FC = () => {
     content:
       path === "textArticle"
         ? yup.string().test("non-empty", "Content is required", (val) => {
-          // allow empty string early, treat "<p><br></p>" as empty too
-          if (!val) return false;
-          return val.replace(/<p><br><\/p>/g, "").trim().length > 0;
-        })
+            // allow empty string early, treat "<p><br></p>" as empty too
+            if (!val) return false;
+            return val.replace(/<p><br><\/p>/g, "").trim().length > 0;
+          })
         : yup.string().notRequired(),
     tags: yup.array().of(yup.string()).min(1, "At least one tag is required"),
     // audio: if audio page, require audio file or a valid URL string from API
     audio:
       path === "audio"
         ? yup
-          .mixed()
-          .test("present", "Audio is required", (value) => {
-            if (!value) return false;
-            return true;
-          })
-          .test("is-audio", "Unsupported audio type", (value: any) => {
-            if (!value) return false;
-            // if server returned URL string, assume valid
-            if (typeof value === "string") return true;
-            // if it's a File, check MIME
-            if (value instanceof File) {
-              const allowed = ["audio/mpeg", "audio/wav", "audio/ogg", "audio/x-m4a", "audio/mp4"];
-              return allowed.includes(value.type);
-            }
-            return false;
-          })
-          .test("size", "Audio exceeds max size (100MB)", (value: any) => {
-            if (!value) return false;
-            if (typeof value === "string") return true;
-            if (value instanceof File) return value.size <= 100 * 1024 * 1024;
-            return false;
-          })
+            .mixed()
+            .test("present", "Audio is required", (value) => {
+              if (!value) return false;
+              return true;
+            })
+            .test("is-audio", "Unsupported audio type", (value: any) => {
+              if (!value) return false;
+              // if server returned URL string, assume valid
+              if (typeof value === "string") return true;
+              // if it's a File, check MIME
+              if (value instanceof File) {
+                const allowed = [
+                  "audio/mpeg",
+                  "audio/wav",
+                  "audio/ogg",
+                  "audio/x-m4a",
+                  "audio/mp4",
+                ];
+                return allowed.includes(value.type);
+              }
+              return false;
+            })
+            .test("size", "Audio exceeds max size (100MB)", (value: any) => {
+              if (!value) return false;
+              if (typeof value === "string") return true;
+              if (value instanceof File) return value.size <= 100 * 1024 * 1024;
+              return false;
+            })
         : yup.mixed().notRequired(),
     video:
       path === "video"
         ? yup
-          .mixed()
-          .test("present", "Video is required", (value) => {
-            if (!value) return false;
-            return true;
-          })
-          .test("is-video", "Unsupported video type", (value: any) => {
-            if (!value) return false;
-            if (typeof value === "string") return true;
-            if (value instanceof File) {
-              return value.type.startsWith("video/");
-            }
-            return false;
-          })
-          .test("size", "Video exceeds max size (500MB)", (value: any) => {
-            if (!value) return false;
-            if (typeof value === "string") return true;
-            if (value instanceof File) return value.size <= 500 * 1024 * 1024;
-            return false;
-          })
+            .mixed()
+            .test("present", "Video is required", (value) => {
+              if (!value) return false;
+              return true;
+            })
+            .test("is-video", "Unsupported video type", (value: any) => {
+              if (!value) return false;
+              if (typeof value === "string") return true;
+              if (value instanceof File) {
+                return value.type.startsWith("video/");
+              }
+              return false;
+            })
+            .test("size", "Video exceeds max size (500MB)", (value: any) => {
+              if (!value) return false;
+              if (typeof value === "string") return true;
+              if (value instanceof File) return value.size <= 500 * 1024 * 1024;
+              return false;
+            })
         : yup.mixed().notRequired(),
     status: yup.string().nullable(),
     thumbnail: yup.mixed<File | string>().nullable().notRequired(),
-
   });
 
   // useForm with typed values
@@ -181,7 +200,6 @@ const EditArticle: React.FC = () => {
     setValue("audio", null, { shouldDirty: true, shouldValidate: true });
   };
 
-
   useEffect(() => {
     const controller = new AbortController();
 
@@ -207,19 +225,21 @@ const EditArticle: React.FC = () => {
 
           // fill form
           Object.entries(mapped).forEach(([key, value]) => {
-            setValue(key as keyof ArticleFormValues, value, { shouldValidate: true, shouldDirty: false });
+            setValue(key as keyof ArticleFormValues, value, {
+              shouldValidate: true,
+              shouldDirty: false,
+            });
           });
 
           setRemarks(response.remarks);
         }
 
         setLoading(false);
-
       } catch (error: any) {
-        if (error.name !== "AbortError") console.error("Error fetching article:", error);
+        if (error.name !== "AbortError")
+          console.error("Error fetching article:", error);
 
         setLoading(false);
-
       }
     };
 
@@ -227,14 +247,15 @@ const EditArticle: React.FC = () => {
     return () => controller.abort();
   }, [id, setValue]);
 
-
-
   const handleAddTag = () => {
     const tag = newTag.trim();
     if (!tag) return;
     const current = getValues("tags") || [];
     if (!current.includes(tag)) {
-      setValue("tags", [...current, tag], { shouldValidate: true, shouldDirty: true });
+      setValue("tags", [...current, tag], {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
       setNewTag("");
     }
   };
@@ -248,16 +269,21 @@ const EditArticle: React.FC = () => {
     );
   };
 
-  const onSubmit = (data: ArticleFormValues, status: "SUBMIT" | "DRAFT" | "REVERTED") => {
-    submitForReview(data, status)
+  const onSubmit = (
+    data: ArticleFormValues,
+    status: "SUBMIT" | "DRAFT" | "REVERTED"
+  ) => {
+    submitForReview(data, status);
   };
 
-
-  const submitForReview = async (data: ArticleFormValues, status: "SUBMIT" | "DRAFT" | "REVERTED") => {
-
-    if (status === 'DRAFT' || status === 'REVERTED') {
-
-      const changedKeys = Object.keys(dirtyFields) as (keyof ArticleFormValues)[];
+  const submitForReview = async (
+    data: ArticleFormValues,
+    status: "SUBMIT" | "DRAFT" | "REVERTED"
+  ) => {
+    if (status === "DRAFT" || status === "REVERTED") {
+      const changedKeys = Object.keys(
+        dirtyFields
+      ) as (keyof ArticleFormValues)[];
       if (changedKeys.length === 0) {
         return;
       }
@@ -278,7 +304,11 @@ const EditArticle: React.FC = () => {
       if (dirtyFields.video && data.video instanceof File) {
         changes.video = await uploadToS3(data.video, "video", "draft");
       }
-      if (dirtyFields.thumbnail && data.thumbnail && typeof data.thumbnail === "string") {
+      if (
+        dirtyFields.thumbnail &&
+        data.thumbnail &&
+        typeof data.thumbnail === "string"
+      ) {
         changes.thumbnail = await uploadToS3(
           base64ToFile(data.thumbnail as string, `${uuidv4()}.png`),
           "thumbnail",
@@ -286,26 +316,27 @@ const EditArticle: React.FC = () => {
         );
       }
 
-      changes.status = 'DRAFT'
-      await PATCH(`${API_LIST.BASE_URL}${API_LIST.DRAFT_BY_ARTICLE}${id}`, changes);
+      changes.status = "DRAFT";
+      await PATCH(
+        `${API_LIST.BASE_URL}${API_LIST.DRAFT_BY_ARTICLE}${id}`,
+        changes
+      );
       toast.success("Saved as draft please keep editing");
 
       // navigate("/drafts");
-    }
-    else if (status === "SUBMIT") {
+    } else if (status === "SUBMIT") {
       setLoading(true);
 
       const API_DATA = {
         ...data,
         articleId: id,
-        status: 'SUBMITTED'
+        status: "SUBMITTED",
       };
 
       await POST(API_LIST.SUBMIT_ARTICLE, API_DATA);
       setLoading(false);
       // handleSubmitUI("SUBMIT");
       navigate("/history");
-
     }
   };
 
@@ -340,40 +371,41 @@ const EditArticle: React.FC = () => {
               <HeaderIcon className="text-white" name="Text Article" />
             </Button>
             <p className="font-bold text-2xl">{activeConfig.label}</p>
-            {!isPreviewMode && <div className="flex items-center gap-2 px-2 ml-auto">
-              <Button
-                form="myForm"
-                type="button"
-                onClick={handleSubmit((data) => {
-                  // save draft -> update status and show UI
-                  // setValue("status", "DRAFT");
-                  onSubmit(data, getValues('status'));
-                })}
-                variant="outline"
-                size="sm"
-                className="gap-2 border-[#B3E6B3] bg-[#F0F9F0] text-[#008001] hover:bg-[#F0F9F0] hover:text-[#008001]"
-              >
-                <Save className="w-4 h-4" />
-                Save Draft
-              </Button>
-              <Button
-                form="myForm"
-                type="button"
-                onClick={handleSubmit((data) => {
-                  // setValue("status", "SUBMIT");
-                  onSubmit(data, "SUBMIT");
-                })}
-                size="sm"
-                className="bg-green-700 hover:bg-green-700 text-white gap-2"
-              >
-                <Send className="w-4 h-4" />
-                Submit for Review
-              </Button>
-            </div>
-            }
+            {!isPreviewMode && (
+              <div className="flex items-center gap-2 px-2 ml-auto">
+                <Button
+                  form="myForm"
+                  type="button"
+                  onClick={handleSubmit((data) => {
+                    // save draft -> update status and show UI
+                    // setValue("status", "DRAFT");
+                    onSubmit(data, getValues("status"));
+                  })}
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 border-[#B3E6B3] bg-[#F0F9F0] text-[#008001] hover:bg-[#F0F9F0] hover:text-[#008001]"
+                >
+                  <Save className="w-4 h-4" />
+                  Save Draft
+                </Button>
+                <Button
+                  form="myForm"
+                  type="button"
+                  onClick={handleSubmit((data) => {
+                    // setValue("status", "SUBMIT");
+                    onSubmit(data, "SUBMIT");
+                  })}
+                  size="sm"
+                  className="bg-green-700 hover:bg-green-700 text-white gap-2"
+                >
+                  <Send className="w-4 h-4" />
+                  Submit for Review
+                </Button>
+              </div>
+            )}
           </div>
 
-          <form id="myForm" >
+          <form id="myForm">
             <div className="bg-white  border-gray-200 px-8 py-6  shadow-md">
               <div className="flex items-center justify-between ">
                 <h2 className="text-[20px] font-semibold">Content Editor</h2>
@@ -387,7 +419,7 @@ const EditArticle: React.FC = () => {
 
                   <Badge
                     className={`px-[16px] font-semibold py-[6px] text-[14px] ${HISTORY_STATUS(
-                      getValues("status") || ''
+                      getValues("status") || ""
                     )}`}
                   >
                     <span>{getValues("status")}</span>
@@ -395,7 +427,9 @@ const EditArticle: React.FC = () => {
                 </div>
               </div>
 
-              {getValues("status") === "REVERTED" && <EditorRemarks remarks={remarks} />}
+              {getValues("status") === "REVERTED" && (
+                <EditorRemarks remarks={remarks} />
+              )}
 
               <div className="flex flex-col gap-[24px]">
                 {/* Title */}
@@ -411,7 +445,9 @@ const EditArticle: React.FC = () => {
                     className="bg-[#f7fbf8] border-[#ECECEC] border"
                   />
                   {errors.name && (
-                    <p className="text-sm text-red-500">{errors.title.message}</p>
+                    <p className="text-sm text-red-500">
+                      {errors.title.message}
+                    </p>
                   )}
                 </div>
 
@@ -432,14 +468,19 @@ const EditArticle: React.FC = () => {
                           selectedValue={field.value}
                           placeholder="Write something..."
                           onChange={(val: string) => {
-                            setValue("content", val, { shouldDirty: true, shouldValidate: true });
+                            setValue("content", val, {
+                              shouldDirty: true,
+                              shouldValidate: true,
+                            });
                             field.onChange(val);
                           }}
                         />
                       )}
                     />
                     {errors.content && (
-                      <p className="text-sm text-red-500">{errors.content.message as string}</p>
+                      <p className="text-sm text-red-500">
+                        {errors.content.message as string}
+                      </p>
                     )}
                   </div>
                 )}
@@ -487,16 +528,14 @@ const EditArticle: React.FC = () => {
                           onClick={handleRemoveAudioVal}
                           className="  bg-red-400 flex items-center gap-2 ml-auto mx-8 my-4 w-min text-white text-sm px-3 py-1 rounded-lg shadow"
                         >
-                          <Trash size={12} />    Remove
+                          <Trash size={12} /> Remove
                         </button>
 
                         {typeof audioVal === "string" ? (
                           <div className="py-2 w-full flex flex-col">
-
                             <div>
                               <AudioUrlPlayer src={audioVal} />
                             </div>
-
                           </div>
                         ) : (
                           <div className="p-2 ">
@@ -505,7 +544,6 @@ const EditArticle: React.FC = () => {
                               fileName={audioVal.name}
                             />
                           </div>
-
                         )}
                       </div>
                     )}
@@ -523,8 +561,14 @@ const EditArticle: React.FC = () => {
                           thumbnailUrl={thumbnailVal as string | undefined}
                           onDelete={() => {
                             // reset values when removed
-                            setValue("video", null, { shouldValidate: true, shouldDirty: true });
-                            setValue("thumbnail", null, { shouldValidate: true, shouldDirty: true });
+                            setValue("video", null, {
+                              shouldValidate: true,
+                              shouldDirty: true,
+                            });
+                            setValue("thumbnail", null, {
+                              shouldValidate: true,
+                              shouldDirty: true,
+                            });
                           }}
                         />
                       </div>
@@ -537,11 +581,12 @@ const EditArticle: React.FC = () => {
                       />
                     )}
                     {errors.video && (
-                      <p className="text-sm text-red-500">{errors.video.message as string}</p>
+                      <p className="text-sm text-red-500">
+                        {errors.video.message as string}
+                      </p>
                     )}
                   </>
                 )}
-
 
                 {/* Tags */}
                 <div className="space-y-3">
@@ -565,37 +610,55 @@ const EditArticle: React.FC = () => {
                         }}
                         className="py-[19px] border-[#ECECEC] border bg-[#f7fbf8]"
                       />
-                      {!isPreviewMode && <Button
-                        type="button"
-                        size="sm"
-                        onClick={handleAddTag}
-                        className="absolute top-[6px] right-[12px] bg-[#006601] hover:bg-[#006601] px-[16px] py-[6px] gap-1"
-                      >
-                        <Plus className="w-3 h-3" />
-                        Add
-                      </Button>}
+                      {!isPreviewMode && (
+                        <Button
+                          type="button"
+                          size="sm"
+                          onClick={handleAddTag}
+                          className="absolute top-[6px] right-[12px] bg-[#006601] hover:bg-[#006601] px-[16px] py-[6px] gap-1"
+                        >
+                          <Plus className="w-3 h-3" />
+                          Add
+                        </Button>
+                      )}
                     </div>
                   </div>
 
                   <div className="flex gap-2 flex-wrap">
                     {tags.map((tag: string, index: number) => (
-                      <Badge key={index} variant="secondary" className="gap-2 px-3 py-1 text-[#008001] bg-[#f8faf9] border-[#B3E6B3]">
+                      <Badge
+                        key={index}
+                        variant="secondary"
+                        className="gap-2 px-3 py-1 text-[#008001] bg-[#f8faf9] border-[#B3E6B3]"
+                      >
                         {tag}
-                        {!isPreviewMode && <button type="button" onClick={() => handleRemoveTag(tag)} className="hover:text-red-600">
-                          <X className="w-3 h-3" />
-                        </button>}
+                        {!isPreviewMode && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveTag(tag)}
+                            className="hover:text-red-600"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        )}
                       </Badge>
                     ))}
                   </div>
 
-                  {errors.tags && <p className="text-sm text-red-500">{errors.tags.message as string}</p>}
+                  {errors.tags && (
+                    <p className="text-sm text-red-500">
+                      {errors.tags.message as string}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
           </form>
         </div>
 
-        {submit.isSubmit && submit.type && <SaveDraftsUI saveType={submit.type} onCancel={handleCloseUI} />}
+        {submit.isSubmit && submit.type && (
+          <SaveDraftsUI saveType={submit.type} onCancel={handleCloseUI} />
+        )}
       </header>
     </div>
   );

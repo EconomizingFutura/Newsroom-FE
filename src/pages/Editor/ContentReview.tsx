@@ -1,12 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Calendar,
-  User,
-  ArrowLeft,
-  Clock,
-  Edit,
-} from "lucide-react";
+import { Calendar, User, ArrowLeft, Clock, Edit } from "lucide-react";
 
 interface ContentReviewProps {
   onBack: () => void;
@@ -30,9 +24,7 @@ export function ContentReview({
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="flex">
-        {/* Main Content */}
         <main className="flex-1 p-6">
-          {/* Back Button and Header */}
           <div className="mb-6">
             <Button
               variant="ghost"
@@ -140,10 +132,11 @@ export function ContentReview({
                   <Badge
                     key={index}
                     variant={category.active ? "default" : "outline"}
-                    className={`px-3 py-1 ${category.active
+                    className={`px-3 py-1 ${
+                      category.active
                         ? "bg-green-600 text-white"
                         : "text-gray-600 border-gray-300"
-                      }`}
+                    }`}
                   >
                     Tag {index + 1}
                   </Badge>

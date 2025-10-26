@@ -1,5 +1,11 @@
 import React, { useEffect, useMemo } from "react";
-import { Routes, Route, useNavigate, useLocation, Navigate } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  useNavigate,
+  useLocation,
+  Navigate,
+} from "react-router-dom";
 
 import Dashboard from "@/pages/Reporter/Dashboard";
 import ContentUploader from "@/pages/Reporter/ArticleCreation/ContentUploader";
@@ -37,6 +43,8 @@ const Layout: React.FC = () => {
     "/video": "Video",
     "/login": "Login",
     "/reviewQueue": "Review Queue",
+    "/calendarView": "calendar",
+    "/publishCenter": "Publish Center",
   };
 
   useEffect(() => {
@@ -154,7 +162,7 @@ const Layout: React.FC = () => {
               element={
                 <AuthRoute>
                   {/* <ProtectedRoutes allowedRoles="REPORTER"> */}
-                    <NewsFeedsPage />
+                  <NewsFeedsPage />
                   {/* </ProtectedRoutes> */}
                 </AuthRoute>
               }

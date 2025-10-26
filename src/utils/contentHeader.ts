@@ -7,6 +7,7 @@ import {
   Mic,
   Video,
   BookCheck,
+  Calendar,
 } from "lucide-react";
 export const contentHeader = Object.freeze({
   "Text Article": FileText,
@@ -17,4 +18,5 @@ export const contentHeader = Object.freeze({
   "Publish Center": BookCheck,
   video: Video,
   audio: Mic,
+  Calendar: Calendar,
 });

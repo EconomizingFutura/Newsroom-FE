@@ -1,14 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import ContentHeader from "@/components/ContentHeader";
 import type { contentResponse } from "@/types/apitypes";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useForm, FormProvider, Controller } from "react-hook-form";
-import { useParams, useNavigate } from "react-router";
+import {
+  useParams,
+  useNavigate,
+  useLocation,
+  useSearchParams,
+} from "react-router";
 import Text from "./contents/Text";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { X, Plus } from "lucide-react";
+import { X, Plus, Mic, Upload, Trash } from "lucide-react";
 import SuccessUI from "@/components/SuccessUI";
 import RemarksModal from "@/components/RemarksModal";
 import Loading from "../Shared/agency-feeds/loading";
@@ -18,6 +23,13 @@ import VideoUrlPlayer, {
 } from "../Reporter/ArticleCreation/Components";
 import InfoBadge from "@/components/ui/InfoBatch";
 import { formatToIST } from "@/utils/utils";
+import DeleteConfirmation from "@/components/DeleteConfirmation";
+import { useCancelEvent } from "@/hooks/useCalendarAPI";
+import type { CurrentPageType } from "@/hooks/useCurrentView";
+import AudioPlayer from "@/components/ui/AudioPlayer";
+import ScheduleArticle from "@/components/ScheduleArticle";
+import SaveDraftsUI from "@/components/SaveDraftUI";
+import { SocialMediaPublishCard } from "@/components/TextEditor/SocialMediaPublishCard";
 
 interface ContentForm {
   content: string;
@@ -25,12 +37,33 @@ interface ContentForm {
   category: string;
   tags: string[];
   newTag: string;
+  audio: string | File | null;
+  video: string | File | null;
+  thumbnail: string;
 }
 
 const ViewContent: React.FC = () => {
-  const [enableEdit, setEnableEdit] = useState<boolean>(false);
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+
+  const from = searchParams.get("from") as
+    | CurrentPageType
+    | null
+    | "publishCenter";
+  const state = location.state as {
+    articletype?: string;
+    editable?: boolean;
+  } | null;
+  const isEDit = from == "publishCenter" || false;
+  const [enableEdit, setEnableEdit] = useState<boolean>(isEDit);
+  const [showEnableEdit, setShowEnableEdit] = useState<boolean>(
+    isEDit ? false : state?.editable || false
+  );
   const [contentData, setContentData] = useState<contentResponse | null>(null);
+  const [showEditPopup, setShowEditPopup] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
+  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
+  const [saveDraftPopup, setSaveDraftPopup] = useState(false);
   const [show, setShow] = useState({
     success: false,
     remarks: false,
@@ -39,6 +72,10 @@ const ViewContent: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { getArticleById, isLoading, revertArticle } = useEditorReviewArticle();
+  const { handleCancelAPI } = useCancelEvent();
+  const [showPublishCard, setShowPublishCard] = useState(false);
+  const publishCardRef = useRef<HTMLDivElement>(null);
+  const publishButtonRef = useRef<HTMLButtonElement>(null);
 
   const methods = useForm<ContentForm>({
     mode: "onChange",
@@ -48,18 +85,41 @@ const ViewContent: React.FC = () => {
       category: "",
       tags: [],
       newTag: "",
+      audio: null,
+      video: null,
+      thumbnail: "",
     },
   });
 
-  const { register, control, setValue, getValues, reset } = methods;
+  const { register, control, setValue, getValues, reset, watch } = methods;
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        publishCardRef.current &&
+        !publishCardRef.current.contains(event.target as Node) &&
+        publishButtonRef.current &&
+        !publishButtonRef.current.contains(event.target as Node)
+      ) {
+        setShowPublishCard(false);
+      }
+    };
+
+    if (showPublishCard) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showPublishCard]);
 
   useEffect(() => {
     const fetch = async () => {
       if (id) {
         const data = await getArticleById(id);
         setContentData(data ?? null);
-
-        // Update form values with API data
+        console.log(data);
         if (data) {
           reset({
             content: data.content || "",
@@ -67,6 +127,8 @@ const ViewContent: React.FC = () => {
             category: data.category || "",
             tags: data.tags || [],
             newTag: "",
+            audio: data.audioUrl || null,
+            video: data.videoUrl || null,
           });
         }
       } else {
@@ -135,30 +197,65 @@ const ViewContent: React.FC = () => {
 
   const handleEditToggle = () => {
     setEnableEdit((prev) => !prev);
+    setShowEnableEdit((prev) => !prev);
   };
 
   if (loading) {
     return <Loading />;
   }
 
+  const handleScheduleFromEditor = () => {
+    setScheduleModalOpen((p) => !p);
+  };
+
+  const handleAPI = async () => {
+    handleCancelAPI(id as string);
+    setShowEditPopup((prev) => !prev);
+    handleBack();
+  };
+
+  const audioVal = watch("audio");
+  const videoVal = watch("video");
+
+  const handlePublishNowClick = () => {
+    setShowPublishCard(!showPublishCard);
+  };
+
+  const handlePublishCardClose = () => {
+    setShowPublishCard(false);
+  };
+
+  const handlePublishCardPublish = (selectedPlatforms: string[]) => {
+    // handlePublishNow(story.id, selectedPlatforms);
+    console.log("Publishing to platforms:", selectedPlatforms);
+    setShowPublishCard(false);
+  };
+
+  const handleCancel = () => {
+    setShowEnableEdit((p) => !p);
+    setEnableEdit((p) => !p);
+    reset({
+      audio: contentData?.audioUrl,
+    });
+  };
+
   return (
-    <div className="flex-1 font-openSans py-8 min-h-screen bg-background overflow-auto">
-      <div
-        style={{ paddingTop: "32px" }}
-        className="flex flex-col  px-[24px] bg-[#F6FAF6] h-full"
-      >
+    <div className="flex-1 font-openSans py-8 min-h-screen bg-[#f2f6f2] overflow-auto">
+      <div className="flex flex-col flex-1 min-h-96  px-6 pt-16 overflow-y-auto">
         <ContentHeader
           text="Content Review"
           onClickBack={handleBack}
           showBackButton
-          showEdit={enableEdit}
+          showEdit={showEnableEdit}
           handleEdit={handleEditToggle}
+          showCancelSchedule={showEnableEdit}
+          handleEditPopup={() => setShowEditPopup((p) => !p)}
         />
 
         <FormProvider {...methods}>
           <form
             onSubmit={methods.handleSubmit(onSubmit)}
-            className="flex flex-col flex-grow p-4 sm:p-6 bg-white rounded-lg shadow-md space-y-6"
+            className="flex flex-col p-4 sm:p-6 bg-white rounded-lg shadow-md space-y-6"
           >
             {contentData?.type === "TEXT" && (
               <Text
@@ -168,33 +265,13 @@ const ViewContent: React.FC = () => {
               />
             )}
 
-            {/* {contentData?.type === "VIDEO" && (
-              <div className="flex-1 flex flex-col p-8 bg-white rounded-lg shadow-sm">
-                <h3 className="text-lg font-medium mb-4">Video Content</h3>
-                {contentData.videoUrl ? (
-                  <video
-                    controls
-                    className="w-full max-w-2xl mx-auto rounded-lg"
-                  >
-                    <source src={contentData.videoUrl} type="video/mp4" />
-                    Your browser does not support the video tag.
-                  </video>
-                ) : (
-                  <div className="text-center text-gray-500 py-8">
-                    <div className="text-4xl mb-4">🎬</div>
-                    <p>No video content available</p>
-                  </div>
-                )}
-              </div>
-            )} */}
-
             {contentData?.type === "VIDEO" && (
               <>
                 <div>
                   <h1 className="text-[#101828] font-bold text-2xl">
                     {contentData?.title || ""}
                   </h1>
-                  <div className="flex items-center my-2 gap-1 ">
+                  <div className="flex items-center my-2 gap-1">
                     <InfoBadge
                       type="date"
                       value={formatToIST(contentData?.updatedAt)}
@@ -205,33 +282,147 @@ const ViewContent: React.FC = () => {
                     />
                   </div>
                 </div>
-                <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl p-4 sm:p-6 bg-[#FAFFFA] shadow-sm">
-                  <div className="rounded-xl overflow-hidden border border-[#D3F0D3] bg-white max-w-4xl mx-auto aspect-video">
-                    <VideoUrlPlayer
-                      videoUrl={contentData.videoUrl}
-                      thumbnailUrl={contentData.thumbnailUrl as string | undefined}
-                    />
-                  </div>
-                </div>
-              </>
-            )}
 
-            {/* {contentData?.type === "AUDIO" && (
-              <div className="flex-1 flex flex-col p-8 bg-white rounded-lg shadow-sm">
-                <h3 className="text-lg font-medium mb-4">Audio Content</h3>
-                {contentData.audioUrl ? (
-                  <audio controls className="w-full max-w-2xl mx-auto">
-                    <source src={contentData.audioUrl} type="audio/mpeg" />
-                    Your browser does not support the audio tag.
-                  </audio>
-                ) : (
-                  <div className="text-center text-gray-500 py-8">
-                    <div className="text-4xl mb-4">🎵</div>
-                    <p>No audio content available</p>
+                {contentData?.type === "VIDEO" && (
+                  <>
+                    <div>
+                      <h1 className="text-[#101828] font-bold text-2xl">
+                        {contentData?.title || ""}
+                      </h1>
+                      <div className="flex items-center my-2 gap-1">
+                        <InfoBadge
+                          type="date"
+                          value={formatToIST(contentData?.updatedAt)}
+                        />
+                        <InfoBadge
+                          type="user"
+                          value={contentData?.reporter.username}
+                        />
+                      </div>
+                    </div>
+
+                    {/* ✅ Upload box (no video yet) */}
+                    {(!watch("video") || watch("video") === null) && (
+                      <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl p-10 text-center bg-[#FAFFFA]">
+                        <div className="mx-auto w-16 h-16 rounded-full bg-purple-100 text-[#a32fff] flex items-center justify-center">
+                          🎬
+                        </div>
+
+                        <p className="mt-6 font-medium">Upload video file</p>
+                        <p className="text-sm text-gray-500 mt-1">
+                          Supports MP4, MOV, AVI (Max 500MB)
+                        </p>
+
+                        <label
+                          htmlFor="video-upload"
+                          className="inline-flex items-center gap-2 mt-6 bg-green-100 text-green-800 px-4 py-2 rounded-xl cursor-pointer hover:bg-green-200 transition"
+                        >
+                          <Upload className="h-4 w-4" />
+                          <span>Choose File</span>
+                        </label>
+
+                        <input
+                          id="video-upload"
+                          type="file"
+                          accept="video/mp4,video/mov,video/avi"
+                          hidden
+                          onChange={(e) => {
+                            const file = e.target.files?.[0] || null;
+                            setValue("video", file, {
+                              shouldValidate: true,
+                              shouldDirty: true,
+                            });
+                          }}
+                        />
+
+                        {methods.formState.errors.video && (
+                          <p className="text-sm text-red-500 mt-2">
+                            {methods.formState.errors.video.message as string}
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* ✅ If video exists */}
+                    {watch("video") && (
+                      <div className="border-2 w-full border-dashed border-[#B2E6B3] rounded-2xl text-end">
+                        {enableEdit && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setValue("video", null, { shouldDirty: true })
+                            }
+                            className="bg-red-400 flex items-center gap-2 ml-auto mx-8 my-4 w-min text-white text-sm px-3 py-1 rounded-lg shadow hover:bg-red-500 transition"
+                          >
+                            <Trash size={12} /> Remove
+                          </button>
+                        )}
+
+                        {typeof watch("video") === "string" ? (
+                          // ✅ From API
+                          <div className="py-2 w-full flex flex-col">
+                            <VideoUrlPlayer
+                              videoUrl={watch("video") as string}
+                              thumbnailUrl={
+                                contentData?.thumbnailUrl as string | undefined
+                              }
+                            />
+                          </div>
+                        ) : (
+                          // ✅ From local upload
+                          <div className="p-4 flex justify-center">
+                            <video
+                              src={URL.createObjectURL(watch("video") as File)}
+                              controls
+                              className="w-full max-w-3xl rounded-lg shadow"
+                            >
+                              Your browser does not support the video tag.
+                            </video>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {watch("video") && (
+                  <div className="border-2 w-full border-dashed border-[#B2E6B3] rounded-2xl text-end">
+                    {enableEdit && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setValue("video", null, { shouldDirty: true })
+                        }
+                        className="bg-red-400 flex items-center gap-2 ml-auto mx-8 my-4 w-min text-white text-sm px-3 py-1 rounded-lg shadow hover:bg-red-500 transition"
+                      >
+                        <Trash size={12} /> Remove
+                      </button>
+                    )}
+
+                    {typeof watch("video") === "string" ? (
+                      <div className="py-2 w-full flex flex-col">
+                        <VideoUrlPlayer
+                          videoUrl={videoVal}
+                          thumbnailUrl={
+                            contentData?.thumbnailUrl as string | undefined
+                          }
+                        />
+                      </div>
+                    ) : (
+                      <div className="p-4 flex justify-center">
+                        <video
+                          src={URL.createObjectURL(watch("video") as File)}
+                          controls
+                          className="w-full max-w-3xl rounded-lg shadow"
+                        >
+                          Your browser does not support the video tag.
+                        </video>
+                      </div>
+                    )}
                   </div>
                 )}
-              </div>
-            )} */}
+              </>
+            )}
 
             {contentData?.type === "AUDIO" && (
               <>
@@ -239,7 +430,7 @@ const ViewContent: React.FC = () => {
                   <h1 className="text-[#101828] font-bold text-2xl">
                     {contentData?.title || ""}
                   </h1>
-                  <div className="flex items-center my-2 gap-1 ">
+                  <div className="flex items-center my-2 gap-1">
                     <InfoBadge
                       type="date"
                       value={formatToIST(contentData?.updatedAt)}
@@ -250,9 +441,76 @@ const ViewContent: React.FC = () => {
                     />
                   </div>
                 </div>
-                <div className="w-full max-w-3xl mx-auto rounded-lg border-2 border-dashed border-green-300 p-4">
-                  <AudioUrlPlayer src={contentData.audioUrl} />
-                </div>
+
+                {(!audioVal || audioVal === null) && (
+                  <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl p-10 text-center bg-[#FAFFFA]">
+                    <div className="mx-auto w-16 h-16 rounded-full bg-purple-100 text-[#a32fff] flex items-center justify-center">
+                      <Mic className="h-6 w-6" />
+                    </div>
+
+                    <p className="mt-6 font-medium">Upload audio file</p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Supports MP3, WAV, M4A (Max 100MB)
+                    </p>
+
+                    <label
+                      htmlFor="audio-upload"
+                      className="inline-flex items-center gap-2 mt-6 bg-green-100 text-green-800 px-4 py-2 rounded-xl cursor-pointer hover:bg-green-200 transition"
+                    >
+                      <Upload className="h-4 w-4" />
+                      <span>Choose File</span>
+                    </label>
+
+                    <input
+                      id="audio-upload"
+                      type="file"
+                      accept=".mp3,.wav,.m4a"
+                      hidden
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] || null;
+                        setValue("audio", file, {
+                          shouldValidate: true,
+                          shouldDirty: true,
+                        });
+                      }}
+                    />
+
+                    {methods.formState.errors.audio && (
+                      <p className="text-sm text-red-500 mt-2">
+                        {methods.formState.errors.audio.message as string}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {audioVal && (
+                  <div className="border-2 w-full border-dashed border-[#B2E6B3] rounded-2xl text-end">
+                    {enableEdit && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setValue("audio", null, { shouldDirty: true })
+                        }
+                        className="bg-red-400 flex items-center gap-2 ml-auto mx-8 my-4 w-min text-white text-sm px-3 py-1 rounded-lg shadow hover:bg-red-500 transition"
+                      >
+                        <Trash size={12} /> Remove
+                      </button>
+                    )}
+
+                    {typeof audioVal === "string" ? (
+                      <div className="py-2 w-full flex flex-col">
+                        <AudioUrlPlayer src={audioVal} />
+                      </div>
+                    ) : (
+                      <div className="p-2">
+                        <AudioPlayer
+                          src={URL.createObjectURL(audioVal)}
+                          fileName={audioVal?.name}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
               </>
             )}
 
@@ -324,25 +582,26 @@ const ViewContent: React.FC = () => {
           </form>
         </FormProvider>
       </div>
-      {
-        enableEdit ? (
-          <div className="flex flex-wrap justify-end gap-3 mx-4 mt-6">
-            <Button
-              type="button"
-              variant="outline"
-              className="text-[14px] w-28 font-semibold"
-              onClick={() => setEnableEdit(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              className="bg-[#006601] text-[14px] w-28 font-semibold hover:bg-[#005001]"
-            >
-              Update
-            </Button>
-          </div>
-        ) : (
+      {!isEDit && enableEdit ? (
+        <div className="flex flex-wrap justify-end gap-3 mx-4 mt-6">
+          <Button
+            type="button"
+            variant="outline"
+            className="text-[14px] w-28 font-semibold"
+            onClick={handleCancel}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            className="bg-[#006601] text-[14px] w-28 font-semibold hover:bg-[#005001]"
+          >
+            Update
+          </Button>
+        </div>
+      ) : (
+        from !== "calendar" &&
+        from !== "publishCenter" && (
           <div className="flex flex-wrap justify-end gap-3 mx-4 mt-6">
             <Button
               variant="outline"
@@ -352,29 +611,89 @@ const ViewContent: React.FC = () => {
               Reverted
             </Button>
             <Button
-              onClick={() => contentData && handleMoveToPublish(contentData?.id)}
+              onClick={() =>
+                contentData && handleMoveToPublish(contentData?.id)
+              }
               className="bg-[#008001] font-semibold hover:bg-[#008001] text-white"
             >
-              Approve & Move to publish{" "}
+              Approve & Move to publish
             </Button>
           </div>
         )
-      }
+      )}
 
-      {
-        show.success && (
-          <SuccessUI
-            onCancel={toggleSuccess}
-            label={"Article Approved and Moved to Publish Successfully!"}
+      {isEDit && (
+        <div className="flex flex-wrap justify-end gap-3 mx-4 mt-6">
+          <Button
+            type="submit"
+            variant="outline"
+            className="text-[14px] w-28 font-semibold text-[#006601]"
+          >
+            Update
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="text-[14px] w-28 font-semibold text-[#006601]"
+            onClick={() => setScheduleModalOpen((p) => !p)}
+          >
+            Schedule
+          </Button>
+          <Button
+            type="button"
+            onClick={handlePublishNowClick}
+            className="bg-[#006601] text-[14px] w-28 font-semibold hover:bg-[#005001]"
+          >
+            Publish Now
+          </Button>
+        </div>
+      )}
+
+      {scheduleModalOpen && (
+        <ScheduleArticle
+          onCancel={() => setScheduleModalOpen(false)}
+          handlePublish={handleScheduleFromEditor}
+        />
+      )}
+
+      {showPublishCard && (
+        <div
+          ref={publishCardRef}
+          className="absolute bottom-28 right-12 mb-2 !z-100"
+        >
+          <SocialMediaPublishCard
+            isOpen={showPublishCard}
+            onClose={handlePublishCardClose}
+            onPublish={handlePublishCardPublish}
           />
-        )
-      }
-      {
-        show.remarks && (
-          <RemarksModal onCancel={toggleRemarks} onConfirm={handleRevert} />
-        )
-      }
-    </div >
+        </div>
+      )}
+
+      {saveDraftPopup && (
+        <SaveDraftsUI
+          saveType={"PUBLISHED"}
+          onCancel={() => setSaveDraftPopup((p) => !p)}
+        />
+      )}
+
+      {show.success && (
+        <SuccessUI
+          onCancel={toggleSuccess}
+          label={"Article Approved and Moved to Publish Successfully!"}
+        />
+      )}
+      {show.remarks && (
+        <RemarksModal onCancel={toggleRemarks} onConfirm={handleRevert} />
+      )}
+      {showEditPopup && (
+        <DeleteConfirmation
+          onCancel={() => {
+            setShowEditPopup((prev) => !prev);
+          }}
+          onConfirm={handleAPI}
+        />
+      )}
+    </div>
   );
 };
 
