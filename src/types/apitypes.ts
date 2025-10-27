@@ -79,9 +79,9 @@ export type scheduledPostsResponse = {
   success: boolean;
   data: {
     articles: scheduledPost[];
+    pagination: PaginationTypes;
   };
   status: number;
-  pagination: PaginationTypes;
 };
 
 export interface PublishCenterArticle {
