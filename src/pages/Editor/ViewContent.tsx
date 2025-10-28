@@ -30,6 +30,9 @@ import AudioPlayer from "@/components/ui/AudioPlayer";
 import ScheduleArticle from "@/components/ScheduleArticle";
 import SaveDraftsUI from "@/components/SaveDraftUI";
 import { SocialMediaPublishCard } from "@/components/TextEditor/SocialMediaPublishCard";
+import { PATCH } from "@/api/apiMethods";
+import { API_LIST } from "@/api/endpoints";
+import { InputLabel } from "@/components/ui/form";
 
 interface ContentForm {
   content: string;
@@ -76,6 +79,7 @@ const ViewContent: React.FC = () => {
   const [showPublishCard, setShowPublishCard] = useState(false);
   const publishCardRef = useRef<HTMLDivElement>(null);
   const publishButtonRef = useRef<HTMLButtonElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const methods = useForm<ContentForm>({
     mode: "onChange",
@@ -91,7 +95,15 @@ const ViewContent: React.FC = () => {
     },
   });
 
-  const { register, control, setValue, getValues, reset, watch } = methods;
+  const {
+    register,
+    control,
+    setValue,
+    getValues,
+    reset,
+    watch,
+    formState: { errors },
+  } = methods;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -113,29 +125,29 @@ const ViewContent: React.FC = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showPublishCard]);
+  const fetch = async () => {
+    if (id) {
+      const data = await getArticleById(id);
+      setContentData(data ?? null);
+      console.log(data);
+      if (data) {
+        reset({
+          content: data.content || "",
+          title: data.title || "",
+          category: data.category || "",
+          tags: data.tags || [],
+          newTag: "",
+          audio: data.audioUrl || null,
+          video: data.videoUrl || null,
+        });
+      }
+    } else {
+      setContentData(null);
+    }
+    setLoading(isLoading);
+  };
 
   useEffect(() => {
-    const fetch = async () => {
-      if (id) {
-        const data = await getArticleById(id);
-        setContentData(data ?? null);
-        console.log(data);
-        if (data) {
-          reset({
-            content: data.content || "",
-            title: data.title || "",
-            category: data.category || "",
-            tags: data.tags || [],
-            newTag: "",
-            audio: data.audioUrl || null,
-            video: data.videoUrl || null,
-          });
-        }
-      } else {
-        setContentData(null);
-      }
-      setLoading(isLoading);
-    };
     fetch();
   }, [id, reset]);
 
@@ -158,9 +170,14 @@ const ViewContent: React.FC = () => {
     );
   };
 
-  const onSubmit = (data: ContentForm) => {
+  const onSubmit = async (data: ContentForm) => {
     console.log("Form submitted:", data);
-    setEnableEdit(false);
+    const URL = API_LIST.BASE_URL + API_LIST.EDITOR_EDIT_ARTICLE + id;
+    const apidata = await PATCH(URL, data);
+    console.log(apidata);
+    await fetch();
+    setShowEnableEdit((p) => !p);
+    setEnableEdit((p) => !p);
   };
 
   const handleBack = () => {
@@ -234,10 +251,15 @@ const ViewContent: React.FC = () => {
   const handleCancel = () => {
     setShowEnableEdit((p) => !p);
     setEnableEdit((p) => !p);
-    reset({
-      audio: contentData?.audioUrl,
-    });
+    // if (contentData?.type == "AUDIO") {
+    //   reset({
+    //     audio: contentData?.audioUrl,
+    //   });
+    // }
+    reset(getValues());
   };
+
+  console.log(contentData);
 
   return (
     <div className="flex-1 font-openSans py-8 min-h-screen bg-[#f2f6f2] overflow-auto">
@@ -254,8 +276,9 @@ const ViewContent: React.FC = () => {
 
         <FormProvider {...methods}>
           <form
+            ref={formRef}
             onSubmit={methods.handleSubmit(onSubmit)}
-            className="flex flex-col p-4 sm:p-6 bg-white rounded-lg shadow-md space-y-6"
+            className="flex flex-col p-4 sm:p-6 mb-2 bg-white rounded-lg shadow-md space-y-6"
           >
             {contentData?.type === "TEXT" && (
               <Text
@@ -268,9 +291,11 @@ const ViewContent: React.FC = () => {
             {contentData?.type === "VIDEO" && (
               <>
                 <div>
-                  <h1 className="text-[#101828] font-bold text-2xl">
-                    {contentData?.title || ""}
-                  </h1>
+                  <Text
+                    content={contentData}
+                    enableEdit={enableEdit}
+                    readOnly={!enableEdit}
+                  />
                   <div className="flex items-center my-2 gap-1">
                     <InfoBadge
                       type="date"
@@ -286,19 +311,48 @@ const ViewContent: React.FC = () => {
                 {contentData?.type === "VIDEO" && (
                   <>
                     <div>
-                      <h1 className="text-[#101828] font-bold text-2xl">
-                        {contentData?.title || ""}
-                      </h1>
-                      <div className="flex items-center my-2 gap-1">
-                        <InfoBadge
-                          type="date"
-                          value={formatToIST(contentData?.updatedAt)}
-                        />
-                        <InfoBadge
-                          type="user"
-                          value={contentData?.reporter.username}
-                        />
-                      </div>
+                      {!enableEdit ? (
+                        <div className="space-y-2">
+                          <Controller
+                            name="title"
+                            control={control}
+                            rules={{ required: "Title is required" }}
+                            render={({ field }) => (
+                              <div className="space-y-2">
+                                <InputLabel label="Title" required />
+                                <Input
+                                  {...field}
+                                  placeholder="Enter title"
+                                  className="bg-[#f7fbf8] h-10 border-[#ECECEC] border"
+                                  disabled={!enableEdit}
+                                />
+
+                                {errors.title && (
+                                  <p className="text-red-500 text-xs mt-1">
+                                    {errors.title.message as string}
+                                  </p>
+                                )}
+                              </div>
+                            )}
+                          />
+                        </div>
+                      ) : (
+                        <div>
+                          <h1 className="text-[#101828] font-bold text-2xl">
+                            {contentData?.title || ""}
+                          </h1>
+                          <div className="flex items-center my-2 gap-1">
+                            <InfoBadge
+                              type="date"
+                              value={formatToIST(contentData?.updatedAt)}
+                            />
+                            <InfoBadge
+                              type="user"
+                              value={contentData?.reporter.username}
+                            />
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     {/* ✅ Upload box (no video yet) */}
@@ -426,21 +480,46 @@ const ViewContent: React.FC = () => {
 
             {contentData?.type === "AUDIO" && (
               <>
-                <div>
-                  <h1 className="text-[#101828] font-bold text-2xl">
-                    {contentData?.title || ""}
-                  </h1>
-                  <div className="flex items-center my-2 gap-1">
-                    <InfoBadge
-                      type="date"
-                      value={formatToIST(contentData?.updatedAt)}
-                    />
-                    <InfoBadge
-                      type="user"
-                      value={contentData?.reporter.username}
+                {enableEdit ? (
+                  <div className="space-y-2">
+                    <Controller
+                      name="title"
+                      control={control}
+                      rules={{ required: "Title is required" }}
+                      render={({ field }) => (
+                        <>
+                          <InputLabel label="Title" required />
+                          <Input
+                            {...field}
+                            placeholder="Enter title"
+                            className="bg-[#f7fbf8] h-10 border-[#ECECEC] border"
+                          />
+                          {errors.title && (
+                            <p className="text-red-500 text-xs mt-1">
+                              {errors.title.message}
+                            </p>
+                          )}
+                        </>
+                      )}
                     />
                   </div>
-                </div>
+                ) : (
+                  <div>
+                    <h1 className="text-[#101828] font-bold text-2xl">
+                      {contentData?.title || ""}
+                    </h1>
+                    <div className="flex items-center my-2 gap-1">
+                      <InfoBadge
+                        type="date"
+                        value={formatToIST(contentData?.updatedAt)}
+                      />
+                      <InfoBadge
+                        type="user"
+                        value={contentData?.reporter.username}
+                      />
+                    </div>
+                  </div>
+                )}
 
                 {(!audioVal || audioVal === null) && (
                   <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl p-10 text-center bg-[#FAFFFA]">
@@ -595,6 +674,9 @@ const ViewContent: React.FC = () => {
           <Button
             type="submit"
             className="bg-[#006601] text-[14px] w-28 font-semibold hover:bg-[#005001]"
+            onClick={() => {
+              formRef.current?.requestSubmit();
+            }}
           >
             Update
           </Button>
@@ -626,15 +708,21 @@ const ViewContent: React.FC = () => {
         <div className="flex flex-wrap justify-end gap-3 mx-4 mt-6">
           <Button
             type="submit"
+            onClick={() => {
+              formRef.current?.requestSubmit();
+              if (from == "publishCenter") {
+                navigate(-1);
+              }
+            }}
             variant="outline"
-            className="text-[14px] w-28 font-semibold text-[#006601]"
+            className="text-[14px] hover:bg-[#fff] hover:text-[#006601]  !w-28 font-semibold text-[#006601]"
           >
             Update
           </Button>
           <Button
             type="button"
             variant="outline"
-            className="text-[14px] w-28 font-semibold text-[#006601]"
+            className="text-[14px] hover:bg-[#fff] hover:text-[#006601]  !w-28 font-semibold text-[#006601]"
             onClick={() => setScheduleModalOpen((p) => !p)}
           >
             Schedule

@@ -17,4 +17,5 @@ export const API_LIST = Object.freeze({
   SCHEDULED_POST: import.meta.env.VITE_SCHEDULE_POST,
   CALENDAR_EVENTS: import.meta.env.VITE_CALENDAR_DATA,
   CANCEL_SCHEDULED_POST: import.meta.env.VITE_CANCEL_SCHEDULED_POST,
+  EDITOR_EDIT_ARTICLE: import.meta.env.VITE_EDITOR_EDIT_ARTICLE,
 });

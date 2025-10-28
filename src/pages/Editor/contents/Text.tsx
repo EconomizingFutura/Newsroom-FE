@@ -44,13 +44,26 @@ const Text: React.FC<TextProps> = ({
     <div className="flex-1 flex flex-col">
       {!readOnly && (
         <div className="space-y-2">
-          <InputLabel label={"Text"} required />
-          <Input
-            // disabled={isPreviewMode}
-            // {...register("name")}
-            value={content?.title || ""}
-            placeholder="Name"
-            className="bg-[#f7fbf8] h-10 border-[#ECECEC] border"
+          <Controller
+            name="title"
+            control={control}
+            rules={{ required: "Title is required" }}
+            render={({ field }) => (
+              <div className="space-y-2">
+                <InputLabel label={"Text"} required />
+                <Input
+                  {...field}
+                  placeholder="Title"
+                  className="bg-[#f7fbf8] h-10 border-[#ECECEC] border"
+                />
+
+                {errors.title && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.title.message as string}
+                  </p>
+                )}
+              </div>
+            )}
           />
         </div>
       )}
