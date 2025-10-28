@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { BookOpen, Search } from "lucide-react";
 import ContentHeader from "@/components/ContentHeader";
@@ -20,6 +20,7 @@ import DeleteConfirmation from "@/components/DeleteConfirmation";
 import type { AxiosError } from "axios";
 import { useCancelEvent } from "@/hooks/useCalendarAPI";
 import { useNavigate } from "react-router";
+import { throttle } from "lodash";
 
 const FILTER_TABS = [
   "Politics",
@@ -89,7 +90,8 @@ export function PublishCenter() {
     page: number,
     size: number,
     articleType: string,
-    category: string
+    category: string,
+    searchQuery: string
   ): Promise<scheduledPostsResponse> => {
     const url = API_LIST.BASE_URL + API_LIST.PUBLISH_CENTER;
     return await POST<scheduledPostsResponse>(url, {
@@ -97,37 +99,45 @@ export function PublishCenter() {
       pageSize: size,
       articleType,
       category,
+      searchQuery,
     });
   };
 
-  const getDraftArticle = async () => {
-    try {
-      const response = await getPublishCenterData(
-        currentPage,
-        pageSize,
-        state.activeTab.toUpperCase(),
-        state.activeFilterTab
-      );
+  const getDraftArticle = useCallback(
+    async (searchTerm = state.searchQuery) => {
+      try {
+        const response = await getPublishCenterData(
+          currentPage,
+          pageSize,
+          state.activeTab.toUpperCase(),
+          state.activeFilterTab,
+          searchTerm
+        );
 
-      setData(response?.data?.articles ?? []);
-      console.log(response.data);
-      const pagination = response.data?.pagination ?? {};
-      setPageMetaData((prev) => ({
-        ...prev,
-        total: Number(pagination.total ?? 0),
-        page: Number(pagination.page ?? prev.page),
-        pageSize,
-        totalPages: Number(pagination.totalPages ?? prev.totalPages),
-        hasNextPage: Boolean(pagination.hasNextPage),
-        hasPrevPage: Boolean(pagination.hasPrevPage),
-      }));
-    } catch (error) {
-      const err = error as AxiosError;
-      if (err.name !== "AbortError") {
+        setData(response?.data?.articles ?? []);
+        const pagination = response.data?.pagination ?? {};
+
+        setPageMetaData((prev) => ({
+          ...prev,
+          total: Number(pagination.total ?? 0),
+          page: Number(pagination.page ?? prev.page),
+          pageSize,
+          totalPages: Number(pagination.totalPages ?? prev.totalPages),
+          hasNextPage: Boolean(pagination.hasNextPage),
+          hasPrevPage: Boolean(pagination.hasPrevPage),
+        }));
+      } catch (error) {
         console.error("Error fetching posts:", error);
       }
-    }
-  };
+    },
+    [
+      currentPage,
+      pageSize,
+      state.activeTab,
+      state.activeFilterTab,
+      state.searchQuery,
+    ]
+  );
   useEffect(() => {
     getDraftArticle();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -139,6 +149,19 @@ export function PublishCenter() {
     state.activeTab,
     currentPage,
   ]);
+
+  const throttledSearch = useMemo(
+    () =>
+      throttle(
+        (term: string) => {
+          setCurrentPage(1);
+          getDraftArticle(term);
+        },
+        1000,
+        { trailing: true }
+      ),
+    [getDraftArticle, setCurrentPage]
+  );
 
   const handlePublishNow = async (storyId: string, platforms: string[]) => {
     const controller = new AbortController();
@@ -272,9 +295,18 @@ export function PublishCenter() {
               <Input
                 placeholder="Search..."
                 value={state.searchQuery}
-                onChange={(e) =>
-                  setState((prev) => ({ ...prev, searchQuery: e.target.value }))
-                }
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setState((prev) => ({ ...prev, searchQuery: value }));
+
+                  if (value.trim() === "") {
+                    throttledSearch.cancel();
+                    setCurrentPage(1);
+                    getDraftArticle("");
+                  } else {
+                    throttledSearch(value);
+                  }
+                }}
                 className="pl-10"
               />
             </div>
