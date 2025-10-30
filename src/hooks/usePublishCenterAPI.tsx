@@ -1,56 +1,93 @@
+import { useState, useCallback, useRef, useEffect } from "react";
 import { POST } from "@/api/apiMethods";
 import { API_LIST } from "@/api/endpoints";
 import { AxiosError } from "axios";
-import { useState, useCallback, useRef, useEffect } from "react";
 
-interface UseSchedulePostProps {
+interface UsePublishCenterAPIProps {
   refreshDrafts?: () => void;
 }
 
 export function usePublishCenterAPI({
   refreshDrafts,
-}: UseSchedulePostProps = {}) {
+}: UsePublishCenterAPIProps = {}) {
   const [loading, setLoading] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const url = `${API_LIST.BASE_URL}${API_LIST.SCHEDULED_POST}`;
 
   const schedulePostAPI = useCallback(
     async (id: string, platforms: string[], time: string, date: string) => {
-      if (!id) return;
+      if (!id) {
+        console.warn("❌ Missing 'id' for scheduling post");
+        return;
+      }
 
+      // Abort any existing request before starting a new one
+      abortControllerRef.current?.abort();
       const controller = new AbortController();
       abortControllerRef.current = controller;
 
       try {
         setLoading(true);
 
-        const url = API_LIST.BASE_URL + API_LIST.SCHEDULED_POST;
-
         await POST(
           url,
-          {
-            id,
-            date,
-            time,
-            platforms,
-          },
+          { id, date, time, platforms },
           { signal: controller.signal }
         );
 
         refreshDrafts?.();
-
         console.log("✅ Story scheduled successfully!");
-      } catch (err: unknown) {
-        const error = err as AxiosError;
-        if (error.name === "AbortError") {
-          console.warn("Request aborted");
+      } catch (err) {
+        if (err instanceof AxiosError) {
+          if (err.name === "CanceledError" || err.name === "AbortError") {
+            console.warn("⚠️ Request aborted");
+          } else {
+            console.error(
+              "❌ Axios error scheduling story:",
+              err.response?.data || err.message
+            );
+          }
         } else {
-          console.error("Error scheduling story:", err);
+          console.error("❌ Unexpected error scheduling story:", err);
         }
       } finally {
         setLoading(false);
       }
     },
-    [refreshDrafts]
+    [url, refreshDrafts]
+  );
+
+  const editSchedulePostAPI = useCallback(
+    async (id: string, platforms: string[], time: string, date: string) => {
+      if (!id) {
+        return;
+      }
+
+      abortControllerRef.current?.abort();
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+
+      try {
+        setLoading(true);
+
+        await POST(
+          url,
+          { id, date, time, platforms },
+          { signal: controller.signal }
+        );
+
+        refreshDrafts?.();
+      } catch (err) {
+        if (err instanceof AxiosError) {
+          console.error(err.response?.data || err.message);
+        } else {
+          console.error(err);
+        }
+      } finally {
+        setLoading(false);
+      }
+    },
+    [url, refreshDrafts]
   );
 
   useEffect(() => {
@@ -59,5 +96,5 @@ export function usePublishCenterAPI({
     };
   }, []);
 
-  return { schedulePostAPI, loading };
+  return { schedulePostAPI, editSchedulePostAPI, loading };
 }

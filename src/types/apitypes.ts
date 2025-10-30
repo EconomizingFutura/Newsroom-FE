@@ -18,6 +18,9 @@ export type contentResponse = {
   createdAt: string;
   updatedAt: string;
   reporterId: string;
+  scheduledDate: Date | null;
+  scheduledTime: string | null;
+  scheduledPlatforms: string[];
   reporter: {
     id: string;
     username: string;

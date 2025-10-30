@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { BookOpen, Search } from "lucide-react";
 import ContentHeader from "@/components/ContentHeader";
 import ScheduleArticle from "@/components/ScheduleArticle";
-import { POST } from "@/api/apiMethods";
+import { POST, PUT } from "@/api/apiMethods";
 import { API_LIST } from "@/api/endpoints";
 import type {
   PaginationTypes,
@@ -68,8 +68,6 @@ export function PublishCenter() {
     totalPages: 1,
     initialPageSize: 10,
   });
-
-  console.log(pageMetaData);
 
   const handlePageSize = (val: string) => {
     const size = Number(val.split(" ")[0]);
@@ -212,22 +210,37 @@ export function PublishCenter() {
   const handlePublish = async (
     platforms: string[],
     time: string,
-    date: string
+    date: string,
+    isEdit: boolean
   ) => {
     const controller = new AbortController();
     try {
       setLoading(true);
       const url = API_LIST.BASE_URL + API_LIST.SCHEDULED_POST;
-      await POST(
-        url,
-        {
-          id: state.cancelPopId,
-          date: date,
-          time: time,
-          platforms,
-        },
-        { signal: controller.signal }
-      );
+      if (isEdit) {
+        await PUT(
+          url,
+          {
+            id: state.cancelPopId,
+            date: date,
+            time: time,
+            platforms,
+          },
+          { signal: controller.signal }
+        );
+      } else {
+        await POST(
+          url,
+          {
+            id: state.cancelPopId,
+            date: date,
+            time: time,
+            platforms,
+          },
+          { signal: controller.signal }
+        );
+      }
+
       getDraftArticle();
 
       console.log("Story scheduled successfully!");
@@ -259,7 +272,6 @@ export function PublishCenter() {
   if (loading) return <Loading />;
 
   const showPagination = Number(pageMetaData.totalPages) >= 1;
-  console.log(showPagination, pageMetaData);
 
   return (
     <div className="min-h-screen flex flex-col pt-16 bg-[#F6FAF6]">

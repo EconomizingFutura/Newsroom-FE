@@ -30,9 +30,11 @@ import AudioPlayer from "@/components/ui/AudioPlayer";
 import ScheduleArticle from "@/components/ScheduleArticle";
 import SaveDraftsUI from "@/components/SaveDraftUI";
 import { SocialMediaPublishCard } from "@/components/TextEditor/SocialMediaPublishCard";
-import { PATCH } from "@/api/apiMethods";
+import { PATCH, POST, PUT } from "@/api/apiMethods";
 import { API_LIST } from "@/api/endpoints";
 import { InputLabel } from "@/components/ui/form";
+import { toast, Toaster } from "sonner";
+import type { AxiosError } from "axios";
 
 interface ContentForm {
   content: string;
@@ -102,7 +104,7 @@ const ViewContent: React.FC = () => {
     getValues,
     reset,
     watch,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = methods;
 
   useEffect(() => {
@@ -171,6 +173,28 @@ const ViewContent: React.FC = () => {
   };
 
   const onSubmit = async (data: ContentForm) => {
+    const currentValues = methods.getValues();
+    const defaultValues = methods.formState.defaultValues;
+
+    const hasChanges = Object.keys(currentValues).some((key) => {
+      const cur = currentValues[key as keyof ContentForm];
+      const def = defaultValues?.[key as keyof ContentForm];
+      if (Array.isArray(cur) && Array.isArray(def)) {
+        return JSON.stringify(cur) !== JSON.stringify(def);
+      }
+      if (cur instanceof File || def instanceof File) {
+        return cur !== def;
+      }
+      return cur !== def;
+    });
+
+    if (!hasChanges) {
+      toast.warning("No changes detected", {
+        description: "You haven’t modified any fields.",
+      });
+      return;
+    }
+
     console.log("Form submitted:", data);
     const URL = API_LIST.BASE_URL + API_LIST.EDITOR_EDIT_ARTICLE + id;
     const apidata = await PATCH(URL, data);
@@ -179,6 +203,8 @@ const ViewContent: React.FC = () => {
     setShowEnableEdit((p) => !p);
     setEnableEdit((p) => !p);
   };
+
+  // const handleEdit = async();
 
   const handleBack = () => {
     navigate(-1);
@@ -221,9 +247,10 @@ const ViewContent: React.FC = () => {
     return <Loading />;
   }
 
-  const handleScheduleFromEditor = () => {
-    setScheduleModalOpen((p) => !p);
-  };
+  // const handleScheduleFromEditor = () => {
+  //   console.log("coming inside muthu");
+  //   setScheduleModalOpen((p) => !p);
+  // };
 
   const handleAPI = async () => {
     handleCancelAPI(id as string);
@@ -248,6 +275,52 @@ const ViewContent: React.FC = () => {
     setShowPublishCard(false);
   };
 
+  const handlePublish = async (
+    platforms: string[],
+    time: string,
+    date: string,
+    isEdit: boolean
+  ) => {
+    const controller = new AbortController();
+    try {
+      setLoading(true);
+      const url = API_LIST.BASE_URL + API_LIST.SCHEDULED_POST;
+      if (isEdit) {
+        await PUT(
+          url,
+          {
+            id: contentData?.id,
+            date: date,
+            time: time,
+            platforms,
+          },
+          { signal: controller.signal }
+        );
+      } else {
+        await POST(
+          url,
+          {
+            id: contentData?.id,
+            date: date,
+            time: time,
+            platforms,
+          },
+          { signal: controller.signal }
+        );
+      }
+      console.log("Story scheduled successfully!");
+    } catch (error: unknown) {
+      const err = error as AxiosError;
+      if (err.name === "AbortError") {
+        console.warn("Request aborted");
+      } else {
+        console.error("Error scheduling story:", error);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleCancel = () => {
     setShowEnableEdit((p) => !p);
     setEnableEdit((p) => !p);
@@ -263,6 +336,7 @@ const ViewContent: React.FC = () => {
 
   return (
     <div className="flex-1 font-openSans py-8 min-h-screen bg-[#f2f6f2] overflow-auto">
+      <Toaster position="top-center" richColors />
       <div className="flex flex-col flex-1 min-h-96 px-6   pt-16 overflow-y-auto">
         <ContentHeader
           text="Content Review"
@@ -656,7 +730,15 @@ const ViewContent: React.FC = () => {
                     <Button
                       type="submit"
                       className="bg-[#006601] text-[14px] w-28 font-semibold hover:bg-[#005001]"
-                      onClick={() => formRef.current?.requestSubmit()}
+                      onClick={() => {
+                        if (!isDirty) {
+                          toast.warning("No changes detected", {
+                            description: "You haven’t modified any fields.",
+                          });
+                          return;
+                        }
+                        methods.handleSubmit(onSubmit)();
+                      }}
                     >
                       Update
                     </Button>
@@ -703,7 +785,7 @@ const ViewContent: React.FC = () => {
                       className="text-[14px] hover:bg-[#fff] hover:text-[#006601] w-28 font-semibold text-[#006601]"
                       onClick={() => setScheduleModalOpen((p) => !p)}
                     >
-                      Schedule
+                      {contentData?.scheduledTime ? "Re Schedule" : "Schedule"}
                     </Button>
                     <Button
                       type="button"
@@ -723,7 +805,8 @@ const ViewContent: React.FC = () => {
       {scheduleModalOpen && (
         <ScheduleArticle
           onCancel={() => setScheduleModalOpen(false)}
-          handlePublish={handleScheduleFromEditor}
+          handlePublish={handlePublish}
+          contentData={contentData}
         />
       )}
 
