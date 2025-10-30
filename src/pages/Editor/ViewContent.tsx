@@ -232,7 +232,7 @@ const ViewContent: React.FC = () => {
   };
 
   const audioVal = watch("audio");
-  const videoVal = watch("video");
+  // const videoVal = watch("video");
 
   const handlePublishNowClick = () => {
     setShowPublishCard(!showPublishCard);
@@ -263,7 +263,7 @@ const ViewContent: React.FC = () => {
 
   return (
     <div className="flex-1 font-openSans py-8 min-h-screen bg-[#f2f6f2] overflow-auto">
-      <div className="flex flex-col flex-1 min-h-96  px-6 pt-16 overflow-y-auto">
+      <div className="flex flex-col flex-1 min-h-96 px-6   pt-16 overflow-y-auto">
         <ContentHeader
           text="Content Review"
           onClickBack={handleBack}
@@ -278,168 +278,147 @@ const ViewContent: React.FC = () => {
           <form
             ref={formRef}
             onSubmit={methods.handleSubmit(onSubmit)}
-            className="flex flex-col p-4 sm:p-6 mb-2 bg-white rounded-lg shadow-md space-y-6"
+            className="flex flex-col  bg-white shadow-[0px_2px_10px_0px_#959DA533] space-y-6"
           >
-            {contentData?.type === "TEXT" && (
-              <Text
-                content={contentData}
-                enableEdit={enableEdit}
-                readOnly={!enableEdit}
-              />
-            )}
+            <div className="flex flex-col px-6 space-y-6 p-4 sm:p-6 mb-2">
+              {contentData?.type === "TEXT" && (
+                <Text
+                  content={contentData}
+                  enableEdit={enableEdit}
+                  readOnly={!enableEdit}
+                />
+              )}
 
-            {contentData?.type === "VIDEO" && (
-              <>
-                <div>
-                  <Text
-                    content={contentData}
-                    enableEdit={enableEdit}
-                    readOnly={!enableEdit}
-                  />
-                  <div className="flex items-center my-2 gap-1">
-                    <InfoBadge
-                      type="date"
-                      value={formatToIST(contentData?.updatedAt)}
-                    />
-                    <InfoBadge
-                      type="user"
-                      value={contentData?.reporter.username}
-                    />
+              {contentData?.type === "VIDEO" && (
+                <>
+                  <div>
+                    {!enableEdit ? (
+                      <div className="space-y-2 my-2">
+                        <Controller
+                          name="title"
+                          control={control}
+                          rules={{ required: "Title is required" }}
+                          render={({ field }) => (
+                            <div className="space-y-2">
+                              <InputLabel label="Title" required />
+                              <Input
+                                {...field}
+                                placeholder="Enter title"
+                                className="bg-[#f7fbf8] h-10 border-[#ECECEC] border"
+                                disabled={!enableEdit}
+                              />
+
+                              {errors.title && (
+                                <p className="text-red-500 text-xs mt-1">
+                                  {errors.title.message as string}
+                                </p>
+                              )}
+                            </div>
+                          )}
+                        />
+                      </div>
+                    ) : (
+                      <div>
+                        <h1 className="text-[#101828] font-bold text-2xl">
+                          {contentData?.title || ""}
+                        </h1>
+                        <div className="flex items-center my-2 gap-1">
+                          <InfoBadge
+                            type="date"
+                            value={formatToIST(contentData?.updatedAt)}
+                          />
+                          <InfoBadge
+                            type="user"
+                            value={contentData?.reporter.username}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </div>
 
-                {contentData?.type === "VIDEO" && (
-                  <>
-                    <div>
-                      {!enableEdit ? (
-                        <div className="space-y-2">
-                          <Controller
-                            name="title"
-                            control={control}
-                            rules={{ required: "Title is required" }}
-                            render={({ field }) => (
-                              <div className="space-y-2">
-                                <InputLabel label="Title" required />
-                                <Input
-                                  {...field}
-                                  placeholder="Enter title"
-                                  className="bg-[#f7fbf8] h-10 border-[#ECECEC] border"
-                                  disabled={!enableEdit}
-                                />
+                  {/* ✅ Upload box (no video yet) */}
+                  {(!watch("video") || watch("video") === null) && (
+                    <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl p-10 text-center bg-[#FAFFFA]">
+                      <div className="mx-auto w-16 h-16 rounded-full bg-purple-100 text-[#a32fff] flex items-center justify-center">
+                        🎬
+                      </div>
 
-                                {errors.title && (
-                                  <p className="text-red-500 text-xs mt-1">
-                                    {errors.title.message as string}
-                                  </p>
-                                )}
-                              </div>
-                            )}
+                      <p className="mt-6 font-medium">Upload video file</p>
+                      <p className="text-sm text-gray-500 mt-1">
+                        Supports MP4, MOV, AVI (Max 500MB)
+                      </p>
+
+                      <label
+                        htmlFor="video-upload"
+                        className="inline-flex items-center gap-2 mt-6 bg-green-100 text-green-800 px-4 py-2 rounded-xl cursor-pointer hover:bg-green-200 transition"
+                      >
+                        <Upload className="h-4 w-4" />
+                        <span>Choose File</span>
+                      </label>
+
+                      <input
+                        id="video-upload"
+                        type="file"
+                        accept="video/mp4,video/mov,video/avi"
+                        hidden
+                        onChange={(e) => {
+                          const file = e.target.files?.[0] || null;
+                          setValue("video", file, {
+                            shouldValidate: true,
+                            shouldDirty: true,
+                          });
+                        }}
+                      />
+
+                      {methods.formState.errors.video && (
+                        <p className="text-sm text-red-500 mt-2">
+                          {methods.formState.errors.video.message as string}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* ✅ If video exists */}
+                  {watch("video") && (
+                    <div className="border-2 w-full border-dashed border-[#B2E6B3] rounded-2xl text-end">
+                      {enableEdit && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setValue("video", null, { shouldDirty: true })
+                          }
+                          className="bg-red-400 flex items-center gap-2 ml-auto mx-8 my-4 w-min text-white text-sm px-3 py-1 rounded-lg shadow hover:bg-red-500 transition"
+                        >
+                          <Trash size={12} /> Remove
+                        </button>
+                      )}
+
+                      {typeof watch("video") === "string" ? (
+                        // ✅ From API
+                        <div className="py-2 w-full flex flex-col">
+                          <VideoUrlPlayer
+                            videoUrl={watch("video") as string}
+                            thumbnailUrl={
+                              contentData?.thumbnailUrl as string | undefined
+                            }
                           />
                         </div>
                       ) : (
-                        <div>
-                          <h1 className="text-[#101828] font-bold text-2xl">
-                            {contentData?.title || ""}
-                          </h1>
-                          <div className="flex items-center my-2 gap-1">
-                            <InfoBadge
-                              type="date"
-                              value={formatToIST(contentData?.updatedAt)}
-                            />
-                            <InfoBadge
-                              type="user"
-                              value={contentData?.reporter.username}
-                            />
-                          </div>
+                        // ✅ From local upload
+                        <div className="p-4 flex justify-center">
+                          <video
+                            src={URL.createObjectURL(watch("video") as File)}
+                            controls
+                            className="w-full max-w-3xl rounded-lg shadow"
+                          >
+                            Your browser does not support the video tag.
+                          </video>
                         </div>
                       )}
                     </div>
+                  )}
 
-                    {/* ✅ Upload box (no video yet) */}
-                    {(!watch("video") || watch("video") === null) && (
-                      <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl p-10 text-center bg-[#FAFFFA]">
-                        <div className="mx-auto w-16 h-16 rounded-full bg-purple-100 text-[#a32fff] flex items-center justify-center">
-                          🎬
-                        </div>
-
-                        <p className="mt-6 font-medium">Upload video file</p>
-                        <p className="text-sm text-gray-500 mt-1">
-                          Supports MP4, MOV, AVI (Max 500MB)
-                        </p>
-
-                        <label
-                          htmlFor="video-upload"
-                          className="inline-flex items-center gap-2 mt-6 bg-green-100 text-green-800 px-4 py-2 rounded-xl cursor-pointer hover:bg-green-200 transition"
-                        >
-                          <Upload className="h-4 w-4" />
-                          <span>Choose File</span>
-                        </label>
-
-                        <input
-                          id="video-upload"
-                          type="file"
-                          accept="video/mp4,video/mov,video/avi"
-                          hidden
-                          onChange={(e) => {
-                            const file = e.target.files?.[0] || null;
-                            setValue("video", file, {
-                              shouldValidate: true,
-                              shouldDirty: true,
-                            });
-                          }}
-                        />
-
-                        {methods.formState.errors.video && (
-                          <p className="text-sm text-red-500 mt-2">
-                            {methods.formState.errors.video.message as string}
-                          </p>
-                        )}
-                      </div>
-                    )}
-
-                    {/* ✅ If video exists */}
-                    {watch("video") && (
-                      <div className="border-2 w-full border-dashed border-[#B2E6B3] rounded-2xl text-end">
-                        {enableEdit && (
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setValue("video", null, { shouldDirty: true })
-                            }
-                            className="bg-red-400 flex items-center gap-2 ml-auto mx-8 my-4 w-min text-white text-sm px-3 py-1 rounded-lg shadow hover:bg-red-500 transition"
-                          >
-                            <Trash size={12} /> Remove
-                          </button>
-                        )}
-
-                        {typeof watch("video") === "string" ? (
-                          // ✅ From API
-                          <div className="py-2 w-full flex flex-col">
-                            <VideoUrlPlayer
-                              videoUrl={watch("video") as string}
-                              thumbnailUrl={
-                                contentData?.thumbnailUrl as string | undefined
-                              }
-                            />
-                          </div>
-                        ) : (
-                          // ✅ From local upload
-                          <div className="p-4 flex justify-center">
-                            <video
-                              src={URL.createObjectURL(watch("video") as File)}
-                              controls
-                              className="w-full max-w-3xl rounded-lg shadow"
-                            >
-                              Your browser does not support the video tag.
-                            </video>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </>
-                )}
-
-                {watch("video") && (
+                  {/* {watch("video") && (
                   <div className="border-2 w-full border-dashed border-[#B2E6B3] rounded-2xl text-end">
                     {enableEdit && (
                       <button
@@ -474,268 +453,272 @@ const ViewContent: React.FC = () => {
                       </div>
                     )}
                   </div>
-                )}
-              </>
-            )}
-
-            {contentData?.type === "AUDIO" && (
-              <>
-                {enableEdit ? (
-                  <div className="space-y-2">
-                    <Controller
-                      name="title"
-                      control={control}
-                      rules={{ required: "Title is required" }}
-                      render={({ field }) => (
-                        <>
-                          <InputLabel label="Title" required />
-                          <Input
-                            {...field}
-                            placeholder="Enter title"
-                            className="bg-[#f7fbf8] h-10 border-[#ECECEC] border"
-                          />
-                          {errors.title && (
-                            <p className="text-red-500 text-xs mt-1">
-                              {errors.title.message}
-                            </p>
-                          )}
-                        </>
-                      )}
-                    />
-                  </div>
-                ) : (
-                  <div>
-                    <h1 className="text-[#101828] font-bold text-2xl">
-                      {contentData?.title || ""}
-                    </h1>
-                    <div className="flex items-center my-2 gap-1">
-                      <InfoBadge
-                        type="date"
-                        value={formatToIST(contentData?.updatedAt)}
-                      />
-                      <InfoBadge
-                        type="user"
-                        value={contentData?.reporter.username}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {(!audioVal || audioVal === null) && (
-                  <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl p-10 text-center bg-[#FAFFFA]">
-                    <div className="mx-auto w-16 h-16 rounded-full bg-purple-100 text-[#a32fff] flex items-center justify-center">
-                      <Mic className="h-6 w-6" />
-                    </div>
-
-                    <p className="mt-6 font-medium">Upload audio file</p>
-                    <p className="text-sm text-gray-500 mt-1">
-                      Supports MP3, WAV, M4A (Max 100MB)
-                    </p>
-
-                    <label
-                      htmlFor="audio-upload"
-                      className="inline-flex items-center gap-2 mt-6 bg-green-100 text-green-800 px-4 py-2 rounded-xl cursor-pointer hover:bg-green-200 transition"
-                    >
-                      <Upload className="h-4 w-4" />
-                      <span>Choose File</span>
-                    </label>
-
-                    <input
-                      id="audio-upload"
-                      type="file"
-                      accept=".mp3,.wav,.m4a"
-                      hidden
-                      onChange={(e) => {
-                        const file = e.target.files?.[0] || null;
-                        setValue("audio", file, {
-                          shouldValidate: true,
-                          shouldDirty: true,
-                        });
-                      }}
-                    />
-
-                    {methods.formState.errors.audio && (
-                      <p className="text-sm text-red-500 mt-2">
-                        {methods.formState.errors.audio.message as string}
-                      </p>
-                    )}
-                  </div>
-                )}
-
-                {audioVal && (
-                  <div className="border-2 w-full border-dashed border-[#B2E6B3] rounded-2xl text-end">
-                    {enableEdit && (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setValue("audio", null, { shouldDirty: true })
-                        }
-                        className="bg-red-400 flex items-center gap-2 ml-auto mx-8 my-4 w-min text-white text-sm px-3 py-1 rounded-lg shadow hover:bg-red-500 transition"
-                      >
-                        <Trash size={12} /> Remove
-                      </button>
-                    )}
-
-                    {typeof audioVal === "string" ? (
-                      <div className="py-2 w-full flex flex-col">
-                        <AudioUrlPlayer src={audioVal} />
-                      </div>
-                    ) : (
-                      <div className="p-2">
-                        <AudioPlayer
-                          src={URL.createObjectURL(audioVal)}
-                          fileName={audioVal?.name}
-                        />
-                      </div>
-                    )}
-                  </div>
-                )}
-              </>
-            )}
-
-            <div className="space-y-3 mt-6">
-              {enableEdit && (
-                <>
-                  <label className="flex items-center gap-2 font-medium">
-                    Tags <span className="text-red-500">*</span>
-                  </label>
-
-                  <div className="relative w-full flex flex-col sm:flex-row gap-2">
-                    <Input
-                      {...register("newTag")}
-                      placeholder="Add tag"
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          handleAddTag();
-                        }
-                      }}
-                      className="py-[19px] border-[#ECECEC] bg-[#f7fbf8]"
-                    />
-                    <Button
-                      type="button"
-                      size="sm"
-                      onClick={handleAddTag}
-                      className="absolute top-[6px] right-[12px] bg-[#006601] hover:bg-[#006601] px-[16px] py-[6px] gap-1"
-                    >
-                      <Plus className="w-3 h-3" />
-                      Add
-                    </Button>
-                  </div>
+                )} */}
                 </>
               )}
 
-              <div className="flex gap-2 flex-wrap">
-                <Controller
-                  name="tags"
-                  control={control}
-                  rules={{
-                    validate: (tags) =>
-                      tags.length > 0 || "At least one tag is required",
-                  }}
-                  render={({ field }) => (
-                    <>
-                      {field.value.map((tag: string, index: number) => (
-                        <Badge
-                          key={index}
-                          variant="secondary"
-                          className="gap-2 px-3 py-1 text-[#008001] bg-[#f8faf9] border-[#B3E6B3]"
-                        >
-                          {tag}
-                          {enableEdit && (
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveTag(tag)}
-                              className=""
-                            >
-                              <X className="w-3 h-3" />
-                            </button>
-                          )}
-                        </Badge>
-                      ))}
-                    </>
+              {contentData?.type === "AUDIO" && (
+                <>
+                  {enableEdit ? (
+                    <div className="space-y-2">
+                      <Controller
+                        name="title"
+                        control={control}
+                        rules={{ required: "Title is required" }}
+                        render={({ field }) => (
+                          <>
+                            <InputLabel label="Title" required />
+                            <Input
+                              {...field}
+                              placeholder="Enter title"
+                              className="bg-[#f7fbf8] h-10 border-[#ECECEC] border"
+                            />
+                            {errors.title && (
+                              <p className="text-red-500 text-xs mt-1">
+                                {errors.title.message}
+                              </p>
+                            )}
+                          </>
+                        )}
+                      />
+                    </div>
+                  ) : (
+                    <div>
+                      <h1 className="text-[#101828] font-bold text-2xl">
+                        {contentData?.title || ""}
+                      </h1>
+                      <div className="flex items-center my-2 gap-1">
+                        <InfoBadge
+                          type="date"
+                          value={formatToIST(contentData?.updatedAt)}
+                        />
+                        <InfoBadge
+                          type="user"
+                          value={contentData?.reporter.username}
+                        />
+                      </div>
+                    </div>
                   )}
-                />
+
+                  {(!audioVal || audioVal === null) && (
+                    <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl p-10 text-center bg-[#FAFFFA]">
+                      <div className="mx-auto w-16 h-16 rounded-full bg-purple-100 text-[#a32fff] flex items-center justify-center">
+                        <Mic className="h-6 w-6" />
+                      </div>
+
+                      <p className="mt-6 font-medium">Upload audio file</p>
+                      <p className="text-sm text-gray-500 mt-1">
+                        Supports MP3, WAV, M4A (Max 100MB)
+                      </p>
+
+                      <label
+                        htmlFor="audio-upload"
+                        className="inline-flex items-center gap-2 mt-6 bg-green-100 text-green-800 px-4 py-2 rounded-xl cursor-pointer hover:bg-green-200 transition"
+                      >
+                        <Upload className="h-4 w-4" />
+                        <span>Choose File</span>
+                      </label>
+
+                      <input
+                        id="audio-upload"
+                        type="file"
+                        accept=".mp3,.wav,.m4a"
+                        hidden
+                        onChange={(e) => {
+                          const file = e.target.files?.[0] || null;
+                          setValue("audio", file, {
+                            shouldValidate: true,
+                            shouldDirty: true,
+                          });
+                        }}
+                      />
+
+                      {methods.formState.errors.audio && (
+                        <p className="text-sm text-red-500 mt-2">
+                          {methods.formState.errors.audio.message as string}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {audioVal && (
+                    <div className="border-2 w-full border-dashed border-[#B2E6B3] rounded-2xl text-end">
+                      {enableEdit && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setValue("audio", null, { shouldDirty: true })
+                          }
+                          className="bg-red-400 flex items-center gap-2 ml-auto mx-8 my-4 w-min text-white text-sm px-3 py-1 rounded-lg shadow hover:bg-red-500 transition"
+                        >
+                          <Trash size={12} /> Remove
+                        </button>
+                      )}
+
+                      {typeof audioVal === "string" ? (
+                        <div className="py-2 w-full flex flex-col">
+                          <AudioUrlPlayer src={audioVal} />
+                        </div>
+                      ) : (
+                        <div className="p-2">
+                          <AudioPlayer
+                            src={URL.createObjectURL(audioVal)}
+                            fileName={audioVal?.name}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
+
+              <div className="space-y-3 mt-6">
+                {enableEdit && (
+                  <>
+                    <label className="flex items-center gap-2 font-medium">
+                      Tags <span className="text-red-500">*</span>
+                    </label>
+
+                    <div className="relative w-full flex flex-col sm:flex-row gap-2">
+                      <Input
+                        {...register("newTag")}
+                        placeholder="Add tag"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            handleAddTag();
+                          }
+                        }}
+                        className="py-[19px] border-[#ECECEC] bg-[#f7fbf8]"
+                      />
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={handleAddTag}
+                        className="absolute top-[6px] right-[12px] bg-[#006601] hover:bg-[#006601] px-[16px] py-[6px] gap-1"
+                      >
+                        <Plus className="w-3 h-3" />
+                        Add
+                      </Button>
+                    </div>
+                  </>
+                )}
+
+                <div className="flex gap-2 flex-wrap">
+                  <Controller
+                    name="tags"
+                    control={control}
+                    rules={{
+                      validate: (tags) =>
+                        tags.length > 0 || "At least one tag is required",
+                    }}
+                    render={({ field }) => (
+                      <>
+                        {field.value.map((tag: string, index: number) => (
+                          <Badge
+                            key={index}
+                            variant="secondary"
+                            className="gap-2 px-3 py-1 text-[#008001] bg-[#f8faf9] border-[#B3E6B3]"
+                          >
+                            {tag}
+                            {enableEdit && (
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveTag(tag)}
+                                className=""
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            )}
+                          </Badge>
+                        ))}
+                      </>
+                    )}
+                  />
+                </div>
               </div>
             </div>
+
+            {((!isEDit && enableEdit) ||
+              (from !== "calendar" && from !== "publishCenter") ||
+              isEDit) && (
+              <div className="shadow-[0px_2px_10px_0px_#0000001A,0px_0px_2px_0px_#00000033] border border-b-[#0000001A] bg-[#FFFFFF] h-min py-6 px-4">
+                {!isEDit && enableEdit ? (
+                  <div className="flex flex-wrap justify-end gap-3">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="text-[14px] w-28 font-semibold"
+                      onClick={handleCancel}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="submit"
+                      className="bg-[#006601] text-[14px] w-28 font-semibold hover:bg-[#005001]"
+                      onClick={() => formRef.current?.requestSubmit()}
+                    >
+                      Update
+                    </Button>
+                  </div>
+                ) : (
+                  from !== "calendar" &&
+                  from !== "publishCenter" && (
+                    <div className="flex flex-wrap justify-end gap-3">
+                      <Button
+                        variant="outline"
+                        onClick={toggleRemarks}
+                        className="text-white bg-[#FB2C36] hover:text-white hover:bg-[#FB2C36] border-red-300"
+                      >
+                        Reverted
+                      </Button>
+                      <Button
+                        onClick={() =>
+                          contentData && handleMoveToPublish(contentData?.id)
+                        }
+                        className="bg-[#008001] font-semibold hover:bg-[#008001] text-white"
+                      >
+                        Approve & Move to publish
+                      </Button>
+                    </div>
+                  )
+                )}
+
+                {isEDit && (
+                  <div className="flex flex-wrap justify-end gap-3">
+                    <Button
+                      type="submit"
+                      onClick={() => {
+                        formRef.current?.requestSubmit();
+                        if (from === "publishCenter") navigate(-1);
+                      }}
+                      variant="outline"
+                      className="text-[14px] hover:bg-[#fff] hover:text-[#006601] w-28 font-semibold text-[#006601]"
+                    >
+                      Update
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="text-[14px] hover:bg-[#fff] hover:text-[#006601] w-28 font-semibold text-[#006601]"
+                      onClick={() => setScheduleModalOpen((p) => !p)}
+                    >
+                      Schedule
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={handlePublishNowClick}
+                      className="bg-[#006601] text-[14px] w-28 font-semibold hover:bg-[#005001]"
+                    >
+                      Publish Now
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
           </form>
         </FormProvider>
       </div>
-      {!isEDit && enableEdit ? (
-        <div className="flex flex-wrap justify-end gap-3 mx-4 mt-6">
-          <Button
-            type="button"
-            variant="outline"
-            className="text-[14px] w-28 font-semibold"
-            onClick={handleCancel}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            className="bg-[#006601] text-[14px] w-28 font-semibold hover:bg-[#005001]"
-            onClick={() => {
-              formRef.current?.requestSubmit();
-            }}
-          >
-            Update
-          </Button>
-        </div>
-      ) : (
-        from !== "calendar" &&
-        from !== "publishCenter" && (
-          <div className="flex flex-wrap justify-end gap-3 mx-4 mt-6">
-            <Button
-              variant="outline"
-              onClick={toggleRemarks}
-              className="text-white bg-[#FB2C36] hover:text-white hover:bg-[#FB2C36] border-red-300 "
-            >
-              Reverted
-            </Button>
-            <Button
-              onClick={() =>
-                contentData && handleMoveToPublish(contentData?.id)
-              }
-              className="bg-[#008001] font-semibold hover:bg-[#008001] text-white"
-            >
-              Approve & Move to publish
-            </Button>
-          </div>
-        )
-      )}
-
-      {isEDit && (
-        <div className="flex flex-wrap justify-end gap-3 mx-4 mt-6">
-          <Button
-            type="submit"
-            onClick={() => {
-              formRef.current?.requestSubmit();
-              if (from == "publishCenter") {
-                navigate(-1);
-              }
-            }}
-            variant="outline"
-            className="text-[14px] hover:bg-[#fff] hover:text-[#006601]  !w-28 font-semibold text-[#006601]"
-          >
-            Update
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            className="text-[14px] hover:bg-[#fff] hover:text-[#006601]  !w-28 font-semibold text-[#006601]"
-            onClick={() => setScheduleModalOpen((p) => !p)}
-          >
-            Schedule
-          </Button>
-          <Button
-            type="button"
-            onClick={handlePublishNowClick}
-            className="bg-[#006601] text-[14px] w-28 font-semibold hover:bg-[#005001]"
-          >
-            Publish Now
-          </Button>
-        </div>
-      )}
 
       {scheduleModalOpen && (
         <ScheduleArticle

@@ -111,28 +111,30 @@ const ContentHeader: React.FC<ContentHeaderProps> = ({
           </Button>
         </div>
       )}
-      <div className="flex gap-2">
-        {showEdit && (
-          <Button
-            variant="outline"
-            onClick={handleEdit}
-            className="text-[#1E2939] cursor-pointer hover:text-[#1E2939]  border-[#E5E7EB] hover:bg-[#F8FAF9]"
-          >
-            <PenLine color="#1E2939" className="w-4 h-4 mr-2" />
-            Edit
-          </Button>
-        )}
-        {showCancelSchedule && (
-          <Button
-            variant="outline"
-            onClick={handleEditPopup}
-            className="text-[#1E2939] cursor-pointer hover:text-[#1E2939]  border-[#1E2939] hover:bg-[#F8FAF9]"
-          >
-            <X color="#1E2939" className="w-4 h-4 mr-2" />
-            Cancel Schedule
-          </Button>
-        )}
-      </div>
+      {(showEdit || showCancelSchedule) && (
+        <div className="flex gap-2">
+          {showEdit && (
+            <Button
+              variant="outline"
+              onClick={handleEdit}
+              className="text-[#1E2939] cursor-pointer hover:text-[#1E2939]  border-[#E5E7EB] hover:bg-[#F8FAF9]"
+            >
+              <PenLine color="#1E2939" className="w-4 h-4 mr-2" />
+              Edit
+            </Button>
+          )}
+          {showCancelSchedule && (
+            <Button
+              variant="outline"
+              onClick={handleEditPopup}
+              className="text-[#1E2939] cursor-pointer hover:text-[#1E2939]  border-[#1E2939] hover:bg-[#F8FAF9]"
+            >
+              <X color="#1E2939" className="w-4 h-4 mr-2" />
+              Cancel Schedule
+            </Button>
+          )}
+        </div>
+      )}
 
       {showSaveSubmit && (
         <div className="flex items-center gap-2 px-2">

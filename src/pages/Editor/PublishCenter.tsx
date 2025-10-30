@@ -29,11 +29,11 @@ const FILTER_TABS = [
   "Sports",
   "Environment",
 ] as const;
-const CONTENT_TABS = ["All", "Scheduled"] as const;
+const CONTENT_TABS = ["Reviewed", "Scheduled"] as const;
 
 export function PublishCenter() {
   const [state, setState] = useState({
-    activeTab: "All",
+    activeTab: "Reviewed",
     activeFilterTab: "Politics",
     searchQuery: "",
     scheduleModalOpen: false,
@@ -253,6 +253,7 @@ export function PublishCenter() {
       ...p,
       cancelPopup: !p.cancelPopup,
     }));
+    getDraftArticle();
   };
 
   if (loading) return <Loading />;

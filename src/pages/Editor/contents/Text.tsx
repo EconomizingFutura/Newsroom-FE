@@ -97,7 +97,6 @@ const Text: React.FC<TextProps> = ({
                 onChange={(value) => {
                   field.onChange(value);
                 }}
-                className=" max-h-56 pb-12"
                 placeholder="Write something..."
                 readOnly={readOnly || !enableEdit}
               />

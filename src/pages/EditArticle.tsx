@@ -407,7 +407,7 @@ const EditArticle: React.FC = () => {
 
           <form id="myForm">
             <div className="bg-white  border-gray-200 px-8 py-6  shadow-md">
-              <div className="flex items-center justify-between ">
+              <div className="flex items-center py-2 justify-between ">
                 <h2 className="text-[20px] font-semibold">Content Editor</h2>
                 <div className="flex gap-2">
                   {/* <StatusBadge
