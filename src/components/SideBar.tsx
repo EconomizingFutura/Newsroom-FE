@@ -103,12 +103,12 @@ const menuConfig = {
       icon: <Users className="w-4 h-4" />,
       action: "onNavigateEditorCalendarView",
     },
-    // {
-    //   key: "editor-history",
-    //   label: "History Log",
-    //   icon: <History className="w-4 h-4" />,
-    //   action: "onNavigateEditorHistory",
-    // },
+    {
+      key: "editor-history",
+      label: "History Log",
+      icon: <History className="w-4 h-4" />,
+      action: "onNavigateEditorHistory",
+    },
   ],
 };
 

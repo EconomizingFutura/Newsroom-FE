@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SocialMediaPublishCard } from "./TextEditor/SocialMediaPublishCard";
 import type { scheduledPost } from "@/types/apitypes";
-import { formatDateForInput } from "@/utils/utils";
+import { convertISOToReadable } from "@/utils/utils";
 
 interface StoryCardProps {
   story: scheduledPost;
@@ -139,14 +139,14 @@ const StoryCard: React.FC<StoryCardProps> = ({
                 Schedule
               </Button>
             )}
-            {story.type == "SCHEDULED" && (
+            {story && story.type == "SCHEDULED" && (
               <Button
                 variant="outline"
                 onClick={() => handleCancel(story.id)}
                 className="bg-[#ffffff] text-[#FB2C36] border hover:bg-[#ffffff] hover:text-[#FB2C36] cursor-pointer border-[#FB2C36]"
               >
                 <Calendar className="w-4 h-4 mr-2" color="#FB2C36" />
-                cancel ({formatDateForInput(story.schuduledAt)})
+                Cancel ({convertISOToReadable(story?.schuduledAt)})
               </Button>
             )}
           </>

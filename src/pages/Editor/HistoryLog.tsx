@@ -144,7 +144,7 @@ export function HistoryLog() {
             style={{ boxShadow: "0px 2px 10px 0px #959DA533" }}
             className="bg-white rounded-lg border  border-gray-200 p-6 mb-6"
           >
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center w-full justify-between space-x-4">
               <div className="relative border border-history-select-border bg-[#F7FBF7] rounded-[8px] flex-1 max-w-sm">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
@@ -154,97 +154,101 @@ export function HistoryLog() {
                   className="pl-10 "
                 />
               </div>
+              <div className="flex gap-4">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="w-40 border flex justify-between items-center bg-[#F7FBF7] border-history-select-border rounded-[8px] text-black font-semibold text-sm px-3 py-2 text-left">
+                      Category
+                      <ChevronDown strokeWidth={2.5} size={15} />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-40">
+                    {FILTER_OPTIONS.CATEGORY.map((option) => (
+                      <DropdownMenuItem
+                        key={option.value}
+                        onSelect={(e) => e.preventDefault()}
+                        onClick={() =>
+                          handleDropDownSelect(
+                            option.value,
+                            setSelectedCategory
+                          )
+                        }
+                      >
+                        <Checkbox
+                          className="data-[state=checked]:!bg-green-500 data-[state=checked]:!border-green-500 data-[state=checked]:!text-white"
+                          checked={selectedCategory.includes(option.value)}
+                        />
+                        {option.label}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="w-40 border flex justify-between items-center bg-[#F7FBF7] border-history-select-border rounded-[8px] text-black font-semibold text-sm px-3 py-2 text-left">
-                    Category
-                    <ChevronDown strokeWidth={2.5} size={15} />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-40">
-                  {FILTER_OPTIONS.CATEGORY.map((option) => (
-                    <DropdownMenuItem
-                      key={option.value}
-                      onSelect={(e) => e.preventDefault()}
-                      onClick={() =>
-                        handleDropDownSelect(option.value, setSelectedCategory)
-                      }
-                    >
-                      <Checkbox
-                        className="data-[state=checked]:!bg-green-500 data-[state=checked]:!border-green-500 data-[state=checked]:!text-white"
-                        checked={selectedCategory.includes(option.value)}
-                      />
-                      {option.label}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="w-40 border flex justify-between items-center bg-[#F7FBF7] border-history-select-border rounded-[8px] text-black font-semibold text-sm px-3 py-2 text-left">
+                      Author
+                      <ChevronDown strokeWidth={2.5} size={15} />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-40">
+                    {FILTER_OPTIONS.AUTHOR.map((option) => (
+                      <DropdownMenuItem
+                        key={option.value}
+                        onSelect={(e) => e.preventDefault()}
+                        onClick={() =>
+                          handleDropDownSelect(option.value, setSelectedAuthor)
+                        }
+                      >
+                        <Checkbox
+                          className="data-[state=checked]:!bg-green-500 data-[state=checked]:!border-green-500 data-[state=checked]:!text-white"
+                          checked={selectedAuthor.includes(option.value)}
+                        />
+                        {option.label}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="w-40 border flex justify-between items-center bg-[#F7FBF7] border-history-select-border rounded-[8px] text-black font-semibold text-sm px-3 py-2 text-left">
-                    Author
-                    <ChevronDown strokeWidth={2.5} size={15} />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-40">
-                  {FILTER_OPTIONS.AUTHOR.map((option) => (
-                    <DropdownMenuItem
-                      key={option.value}
-                      onSelect={(e) => e.preventDefault()}
-                      onClick={() =>
-                        handleDropDownSelect(option.value, setSelectedAuthor)
-                      }
-                    >
-                      <Checkbox
-                        className="data-[state=checked]:!bg-green-500 data-[state=checked]:!border-green-500 data-[state=checked]:!text-white"
-                        checked={selectedAuthor.includes(option.value)}
-                      />
-                      {option.label}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="w-40 border flex justify-between items-center bg-[#F7FBF7] border-history-select-border rounded-[8px] text-black font-semibold text-sm px-3 py-2 text-left">
+                      Status
+                      <ChevronDown strokeWidth={2.5} size={15} />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-40">
+                    {FILTER_OPTIONS.STATUS.map((option) => (
+                      <DropdownMenuItem
+                        key={option.value}
+                        onSelect={(e) => e.preventDefault()}
+                        onClick={() =>
+                          handleDropDownSelect(option.value, setSelectedStatus)
+                        }
+                      >
+                        <Checkbox
+                          className="data-[state=checked]:!bg-green-500 data-[state=checked]:!border-green-500 data-[state=checked]:!text-white"
+                          checked={selectedStatus.includes(option.value)}
+                        />
+                        {option.label}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="w-40 border flex justify-between items-center bg-[#F7FBF7] border-history-select-border rounded-[8px] text-black font-semibold text-sm px-3 py-2 text-left">
-                    Status
-                    <ChevronDown strokeWidth={2.5} size={15} />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-40">
-                  {FILTER_OPTIONS.STATUS.map((option) => (
-                    <DropdownMenuItem
-                      key={option.value}
-                      onSelect={(e) => e.preventDefault()}
-                      onClick={() =>
-                        handleDropDownSelect(option.value, setSelectedStatus)
-                      }
-                    >
-                      <Checkbox
-                        className="data-[state=checked]:!bg-green-500 data-[state=checked]:!border-green-500 data-[state=checked]:!text-white"
-                        checked={selectedStatus.includes(option.value)}
-                      />
-                      {option.label}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <Select value={dateRange} onValueChange={setDateRange}>
-                <SelectTrigger className="w-40 border flex justify-between items-center bg-[#F7FBF7] border-history-select-border rounded-[8px] text-black font-semibold text-sm px-3 py-2 text-left">
-                  <SelectValue placeholder="all" />
-                </SelectTrigger>
-                <SelectContent>
-                  {FILTER_OPTIONS.DATE_RANGE.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                <Select value={dateRange} onValueChange={setDateRange}>
+                  <SelectTrigger className="w-40 border flex justify-between items-center bg-[#F7FBF7] border-history-select-border rounded-[8px] text-black font-semibold text-sm px-3 py-2 text-left">
+                    <SelectValue placeholder="all" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {FILTER_OPTIONS.DATE_RANGE.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
 

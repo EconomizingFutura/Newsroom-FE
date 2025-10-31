@@ -41,13 +41,13 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
           <div className="flex w-full justify-center gap-4 my-2">
             <button
               onClick={handleConfirm}
-              className="px-6 py-2 w-1/2  rounded-lg border border-[#008001] text-[#008001] "
+              className="px-6 py-2 w-1/2 font-semibold  rounded-lg border border-[#008001] text-[#008001] "
             >
               Yes
             </button>
             <button
               onClick={onCancel}
-              className="px-6 py-2 w-1/2 rounded-lg bg-[#008001] text-white "
+              className="px-6 py-2 w-1/2 font-semibold  rounded-lg bg-[#008001] text-white "
             >
               No
             </button>

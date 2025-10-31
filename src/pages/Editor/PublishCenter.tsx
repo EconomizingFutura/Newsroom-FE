@@ -104,6 +104,7 @@ export function PublishCenter() {
   const getDraftArticle = useCallback(
     async (searchTerm = state.searchQuery) => {
       try {
+        setLoading(true);
         const response = await getPublishCenterData(
           currentPage,
           pageSize,
@@ -126,6 +127,8 @@ export function PublishCenter() {
         }));
       } catch (error) {
         console.error("Error fetching posts:", error);
+      } finally {
+        setLoading(false);
       }
     },
     [
@@ -164,7 +167,7 @@ export function PublishCenter() {
   const handlePublishNow = async (storyId: string, platforms: string[]) => {
     const controller = new AbortController();
     const now = new Date();
-    const futureTime = new Date(now.getTime() + 3 * 60 * 1000);
+    const futureTime = new Date(now.getTime());
 
     try {
       setLoading(true);
