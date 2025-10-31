@@ -119,10 +119,6 @@ export function ReviewQueue() {
     setPageSize(Number(size));
   };
 
-  if (isLoading) {
-    return <Loading />;
-  }
-
   return (
     <div className="min-h-screen flex flex-col pt-16 bg-[#F6FAF6]">
       <main className="flex-1 p-8 flex flex-col">
@@ -139,11 +135,10 @@ export function ReviewQueue() {
               <button
                 key={category.name}
                 onClick={() => setActiveCategory(category.name)}
-                className={`px-4 py-2 cursor-pointer text-sm transition-all ${
-                  activeCategory === category.name
+                className={`px-4 py-2 cursor-pointer text-sm transition-all ${activeCategory === category.name
                     ? "text-black bg-[#FFFFFF] rounded-md font-bold"
                     : "text-[#999999]"
-                }`}
+                  }`}
               >
                 {category.name}
               </button>
@@ -151,68 +146,70 @@ export function ReviewQueue() {
           </div>
         </div>
 
-        {/* ONLY THIS PART SCROLLS */}
-        <div className="flex-1 overflow-y-auto my-3 space-y-4 pr-2">
-          {pendingStories.length === 0 ? (
-            <div className="flex justify-center items-center h-full w-full">
-              <PendingReviewEmptyState />
-            </div>
-          ) : (
-            pendingStories.map((story) => (
-              <div
-                key={story.id}
-                className="bg-white rounded-[12px] shadow-[0px_2px_15px_0px_#64646F1A] border border-gray-200 p-6"
-              >
-                <h3 className="text-[16px] font-semibold text-[#101828] mb-3">
-                  {story.title}
-                </h3>
+        {isLoading ? <Loading /> :
 
-                <div className="flex items-center space-x-4 text-sm text-[#6A7282] mb-4">
-                  <div className="flex items-center space-x-1">
-                    <Clock className="w-4 h-4" />
-                    <span>{formatToIST(story.updatedAt)}</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <User className="w-4 h-4" />
-                    <span>{story?.reporter?.username}</span>
-                  </div>
-                </div>
-
-                <p className="text-[#4A5565] text-sm leading-relaxed mb-6">
-                  {extractTextSummary(story.content ?? "", 30).text}
-                </p>
-
-                <div className="flex items-center space-x-3">
-                  <Button
-                    variant="outline"
-                    onClick={() => handleView(story.id.toString())}
-                    className="text-[#6A7282] hover:text-[#6A7282] font-medium border-gray-300 hover:bg-gray-50"
-                  >
-                    <PenLine className="w-4 h-4 mr-2" />
-                    View Story
-                  </Button>
-
-                  <Button
-                    onClick={() => handleApprove(story.id.toString())}
-                    className="bg-[#008001] font-semibold hover:bg-[#008001] text-white"
-                  >
-                    <CircleCheckBig className="w-4 h-4 mr-2" />
-                    Approve & Move to publish
-                  </Button>
-
-                  <Button
-                    variant="outline"
-                    onClick={() => handleReject(story.id.toString())}
-                    className="text-white bg-[#FB2C36] hover:text-white hover:bg-[#FB2C36] border-red-300"
-                  >
-                    <ShieldAlert className="w-4 h-4 mr-2" />
-                    Reverted
-                  </Button>
-                </div>
+          <div className="flex-1 overflow-y-auto my-3 space-y-4 pr-2">
+            {pendingStories.length === 0 ? (
+              <div className="flex justify-center items-center h-full w-full">
+                <PendingReviewEmptyState />
               </div>
-            ))
-          )}
-        </div>
+            ) : (
+              pendingStories.map((story) => (
+                <div
+                  key={story.id}
+                  className="bg-white rounded-[12px] shadow-[0px_2px_15px_0px_#64646F1A] border border-gray-200 p-6"
+                >
+                  <h3 className="text-[16px] font-semibold text-[#101828] mb-3">
+                    {story.title}
+                  </h3>
+
+                  <div className="flex items-center space-x-4 text-sm text-[#6A7282] mb-4">
+                    <div className="flex items-center space-x-1">
+                      <Clock className="w-4 h-4" />
+                      <span>{formatToIST(story.updatedAt)}</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <User className="w-4 h-4" />
+                      <span>{story?.reporter?.username}</span>
+                    </div>
+                  </div>
+
+                  <p className="text-[#4A5565] text-sm leading-relaxed mb-6">
+                    {extractTextSummary(story.content ?? "", 30).text}
+                  </p>
+
+                  <div className="flex items-center space-x-3">
+                    <Button
+                      variant="outline"
+                      onClick={() => handleView(story.id.toString())}
+                      className="text-[#6A7282] hover:text-[#6A7282] font-medium border-gray-300 hover:bg-gray-50"
+                    >
+                      <PenLine className="w-4 h-4 mr-2" />
+                      View Story
+                    </Button>
+
+                    <Button
+                      onClick={() => handleApprove(story.id.toString())}
+                      className="bg-[#008001] font-semibold hover:bg-[#008001] text-white"
+                    >
+                      <CircleCheckBig className="w-4 h-4 mr-2" />
+                      Approve & Move to publish
+                    </Button>
+
+                    <Button
+                      variant="outline"
+                      onClick={() => handleReject(story.id.toString())}
+                      className="text-white bg-[#FB2C36] hover:text-white hover:bg-[#FB2C36] border-red-300"
+                    >
+                      <ShieldAlert className="w-4 h-4 mr-2" />
+                      Reverted
+                    </Button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        }
       </main>
 
       {/* ✅ FIXED PAGINATION AT BOTTOM */}

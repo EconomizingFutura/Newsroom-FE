@@ -272,7 +272,6 @@ export function PublishCenter() {
     getDraftArticle();
   };
 
-  if (loading) return <Loading />;
 
   const showPagination = Number(pageMetaData.totalPages) >= 1;
 
@@ -295,11 +294,10 @@ export function PublishCenter() {
                     setState((prev) => ({ ...prev, activeTab: tab }));
                     setCurrentPage(1);
                   }}
-                  className={`px-4 py-2 rounded-md text-sm font-medium ${
-                    state.activeTab === tab
-                      ? "font-bold bg-white"
-                      : "text-gray-500"
-                  }`}
+                  className={`px-4 py-2 rounded-md text-sm font-medium ${state.activeTab === tab
+                    ? "font-bold bg-white"
+                    : "text-gray-500"
+                    }`}
                 >
                   {tab}
                 </button>
@@ -328,6 +326,7 @@ export function PublishCenter() {
             </div>
           </div>
 
+
           <div className="my-3 bg-white py-2 px-6 rounded-lg">
             <div className="flex space-x-2.5 bg-[#6A72821A] p-1 rounded-lg w-fit">
               {FILTER_TABS.map((tab) => (
@@ -337,55 +336,56 @@ export function PublishCenter() {
                     setState((prev) => ({ ...prev, activeFilterTab: tab }));
                     setCurrentPage(1);
                   }}
-                  className={`px-4 py-2 rounded-md text-sm ${
-                    state.activeFilterTab === tab
-                      ? "font-bold bg-white"
-                      : "text-gray-500"
-                  }`}
+                  className={`px-4 py-2 rounded-md text-sm ${state.activeFilterTab === tab
+                    ? "font-bold bg-white"
+                    : "text-gray-500"
+                    }`}
                 >
                   {tab}
                 </button>
               ))}
             </div>
           </div>
-        </section>
 
-        {/* === STORY LIST === */}
-        <div className="flex-1 overflow-y-auto mt-4 space-y-4 pr-2">
-          {data.length > 0 ? (
-            data.map((story) => (
-              <StoryCard
-                key={story.id}
-                story={story}
-                getPriorityColor={getPriorityColor}
-                handleViewStory={handleViewStory}
-                handlePublishNow={handlePublishNow}
-                handleSchedulePublish={handleSchedulePublish}
-                handleCancel={(id) =>
-                  setState((p) => ({
-                    ...p,
-                    cancelPopup: !p.cancelPopup,
-                    cancelPopId: id,
-                  }))
-                }
-              />
-            ))
-          ) : (
-            <div className="text-center py-12">
-              <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                No articles in {state.activeTab.toLowerCase()}
-              </h3>
-              <p className="text-gray-500">
-                {state.activeTab === "Ready to Publish"
-                  ? "Articles approved for publication will appear here."
-                  : state.activeTab === "Scheduled"
-                  ? "Scheduled articles will appear here."
-                  : "Published articles will appear here."}
-              </p>
-            </div>
-          )}
-        </div>
+        </section>
+        {(loading) ? <Loading /> :
+
+          <div className="flex-1 overflow-y-auto mt-4 space-y-4 pr-2">
+            {data.length > 0 ? (
+              data.map((story) => (
+                <StoryCard
+                  key={story.id}
+                  story={story}
+                  getPriorityColor={getPriorityColor}
+                  handleViewStory={handleViewStory}
+                  handlePublishNow={handlePublishNow}
+                  handleSchedulePublish={handleSchedulePublish}
+                  handleCancel={(id) =>
+                    setState((p) => ({
+                      ...p,
+                      cancelPopup: !p.cancelPopup,
+                      cancelPopId: id,
+                    }))
+                  }
+                />
+              ))
+            ) : (
+              <div className="text-center py-12">
+                <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  No articles in {state.activeTab.toLowerCase()}
+                </h3>
+                <p className="text-gray-500">
+                  {state.activeTab === "Ready to Publish"
+                    ? "Articles approved for publication will appear here."
+                    : state.activeTab === "Scheduled"
+                      ? "Scheduled articles will appear here."
+                      : "Published articles will appear here."}
+                </p>
+              </div>
+            )}
+          </div>
+        }
       </main>
 
       {/* === PAGINATION SECTION === */}
