@@ -27,6 +27,7 @@ import AuthRoute from "./AuthRoutes";
 import ProtectedRoutes from "./ProtectedRoutes";
 import PublicRoute from "./PublicRoutes";
 import ViewContent from "@/pages/Editor/ViewContent";
+import CalendarPage from "@/pages/Editor/CalendarPage";
 const Layout: React.FC = () => {
   const navigate = useNavigate();
   const getCurrentView = useCurrentView();
@@ -206,7 +207,7 @@ const Layout: React.FC = () => {
               element={
                 <AuthRoute>
                   <ProtectedRoutes allowedRoles="EDITOR">
-                    <CalendarView />
+                    <CalendarPage />
                   </ProtectedRoutes>
                 </AuthRoute>
               }
