@@ -107,7 +107,7 @@ export function CalendarView() {
   // );
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-16 x">
+    <div className="min-h-screen bg-gray-50 pt-16 ">
       <style>{`
         /* Limit events shown in week view time slots */
         .rbc-time-slot .rbc-events-container {

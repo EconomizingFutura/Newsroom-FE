@@ -341,3 +341,8 @@ body {
   min-width: unset !important;
   width: fit-content !important;
 }
+
+.fc-event.custom-event {
+  border-left-width: 3px !important;
+  border-left-style: solid !important;
+}

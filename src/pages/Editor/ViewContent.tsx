@@ -342,9 +342,11 @@ const ViewContent: React.FC = () => {
           text="Content Review"
           onClickBack={handleBack}
           showBackButton
-          showEdit={showEnableEdit}
+          showEdit={contentData?.status == "POSTED" ? false : showEnableEdit}
           handleEdit={handleEditToggle}
-          showCancelSchedule={showEnableEdit}
+          showCancelSchedule={
+            contentData?.status == "POSTED" ? false : showEnableEdit
+          }
           handleEditPopup={() => setShowEditPopup((p) => !p)}
         />
 

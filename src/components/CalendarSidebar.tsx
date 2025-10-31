@@ -77,12 +77,14 @@ const Article = ({ event, onConfirmDelete }: ArticleCardProps) => {
         >
           View Article
         </Button>
-        <Button
-          onClick={onConfirmDelete}
-          className="h-full bg-[#FFFFFF] hover:bg-[#FFFFFF] border border-[#1E2939] text-[#1E2939]"
-        >
-          <X /> <span>Cancel Schedule</span>
-        </Button>
+        {event.status !== "POSTED" && (
+          <Button
+            onClick={onConfirmDelete}
+            className="h-full bg-[#FFFFFF] hover:bg-[#FFFFFF] border border-[#1E2939] text-[#1E2939]"
+          >
+            <X /> <span>Cancel Schedule</span>
+          </Button>
+        )}
       </div>
     </div>
   );

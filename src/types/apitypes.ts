@@ -7,7 +7,7 @@ export type contentResponse = {
   title: string;
   content: string;
   type: "TEXT" | "VIDEO" | "AUDIO";
-  status: "SUBMITTED";
+  status: "SUBMITTED" | "POSTED";
   remarks: string | null;
   audio: string | File | null;
   audioUrl?: string | File | null;
