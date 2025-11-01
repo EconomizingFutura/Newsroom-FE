@@ -15,7 +15,6 @@ import HistoryLogPage from "@/pages/HistoryLogPage";
 import NewsFeedsPage from "@/pages/NewsFeedsPage";
 import SideBar from "@/components/SideBar";
 import Navigation from "@/components/Navigation";
-import { CalendarView } from "@/pages/Editor/CalendarView";
 import { HistoryLog } from "@/pages/Editor/HistoryLog";
 import { PublishCenter } from "@/pages/Editor/PublishCenter";
 import { ReviewQueue } from "@/pages/Editor/ReviewQueue";

@@ -37,6 +37,7 @@ import {
   type TransformedItem,
 } from "@/utils/PublishCenter";
 import { cn } from "@/components/ui/utils";
+import Loading from "../Shared/agency-feeds/loading";
 
 const CalendarPage: React.FC = () => {
   const calendarRef = useRef<FullCalendar | null>(null);
@@ -120,8 +121,8 @@ const CalendarPage: React.FC = () => {
       v === "month"
         ? "dayGridMonth"
         : v === "week"
-          ? "timeGridWeek"
-          : "timeGridDay";
+        ? "timeGridWeek"
+        : "timeGridDay";
     setView(newView);
     api.changeView(newView);
   };
@@ -186,96 +187,101 @@ const CalendarPage: React.FC = () => {
             description="Here's what's happening in your newsroom today."
           />
         </div>
-
-        <div className="bg-white mb-6 flex flex-col">
-          <div className="flex w-full py-4 justify-between">
-            <div className="flex items-center space-x-4 mb-3 sm:mb-0">
-              <div className="flex items-center">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="border-none"
-                  onClick={() => handleNavigate("prev")}
-                >
-                  <ChevronLeft color="#282C3F" className="w-6 h-6" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-none"
-                  onClick={() => handleNavigate("next")}
-                >
-                  <ChevronRight color="#282C3F" className="w-6 h-6" />
-                </Button>
+        {loading ? (
+          <Loading />
+        ) : (
+          <div className="bg-white mb-6 flex flex-col">
+            <div className="flex w-full py-4 justify-between">
+              <div className="flex items-center space-x-4 mb-3 sm:mb-0">
+                <div className="flex items-center">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="border-none"
+                    onClick={() => handleNavigate("prev")}
+                  >
+                    <ChevronLeft color="#282C3F" className="w-6 h-6" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-none"
+                    onClick={() => handleNavigate("next")}
+                  >
+                    <ChevronRight color="#282C3F" className="w-6 h-6" />
+                  </Button>
+                </div>
+                <h2 className="text-xl font-semibold text-gray-900">
+                  {moment(currentDate).format("MMMM YYYY")}
+                </h2>
               </div>
-              <h2 className="text-xl font-semibold text-gray-900">
-                {moment(currentDate).format("MMMM YYYY")}
-              </h2>
-            </div>
 
-            <div className="flex items-center text-[#333333] space-x-2">
-              <Badge variant="outline" className="border-none">
-                <span className="h-3 w-3 rounded bg-[#03528F]"></span> Scheduled
-              </Badge>
-              <Badge variant="outline" className="border-none">
-                <span className="h-3 rounded w-3 bg-[#2DA94F]"></span> Published
-              </Badge>
+              <div className="flex items-center text-[#333333] space-x-2">
+                <Badge variant="outline" className="border-none">
+                  <span className="h-3 w-3 rounded bg-[#03528F]"></span>{" "}
+                  Scheduled
+                </Badge>
+                <Badge variant="outline" className="border-none">
+                  <span className="h-3 rounded w-3 bg-[#2DA94F]"></span>{" "}
+                  Published
+                </Badge>
 
-              <Select
-                value={
-                  view === "dayGridMonth"
-                    ? "month"
-                    : view === "timeGridWeek"
+                <Select
+                  value={
+                    view === "dayGridMonth"
+                      ? "month"
+                      : view === "timeGridWeek"
                       ? "week"
                       : "day"
-                }
-                onValueChange={handleViewChange}
-              >
-                <SelectTrigger className="w-[120px]">
-                  <SelectValue placeholder="View" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="month">Month</SelectItem>
-                  <SelectItem value="week">Week</SelectItem>
-                  <SelectItem value="day">Day</SelectItem>
-                </SelectContent>
-              </Select>
+                  }
+                  onValueChange={handleViewChange}
+                >
+                  <SelectTrigger className="w-[120px]">
+                    <SelectValue placeholder="View" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="month">Month</SelectItem>
+                    <SelectItem value="week">Week</SelectItem>
+                    <SelectItem value="day">Day</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-          </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <style>{`
+            <div className="bg-white rounded-lg shadow-sm p-4">
+              <style>{`
               .fc .fc-day-today ,.fc-v-event{
                 background-color: transparent !important;
                 border:transparent !important
   }
 `}</style>
-            <FullCalendar
-              ref={calendarRef}
-              plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-              initialView={view}
-              headerToolbar={false}
-              events={fullCalendarEvents}
-              selectable={true}
-              select={handleSelect}
-              eventClick={handleEventClick}
-              eventContent={renderEvent}
-              dayMaxEventRows={4}
-              allDaySlot={false}
-              nowIndicator={true}
-              height="80vh"
-              moreLinkClick="popover"
-              slotMinTime="00:00:00"
-              slotMaxTime="24:00:00"
-              eventMinHeight={20}
-              eventOverlap={(stillEvent, movingEvent) => {
-                return stillEvent.startStr === movingEvent?.startStr;
-              }} dayCellClassNames={() => "px-1 py-2"}
-            />
+              <FullCalendar
+                ref={calendarRef}
+                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                initialView={view}
+                headerToolbar={false}
+                events={fullCalendarEvents}
+                selectable={true}
+                select={handleSelect}
+                eventClick={handleEventClick}
+                eventContent={renderEvent}
+                dayMaxEventRows={4}
+                allDaySlot={false}
+                nowIndicator={true}
+                height="80vh"
+                moreLinkClick="popover"
+                slotMinTime="00:00:00"
+                slotMaxTime="24:00:00"
+                eventMinHeight={20}
+                eventOverlap={(stillEvent, movingEvent) => {
+                  return stillEvent.startStr === movingEvent?.startStr;
+                }}
+                dayCellClassNames={() => "px-1 py-2"}
+              />
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Sidebar */}
         {showSidebar && (
           <CalendarSidebar
             onToggle={handleShow}

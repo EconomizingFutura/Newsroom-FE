@@ -1,3 +1,5 @@
+import type { ArticleStatus } from "@/types/apitypes";
+
 export const returnType = (type: string) => {
   let route: string;
 
@@ -163,3 +165,65 @@ export function convertISOToReadable(isoString: string): string {
 
   return `${year}-${month}-${day} at ${hours}:${minutes}:${seconds}`;
 }
+
+export type HistoryStatus = Record<ArticleStatus, number>;
+
+export interface HistoryTstatus {
+  title: string;
+  value: number;
+  pillBg: string;
+  pillText: string;
+}
+
+export interface ReturnStatus {
+  title: string;
+  value: number;
+  pillBg: string;
+  pillText: string;
+}
+
+export const transformHistoryStats = (data: HistoryStatus): ReturnStatus[] => {
+  const STATUS_COLORS: Record<
+    ArticleStatus,
+    { pillBg: string; pillText: string }
+  > = {
+    DRAFT: { pillBg: "bg-gray-100", pillText: "text-gray-700" },
+    SUBMITTED: { pillBg: "bg-blue-100", pillText: "text-blue-700" },
+    REVIEWED: { pillBg: "bg-[#E0E7FF]", pillText: "text-[#3730A3]" },
+    REVERTED: { pillBg: "bg-[#FEE2E0]", pillText: "text-[#F41D28]" },
+    PUBLISHED: { pillBg: "bg-green-100", pillText: "text-green-700" },
+    SCHEDULED: { pillBg: "bg-[#E6F4EA]", pillText: "text-[#2DA94F]" },
+    POSTED: { pillBg: "bg-[#F2F4F6]", pillText: "text-[#4A5565]" },
+  };
+
+  const transformed = (Object.keys(data) as ArticleStatus[]).map((status) => ({
+    title: status === "REVIEWED" ? "APPROVED" : status,
+    value: data[status] ?? 0,
+    pillBg: STATUS_COLORS[status].pillBg,
+    pillText: STATUS_COLORS[status].pillText,
+  }));
+
+  const ORDER: ArticleStatus[] = [
+    "POSTED",
+    "REVIEWED",
+    "SCHEDULED",
+    "REVERTED",
+  ];
+  const filtered = transformed.filter((item) =>
+    ORDER.includes(
+      item.title === "APPROVED" ? "REVIEWED" : (item.title as ArticleStatus)
+    )
+  );
+
+  const ordered = filtered.sort(
+    (a, b) =>
+      ORDER.indexOf(
+        a.title === "APPROVED" ? "REVIEWED" : (a.title as ArticleStatus)
+      ) -
+      ORDER.indexOf(
+        b.title === "APPROVED" ? "REVIEWED" : (b.title as ArticleStatus)
+      )
+  );
+
+  return ordered;
+};

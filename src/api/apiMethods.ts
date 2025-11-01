@@ -68,7 +68,6 @@ const request = async <T>(
       url,
       ...axiosConfig,
     });
-    console.log(response);
 
     return response.data;
   } catch (error) {

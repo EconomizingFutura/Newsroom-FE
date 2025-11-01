@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import ContentHeader from "@/components/ContentHeader";
-import type { contentResponse } from "@/types/apitypes";
+import { historyStatus, type contentResponse } from "@/types/apitypes";
 import React, { useState, useEffect, useRef } from "react";
 import { useForm, FormProvider, Controller } from "react-hook-form";
 import {
@@ -35,6 +35,7 @@ import { API_LIST } from "@/api/endpoints";
 import { InputLabel } from "@/components/ui/form";
 import { toast, Toaster } from "sonner";
 import type { AxiosError } from "axios";
+import EditorRemarks from "@/components/EditorRemarks";
 
 interface ContentForm {
   content: string;
@@ -131,7 +132,6 @@ const ViewContent: React.FC = () => {
     if (id) {
       const data = await getArticleById(id);
       setContentData(data ?? null);
-      console.log(data);
       if (data) {
         reset({
           content: data.content || "",
@@ -195,10 +195,8 @@ const ViewContent: React.FC = () => {
       return;
     }
 
-    console.log("Form submitted:", data);
     const URL = API_LIST.BASE_URL + API_LIST.EDITOR_EDIT_ARTICLE + id;
-    const apidata = await PATCH(URL, data);
-    console.log(apidata);
+    await PATCH(URL, data);
     await fetch();
     setShowEnableEdit((p) => !p);
     setEnableEdit((p) => !p);
@@ -332,7 +330,7 @@ const ViewContent: React.FC = () => {
     reset(getValues());
   };
 
-  console.log(contentData);
+  const ISPOSTED = contentData?.status !== "POSTED";
 
   return (
     <div className="flex-1 font-openSans py-8 min-h-screen bg-[#f2f6f2] overflow-auto">
@@ -394,20 +392,39 @@ const ViewContent: React.FC = () => {
                         />
                       </div>
                     ) : (
-                      <div>
-                        <h1 className="text-[#101828] font-bold text-2xl">
-                          {contentData?.title || ""}
-                        </h1>
-                        <div className="flex items-center my-2 gap-1">
-                          <InfoBadge
-                            type="date"
-                            value={formatToIST(contentData?.updatedAt)}
-                          />
-                          <InfoBadge
-                            type="user"
-                            value={contentData?.reporter.username}
-                          />
+                      <div className=" flex justify-between items-center">
+                        <div>
+                          <h1 className="text-[#101828] font-bold text-2xl">
+                            {contentData?.title || ""}
+                          </h1>
+                          <div className="flex items-center my-2 gap-1">
+                            <InfoBadge
+                              type="date"
+                              value={formatToIST(contentData?.updatedAt)}
+                            />
+                            <InfoBadge
+                              type="user"
+                              value={contentData?.reporter.username}
+                            />
+                          </div>
                         </div>
+
+                        {from == "editor-history" && (
+                          <div>
+                            <Badge
+                              className={`px-2 py-1 max-h-8 flex justify-center items-center ${historyStatus(
+                                contentData.status
+                              )}`}
+                            >
+                              <span className="!font-semibold text-[14px]">
+                                {contentData.status}
+                              </span>
+                            </Badge>
+                          </div>
+                        )}
+                        {contentData?.remarks && from == "editor-history" && (
+                          <EditorRemarks remarks={contentData?.remarks} />
+                        )}
                       </div>
                     )}
                   </div>
@@ -472,6 +489,9 @@ const ViewContent: React.FC = () => {
                       {typeof watch("video") === "string" ? (
                         // ✅ From API
                         <div className="py-2 w-full flex flex-col">
+                          {contentData?.remarks && from == "editor-history" && (
+                            <EditorRemarks remarks={contentData?.remarks} />
+                          )}
                           <VideoUrlPlayer
                             videoUrl={watch("video") as string}
                             thumbnailUrl={
@@ -559,20 +579,36 @@ const ViewContent: React.FC = () => {
                       />
                     </div>
                   ) : (
-                    <div>
-                      <h1 className="text-[#101828] font-bold text-2xl">
-                        {contentData?.title || ""}
-                      </h1>
-                      <div className="flex items-center my-2 gap-1">
-                        <InfoBadge
-                          type="date"
-                          value={formatToIST(contentData?.updatedAt)}
-                        />
-                        <InfoBadge
-                          type="user"
-                          value={contentData?.reporter.username}
-                        />
+                    <div className=" flex justify-between items-center">
+                      <div>
+                        <h1 className="text-[#101828] font-bold text-2xl">
+                          {contentData?.title || ""}
+                        </h1>
+                        <div className="flex items-center my-2 gap-1">
+                          <InfoBadge
+                            type="date"
+                            value={formatToIST(contentData?.updatedAt)}
+                          />
+                          <InfoBadge
+                            type="user"
+                            value={contentData?.reporter.username}
+                          />
+                        </div>
                       </div>
+
+                      {ISPOSTED && (
+                        <div>
+                          <Badge
+                            className={`px-2 py-1 max-h-8 flex justify-center items-center ${historyStatus(
+                              contentData.status
+                            )}`}
+                          >
+                            <span className="!font-semibold text-[14px]">
+                              {contentData.status}
+                            </span>
+                          </Badge>
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -615,6 +651,9 @@ const ViewContent: React.FC = () => {
                         </p>
                       )}
                     </div>
+                  )}
+                  {contentData?.remarks && from == "editor-history" && (
+                    <EditorRemarks remarks={contentData?.remarks} />
                   )}
 
                   {audioVal && (
@@ -671,7 +710,7 @@ const ViewContent: React.FC = () => {
                         type="button"
                         size="sm"
                         onClick={handleAddTag}
-                        className="absolute top-[6px] right-[12px] bg-[#006601] hover:bg-[#006601] px-[16px] py-[6px] gap-1"
+                        className="absolute top-1.5 right-3 bg-[#006601] hover:bg-[#006601] px-4 py-1.5 gap-1"
                       >
                         <Plus className="w-3 h-3" />
                         Add
@@ -716,90 +755,96 @@ const ViewContent: React.FC = () => {
             </div>
 
             {((!isEDit && enableEdit) ||
-              (from !== "calendar" && from !== "publishCenter") ||
-              isEDit) && (
-              <div className="shadow-[0px_2px_10px_0px_#0000001A,0px_0px_2px_0px_#00000033] border border-b-[#0000001A] bg-[#FFFFFF] h-min py-6 px-4">
-                {!isEDit && enableEdit ? (
-                  <div className="flex flex-wrap justify-end gap-3">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="text-[14px] w-28 font-semibold"
-                      onClick={handleCancel}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      type="submit"
-                      className="bg-[#006601] text-[14px] w-28 font-semibold hover:bg-[#005001]"
-                      onClick={() => {
-                        if (!isDirty) {
-                          toast.warning("No changes detected", {
-                            description: "You haven’t modified any fields.",
-                          });
-                          return;
-                        }
-                        methods.handleSubmit(onSubmit)();
-                      }}
-                    >
-                      Update
-                    </Button>
-                  </div>
-                ) : (
-                  from !== "calendar" &&
-                  from !== "publishCenter" && (
+              (from !== "calendar" &&
+                from !== "publishCenter" &&
+                from !== "editor-history") ||
+              isEDit) &&
+              ISPOSTED && (
+                <div className="shadow-[0px_2px_10px_0px_#0000001A,0px_0px_2px_0px_#00000033] border border-b-[#0000001A] bg-[#FFFFFF] h-min py-6 px-4">
+                  {!isEDit && enableEdit ? (
                     <div className="flex flex-wrap justify-end gap-3">
                       <Button
+                        type="button"
                         variant="outline"
-                        onClick={toggleRemarks}
-                        className="text-white bg-[#FB2C36] hover:text-white hover:bg-[#FB2C36] border-red-300"
+                        className="text-[14px] w-28 font-semibold"
+                        onClick={handleCancel}
                       >
-                        Reverted
+                        Cancel
                       </Button>
                       <Button
-                        onClick={() =>
-                          contentData && handleMoveToPublish(contentData?.id)
-                        }
-                        className="bg-[#008001] font-semibold hover:bg-[#008001] text-white"
+                        type="submit"
+                        className="bg-[#006601] text-[14px] w-28 font-semibold hover:bg-[#005001]"
+                        onClick={() => {
+                          if (!isDirty) {
+                            toast.warning("No changes detected", {
+                              description: "You haven’t modified any fields.",
+                            });
+                            return;
+                          }
+                          methods.handleSubmit(onSubmit)();
+                        }}
                       >
-                        Approve & Move to publish
+                        Update
                       </Button>
                     </div>
-                  )
-                )}
+                  ) : (
+                    from !== "calendar" &&
+                    from !== "publishCenter" &&
+                    from !== "editor-history" && (
+                      <div className="flex flex-wrap justify-end gap-3">
+                        <Button
+                          variant="outline"
+                          onClick={toggleRemarks}
+                          className="text-white bg-[#FB2C36] hover:text-white hover:bg-[#FB2C36] border-red-300"
+                        >
+                          Reverted
+                        </Button>
+                        <Button
+                          onClick={() =>
+                            contentData && handleMoveToPublish(contentData?.id)
+                          }
+                          className="bg-[#008001] font-semibold hover:bg-[#008001] text-white"
+                        >
+                          Approve & Move to publish
+                        </Button>
+                      </div>
+                    )
+                  )}
 
-                {isEDit && (
-                  <div className="flex flex-wrap justify-end gap-3">
-                    <Button
-                      type="submit"
-                      onClick={() => {
-                        formRef.current?.requestSubmit();
-                        if (from === "publishCenter") navigate(-1);
-                      }}
-                      variant="outline"
-                      className="text-[14px] hover:bg-[#fff] hover:text-[#006601] w-28 font-semibold text-[#006601]"
-                    >
-                      Update
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="text-[14px] hover:bg-[#fff] hover:text-[#006601] w-28 font-semibold text-[#006601]"
-                      onClick={() => setScheduleModalOpen((p) => !p)}
-                    >
-                      {contentData?.scheduledTime ? "Re Schedule" : "Schedule"}
-                    </Button>
-                    <Button
-                      type="button"
-                      onClick={handlePublishNowClick}
-                      className="bg-[#006601] text-[14px] w-28 font-semibold hover:bg-[#005001]"
-                    >
-                      Publish Now
-                    </Button>
-                  </div>
-                )}
-              </div>
-            )}
+                  {isEDit && (
+                    <div className="flex flex-wrap justify-end gap-3">
+                      <Button
+                        type="submit"
+                        onClick={() => {
+                          formRef.current?.requestSubmit();
+                          if (from === "publishCenter") navigate(-1);
+                        }}
+                        variant="outline"
+                        className="text-[14px] hover:bg-white hover:text-[#006601] w-28 font-semibold text-[#006601]"
+                      >
+                        Update
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="text-[14px] hover:bg-white hover:text-[#006601] w-28 font-semibold text-[#006601]"
+                        onClick={() => setScheduleModalOpen((p) => !p)}
+                      >
+                        {contentData?.scheduledTime
+                          ? "Re Schedule"
+                          : "Schedule"}
+                      </Button>
+                      <Button
+                        type="button"
+                        onClick={handlePublishNowClick}
+                        className="bg-[#006601] text-[14px] w-28 font-semibold hover:bg-[#005001]"
+                      >
+                        Publish Now
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
           </form>
         </FormProvider>
       </div>
@@ -815,7 +860,7 @@ const ViewContent: React.FC = () => {
       {showPublishCard && (
         <div
           ref={publishCardRef}
-          className="absolute bottom-28 right-12 mb-2 !z-100"
+          className="absolute bottom-28 right-12 mb-2 z-100!"
         >
           <SocialMediaPublishCard
             isOpen={showPublishCard}

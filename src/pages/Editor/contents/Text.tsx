@@ -1,11 +1,15 @@
+import EditorRemarks from "@/components/EditorRemarks";
+import { Badge } from "@/components/ui/badge";
 import CustomQuilTextEditor from "@/components/ui/CustomQuilTextEditor";
 import { InputLabel } from "@/components/ui/form";
 import InfoBadge from "@/components/ui/InfoBatch";
 import { Input } from "@/components/ui/input";
-import type { contentResponse } from "@/types/apitypes";
+import { historyStatus, type contentResponse } from "@/types/apitypes";
+import type { currentPageType } from "@/types/sidebarTypes";
 import { formatToIST } from "@/utils/utils";
 import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
+import { useSearchParams } from "react-router";
 
 interface TextProps {
   content: contentResponse;
@@ -22,6 +26,12 @@ const Text: React.FC<TextProps> = ({
     control,
     formState: { errors },
   } = useFormContext();
+  const [searchParams] = useSearchParams();
+
+  const from = searchParams.get("from") as
+    | currentPageType
+    | null
+    | "publishCenter";
 
   // const validateContent = (value: string): boolean | string => {
   //   if (!value || value.trim() === "" || value.trim() === "<p><br></p>") {
@@ -68,15 +78,32 @@ const Text: React.FC<TextProps> = ({
         </div>
       )}
       {readOnly && (
-        <div>
-          <h1 className="text-[#101828] font-bold text-2xl">
-            {content?.title || ""}
-          </h1>
-          <div className="flex items-center my-2 gap-1 ">
-            <InfoBadge type="date" value={formatToIST(content?.updatedAt)} />
-            <InfoBadge type="user" value={content?.reporter.username} />
+        <div className="flex justify-between px-4">
+          <div>
+            <h1 className="text-[#101828] font-bold text-2xl">
+              {content?.title || ""}
+            </h1>
+            <div className="flex items-center my-2 gap-1 ">
+              <InfoBadge type="date" value={formatToIST(content?.updatedAt)} />
+              <InfoBadge type="user" value={content?.reporter.username} />
+            </div>
           </div>
+          {from == "editor-history" && (
+            <Badge
+              className={`px-2 py-1 max-h-8 flex justify-center items-center ${historyStatus(
+                content.status
+              )}`}
+            >
+              <span className="!font-semibold text-[14px]">
+                {content.status}
+              </span>
+            </Badge>
+          )}
         </div>
+      )}
+
+      {content?.remarks && from == "editor-history" && (
+        <EditorRemarks remarks={content?.remarks} />
       )}
 
       <>
