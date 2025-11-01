@@ -45,14 +45,21 @@ export const transformScheduleData = (
 ): TransformedItem[] => {
   return data.map((item) => {
     const start = new Date(item.scheduledDate);
-    const [hours, minutes, seconds = "0"] = item.scheduledTime.split(":");
-    start.setHours(Number(hours), Number(minutes), Number(seconds));
+    const [hours, minutesStr] = item.scheduledTime.split(":");
+    const hoursNum = Number(hours);
+    const minutesNum = Number(minutesStr);
+
+    // ⏱ Normalize to nearest half-hour
+    const normalizedMinutes = minutesNum < 30 ? 0 : 30;
+
+    start.setHours(hoursNum, normalizedMinutes, 0, 0);
 
     const end = new Date(start);
     end.setMinutes(start.getMinutes() + 30);
 
     return {
       ...item,
+      originalScheduledTime: item.scheduledTime,
       start,
       end,
     };

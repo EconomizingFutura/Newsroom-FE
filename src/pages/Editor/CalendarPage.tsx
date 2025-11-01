@@ -1,11 +1,14 @@
 import React, { useRef, useState, useEffect } from "react";
-import FullCalendar, {
-  EventInput,
-  EventClickArg,
-  DateSelectArg,
+import FullCalendar from "@fullcalendar/react";
+
+import type {
   CalendarApi,
+  EventInput,
+  DateSelectArg,
+  EventClickArg,
   EventContentArg,
-} from "@fullcalendar/react";
+} from "@fullcalendar/core";
+
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -90,7 +93,7 @@ const CalendarPage: React.FC = () => {
   }, []);
 
   const fullCalendarEvents: EventInput[] = events.map((e) => ({
-    id: e.id,
+    id: e.id.toString(),
     title: e.title,
     start: e.start,
     end: e.end,
@@ -117,8 +120,8 @@ const CalendarPage: React.FC = () => {
       v === "month"
         ? "dayGridMonth"
         : v === "week"
-        ? "timeGridWeek"
-        : "timeGridDay";
+          ? "timeGridWeek"
+          : "timeGridDay";
     setView(newView);
     api.changeView(newView);
   };
@@ -223,8 +226,8 @@ const CalendarPage: React.FC = () => {
                   view === "dayGridMonth"
                     ? "month"
                     : view === "timeGridWeek"
-                    ? "week"
-                    : "day"
+                      ? "week"
+                      : "day"
                 }
                 onValueChange={handleViewChange}
               >
@@ -245,8 +248,8 @@ const CalendarPage: React.FC = () => {
               .fc .fc-day-today ,.fc-v-event{
                 background-color: transparent !important;
                 border:transparent !important
-              }
-            `}</style>
+  }
+`}</style>
             <FullCalendar
               ref={calendarRef}
               plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
@@ -262,10 +265,12 @@ const CalendarPage: React.FC = () => {
               nowIndicator={true}
               height="80vh"
               moreLinkClick="popover"
-              slotMinTime="0:00:00"
+              slotMinTime="00:00:00"
               slotMaxTime="24:00:00"
-              eventOverlap={false}
-              dayCellClassNames={() => "px-1 py-2"}
+              eventMinHeight={20}
+              eventOverlap={(stillEvent, movingEvent) => {
+                return stillEvent.startStr === movingEvent?.startStr;
+              }} dayCellClassNames={() => "px-1 py-2"}
             />
           </div>
         </div>
