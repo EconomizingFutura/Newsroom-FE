@@ -141,11 +141,12 @@ export function HistoryLog() {
           page: currentPage.toString(),
           pageSize: pageSize.toString(),
         });
+        console.log(  filters);
 
         if (filters.statuses && filters.statuses.length > 0) {
           queryParams.append("status", filters.statuses.join(","));
         }
-        if (filters.categories && filters.categories.length > 0) {
+        if ( filters.categories && filters.categories.length > 0) {
           queryParams.append("category", filters.categories.join(","));
         }
         if (filters.authors && filters.authors.length > 0) {
@@ -292,7 +293,7 @@ export function HistoryLog() {
                             key={option.id}
                             onSelect={(e) => e.preventDefault()}
                             onClick={() =>
-                              handleDropDownToggle(option.username, "authors")
+                              handleDropDownToggle(option.id, "authors")
                             }
                           >
                             <Checkbox
