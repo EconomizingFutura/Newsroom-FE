@@ -75,7 +75,7 @@ export function CalendarView() {
     fetchData();
   }, []);
 
-  const CustomEvent = ({ event }) => (
+  const CustomEvent = ({ event }: { event: TransformedItem }) => (
     <span
       style={{
         whiteSpace: "nowrap",

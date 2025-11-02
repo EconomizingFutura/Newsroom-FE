@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -139,55 +139,7 @@ console.log("🕓 debouncedSearch:", debouncedSearch);
     });
   };
 
-const debouncedFilters = useMemo(
-  () => ({ ...filters, search: debouncedSearch }),
-  [filters, debouncedSearch]
-);
 
-console.log("📡 API call triggered with filters:", debouncedFilters);
-
-const getHistoryList = useCallback(
-  async (signal?: AbortSignal) => {
-    try {
-      setLoading(true);
-      const queryParams = new URLSearchParams({
-        page: currentPage.toString(),
-        pageSize: pageSize.toString(),
-      });
-
-      if (debouncedFilters.statuses.length > 0) {
-        queryParams.append("status", debouncedFilters.statuses.join(","));
-      }
-      if (debouncedFilters.categories.length > 0) {
-        queryParams.append("category", debouncedFilters.categories.join(","));
-      }
-      if (debouncedFilters.authors.length > 0) {
-        queryParams.append("authorId", debouncedFilters.authors.join(","));
-      }
-      if (debouncedFilters.dateRange !== "all") {
-        queryParams.append("range", debouncedFilters.dateRange);
-      }
-      if (debouncedFilters.search.trim() !== "") {
-        queryParams.append("search", debouncedFilters.search.trim());
-      }
-
-      const url = `${API_LIST.BASE_URL}${API_LIST.HISTORY}?${queryParams.toString()}`;
-      const response: HistoryResponse = await GET(url, { signal });
-
-      setHistoryArticles(response.articles ?? []);
-      setPageMetaData(response.pagination ?? {
-        total: 0, page: currentPage, pageSize, totalPages: 1, hasNextPage: false, hasPrevPage: false
-      });
-    } catch (err) {
-      if ((err as AxiosError).name !== "AbortError") {
-        console.error("Error fetching history:", err);
-      }
-    } finally {
-      setLoading(false);
-    }
-  },
-  [debouncedFilters, currentPage, pageSize] // <-- use debouncedFilters instead of filters
-);
 
   useEffect(() => {
   const controller = new AbortController();

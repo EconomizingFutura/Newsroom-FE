@@ -22,7 +22,6 @@ import { GET } from "@/api/apiMethods";
 import moment from "moment";
 import type { RevertedArticleTypes } from "@/types/draftPageTypes";
 import Loading from "./Shared/agency-feeds/loading";
-import { set } from "lodash";
 
 const HistoryLogPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
