@@ -273,7 +273,7 @@ export function PublishCenter() {
   };
 
 
-  const showPagination = Number(pageMetaData.totalPages) >= 1;
+  const showPagination = Number(pageMetaData.totalPages) > 1;
 
   return (
     <div className="min-h-screen flex flex-col pt-16 bg-[#F6FAF6]">

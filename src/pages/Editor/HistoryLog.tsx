@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -39,6 +39,7 @@ import {
 } from "@/utils/utils";
 import type { AxiosError } from "axios";
 import { useNavigate } from "react-router";
+import { useDebounce } from "@/hooks/useDebounce";
 
 export function HistoryLog() {
   const [filters, setFilters] = useState({
@@ -77,6 +78,11 @@ export function HistoryLog() {
     totalPages: pageMetaData.totalPages ?? 1,
     initialPageSize: pageMetaData.pageSize ?? 10,
   });
+  const debouncedSearch = useDebounce(filters.search, 600);
+
+  console.log("⌨️ filters.search:", filters.search);
+console.log("🕓 debouncedSearch:", debouncedSearch);
+
 
   const updateFilter = <K extends keyof typeof filters>(
     key: K,
@@ -133,67 +139,121 @@ export function HistoryLog() {
     });
   };
 
-  const getHistoryList = useCallback(
-    async (signal?: AbortSignal) => {
-      try {
-        setLoading(true);
-        const queryParams = new URLSearchParams({
-          page: currentPage.toString(),
-          pageSize: pageSize.toString(),
-        });
-        console.log(filters);
+const debouncedFilters = useMemo(
+  () => ({ ...filters, search: debouncedSearch }),
+  [filters, debouncedSearch]
+);
 
-        if (filters.statuses && filters.statuses.length > 0) {
-          queryParams.append("status", filters.statuses.join(","));
-        }
-        if (filters.categories && filters.categories.length > 0) {
-          queryParams.append("category", filters.categories.join(","));
-        }
-        if (filters.authors && filters.authors.length > 0) {
-          queryParams.append("authorId", filters.authors.join(","));
-        }
-        if (filters.dateRange && filters.dateRange !== "all") {
-          queryParams.append("range", filters.dateRange);
-        }
-        if (filters.search && filters.search.trim() !== "") {
-          queryParams.append("search", filters.search.trim());
-        }
+console.log("📡 API call triggered with filters:", debouncedFilters);
 
-        const url = `${API_LIST.BASE_URL}${
-          API_LIST.HISTORY
-        }?${queryParams.toString()}`;
-        const response: HistoryResponse = await GET(url, { signal });
+const getHistoryList = useCallback(
+  async (signal?: AbortSignal) => {
+    try {
+      setLoading(true);
+      const queryParams = new URLSearchParams({
+        page: currentPage.toString(),
+        pageSize: pageSize.toString(),
+      });
 
-        const articles: HistoryContentResponse[] = response.articles ?? [];
-        const pagination = response.pagination ?? {
-          total: articles.length,
+      if (debouncedFilters.statuses.length > 0) {
+        queryParams.append("status", debouncedFilters.statuses.join(","));
+      }
+      if (debouncedFilters.categories.length > 0) {
+        queryParams.append("category", debouncedFilters.categories.join(","));
+      }
+      if (debouncedFilters.authors.length > 0) {
+        queryParams.append("authorId", debouncedFilters.authors.join(","));
+      }
+      if (debouncedFilters.dateRange !== "all") {
+        queryParams.append("range", debouncedFilters.dateRange);
+      }
+      if (debouncedFilters.search.trim() !== "") {
+        queryParams.append("search", debouncedFilters.search.trim());
+      }
+
+      const url = `${API_LIST.BASE_URL}${API_LIST.HISTORY}?${queryParams.toString()}`;
+      const response: HistoryResponse = await GET(url, { signal });
+
+      setHistoryArticles(response.articles ?? []);
+      setPageMetaData(response.pagination ?? {
+        total: 0, page: currentPage, pageSize, totalPages: 1, hasNextPage: false, hasPrevPage: false
+      });
+    } catch (err) {
+      if ((err as AxiosError).name !== "AbortError") {
+        console.error("Error fetching history:", err);
+      }
+    } finally {
+      setLoading(false);
+    }
+  },
+  [debouncedFilters, currentPage, pageSize] // <-- use debouncedFilters instead of filters
+);
+
+  useEffect(() => {
+  const controller = new AbortController();
+
+  const getHistoryList = async (signal?: AbortSignal) => {
+    try {
+      setLoading(true);
+
+      const queryParams = new URLSearchParams({
+        page: currentPage.toString(),
+        pageSize: pageSize.toString(),
+      });
+
+      // ✅ use filters normally, but for search use debouncedSearch
+      if (filters.statuses.length > 0) {
+        queryParams.append("status", filters.statuses.join(","));
+      }
+      if (filters.categories.length > 0) {
+        queryParams.append("category", filters.categories.join(","));
+      }
+      if (filters.authors.length > 0) {
+        queryParams.append("authorId", filters.authors.join(","));
+      }
+      if (filters.dateRange !== "all") {
+        queryParams.append("range", filters.dateRange);
+      }
+      if (debouncedSearch.trim() !== "") {
+        queryParams.append("search", debouncedSearch.trim());
+      }
+
+      const url = `${API_LIST.BASE_URL}${API_LIST.HISTORY}?${queryParams.toString()}`;
+      console.log("📡 API triggered with search:", debouncedSearch);
+      const response: HistoryResponse = await GET(url, { signal });
+
+      setHistoryArticles(response.articles ?? []);
+      setPageMetaData(
+        response.pagination ?? {
+          total: 0,
           page: currentPage,
           pageSize,
           totalPages: 1,
           hasNextPage: false,
           hasPrevPage: false,
-        };
-
-        setHistoryArticles(articles);
-        setPageMetaData(pagination);
-      } catch (error: unknown) {
-        const err = error as AxiosError;
-        if (err.name === "AbortError") {
-          return;
         }
-        console.error("Error fetching history:", error);
-      } finally {
-        setLoading(false);
+      );
+    } catch (err) {
+      if ((err as AxiosError).name !== "AbortError") {
+        console.error("Error fetching history:", err);
       }
-    },
-    [filters, currentPage, pageSize]
-  );
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  useEffect(() => {
-    const controller = new AbortController();
-    getHistoryList(controller.signal);
-    return () => controller.abort();
-  }, [getHistoryList]);
+  getHistoryList(controller.signal);
+
+  return () => controller.abort();
+}, [
+  debouncedSearch,            // ✅ only triggers when debounce completes
+  filters.statuses,
+  filters.categories,
+  filters.authors,
+  filters.dateRange,
+  currentPage,
+  pageSize,
+]);
 
   const handleDropDownToggle = (
     value: string,

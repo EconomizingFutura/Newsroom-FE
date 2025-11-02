@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "./ui/button";
 import {
+  Calendar,
   FileText,
   Heart,
   History,
@@ -100,7 +101,7 @@ const menuConfig = {
     {
       key: "calendar",
       label: "Calendar",
-      icon: <Users className="w-4 h-4" />,
+      icon: <Calendar className="w-4 h-4" />,
       action: "onNavigateEditorCalendarView",
     },
     {
