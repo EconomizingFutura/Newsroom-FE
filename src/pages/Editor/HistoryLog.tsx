@@ -103,14 +103,14 @@ export function HistoryLog() {
           API_LIST.BASE_URL + API_LIST.AUTHOR_LIST
         );
         if (cancelled) return;
-        const ALL = {
-          id: "all",
-          username: "All Authors",
-          email: "all",
-        };
-        const data = [ALL, ...response];
+        // const ALL = {
+        //   id: "all",
+        //   username: "All Authors",
+        //   email: "all",
+        // };
+        const data = [...response];
         console.log(data);
-        setAuthors(data);
+        setAuthors(response);
       } catch (err) {
         console.error("Error fetching stats:", err);
       }
@@ -141,12 +141,12 @@ export function HistoryLog() {
           page: currentPage.toString(),
           pageSize: pageSize.toString(),
         });
-        console.log(  filters);
+        console.log(filters);
 
         if (filters.statuses && filters.statuses.length > 0) {
           queryParams.append("status", filters.statuses.join(","));
         }
-        if ( filters.categories && filters.categories.length > 0) {
+        if (filters.categories && filters.categories.length > 0) {
           queryParams.append("category", filters.categories.join(","));
         }
         if (filters.authors && filters.authors.length > 0) {
@@ -199,12 +199,37 @@ export function HistoryLog() {
     value: string,
     key: "categories" | "authors" | "statuses"
   ) => {
+    let allOptions: string[] = [];
+
+    if (key === "statuses") {
+      allOptions = FILTER_OPTIONS.STATUS.map((s) => s.value);
+    } else if (key === "categories") {
+      allOptions = FILTER_OPTIONS.CATEGORY.map((c) => c.value);
+    } else if (key === "authors") {
+      allOptions = authors.map((a) => a.id);
+    }
+
     setFilters((prev) => {
       const arr = prev[key];
+
+      if (value === "all") {
+        const allSelected = arr.length === allOptions.length;
+        return {
+          ...prev,
+          [key]: allSelected ? [] : [...allOptions],
+        };
+      }
+
       const next = arr.includes(value)
         ? arr.filter((v) => v !== value)
         : [...arr, value];
-      return { ...prev, [key]: next } as typeof filters;
+
+      const allSelected = next.length === allOptions.length;
+
+      return {
+        ...prev,
+        [key]: allSelected ? [...allOptions] : next,
+      };
     });
   };
 
@@ -216,143 +241,140 @@ export function HistoryLog() {
 
   const isEmpty = !loading && paginatedArticles.length === 0;
 
+  console.log(filters);
+
   return (
     <div className="min-h-screen flex flex-col pt-16 bg-[#F6FAF6]">
       <main className="flex-1 p-8 flex flex-col">
-        {loading ? (
-          <Loading />
-        ) : (
-          <>
-            <ContentHeader text="History" iconName="History" />
+        <>
+          <ContentHeader text="History" iconName="History" />
 
-            <div className="grid grid-cols-4 py-5 gap-6">
-              {stats?.map((item, index) => (
-                <HistoryCard
-                  key={index}
-                  title={item.title}
-                  value={item.value}
-                  pillBg={item.pillBg}
-                  pillText={item.pillText}
-                />
-              ))}
-            </div>
+          <div className="grid grid-cols-4 py-5 gap-6">
+            {stats?.map((item, index) => (
+              <HistoryCard
+                key={index}
+                title={item.title}
+                value={item.value}
+                pillBg={item.pillBg}
+                pillText={item.pillText}
+              />
+            ))}
+          </div>
 
-            <section className="sticky top-16 bg-[#F6FAF6] z-10">
-              <div
-                style={{ boxShadow: "0px 2px 10px 0px #959DA533" }}
-                className="bg-white rounded-lg border border-gray-200 p-6 mb-2"
-              >
-                <div className="flex items-center w-full justify-between space-x-4">
-                  <div className="relative max-w-96 w-full border border-[#ECECEC] bg-[#F7FBF7] rounded-[8px]">
-                    <Search className="absolute  left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <Input
-                      placeholder="Search Articles..."
-                      value={filters.search}
-                      onChange={(e) => updateFilter("search", e.target.value)}
-                      className="pl-9 w-full bg-[#F6FAF6]"
-                    />
-                  </div>
+          <section className="sticky top-16 bg-[#F6FAF6] z-10">
+            <div
+              style={{ boxShadow: "0px 2px 10px 0px #959DA533" }}
+              className="bg-white rounded-lg border border-gray-200 p-6 mb-2"
+            >
+              <div className="flex items-center w-full justify-between space-x-4">
+                <div className="relative max-w-96 w-full border border-[#ECECEC] bg-[#F7FBF7] rounded-[8px]">
+                  <Search className="absolute  left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input
+                    placeholder="Search Articles..."
+                    value={filters.search}
+                    onChange={(e) => updateFilter("search", e.target.value)}
+                    className="pl-9 w-full bg-[#F6FAF6]"
+                  />
+                </div>
 
-                  <div className="flex gap-4 ">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <button className="w-40 border flex justify-between items-center bg-[#F7FBF7] border-history-select-border text-black font-semibold text-sm px-3 py-2 rounded-[8px]">
-                          Category <ChevronDown strokeWidth={2.5} size={15} />
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-40">
-                        {FILTER_OPTIONS.CATEGORY.map((option) => (
-                          <DropdownMenuItem
-                            key={option.value}
-                            onSelect={(e) => e.preventDefault()}
-                            onClick={() =>
-                              handleDropDownToggle(option.value, "categories")
-                            }
-                          >
-                            <Checkbox
-                              className="data-[state=checked]:!bg-green-500 data-[state=checked]:!border-green-500"
-                              checked={filters.categories.includes(
-                                option.value
-                              )}
-                            />
-                            {option.label}
-                          </DropdownMenuItem>
-                        ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                <div className="flex gap-4 ">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="w-40 border flex justify-between items-center bg-[#F7FBF7] border-history-select-border text-[#1E2939] font-semibold text-sm px-3 py-2 rounded-[8px]">
+                        Category <ChevronDown strokeWidth={2.5} size={15} />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-40">
+                      {FILTER_OPTIONS.CATEGORY.map((option) => (
+                        <DropdownMenuItem
+                          key={option.value}
+                          onSelect={(e) => e.preventDefault()}
+                          onClick={() =>
+                            handleDropDownToggle(option.value, "categories")
+                          }
+                        >
+                          <Checkbox
+                            className="data-[state=checked]:!bg-green-500 data-[state=checked]:!border-green-500"
+                            checked={filters.categories.includes(option.value)}
+                          />
+                          {option.label}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
 
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <button className="w-40 border flex justify-between items-center bg-[#F7FBF7] border-history-select-border rounded-[8px] text-black font-semibold text-sm px-3 py-2">
-                          Author <ChevronDown strokeWidth={2.5} size={15} />
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-40">
-                        {authors?.map((option) => (
-                          <DropdownMenuItem
-                            key={option.id}
-                            onSelect={(e) => e.preventDefault()}
-                            onClick={() =>
-                              handleDropDownToggle(option.id, "authors")
-                            }
-                          >
-                            <Checkbox
-                              className="data-[state=checked]:!bg-green-500 data-[state=checked]:!border-green-500"
-                              checked={filters.authors.includes(
-                                option.username
-                              )}
-                            />
-                            {option.username}
-                          </DropdownMenuItem>
-                        ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="w-40 border flex justify-between items-center bg-[#F7FBF7] border-history-select-border text-[#1E2939] font-semibold text-sm px-3 py-2 rounded-[8px]">
+                        Author <ChevronDown strokeWidth={2.5} size={15} />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-40">
+                      {authors?.map((option) => (
+                        <DropdownMenuItem
+                          key={option.id}
+                          onSelect={(e) => e.preventDefault()}
+                          onClick={() =>
+                            handleDropDownToggle(option.id, "authors")
+                          }
+                        >
+                          <Checkbox
+                            className="data-[state=checked]:!bg-green-500 data-[state=checked]:!border-green-500"
+                            checked={filters.authors.includes(option.id)}
+                          />
+                          {option.username}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
 
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <button className="w-40 border flex justify-between items-center bg-[#F7FBF7] border-history-select-border rounded-[8px] text-black font-semibold text-sm px-3 py-2">
-                          Status <ChevronDown strokeWidth={2.5} size={15} />
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-40">
-                        {FILTER_OPTIONS.STATUS.map((option) => (
-                          <DropdownMenuItem
-                            key={option.value}
-                            onSelect={(e) => e.preventDefault()}
-                            onClick={() =>
-                              handleDropDownToggle(option.value, "statuses")
-                            }
-                          >
-                            <Checkbox
-                              className="data-[state=checked]:!bg-green-500 data-[state=checked]:!border-green-500"
-                              checked={filters.statuses.includes(option.value)}
-                            />
-                            {option.label}
-                          </DropdownMenuItem>
-                        ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="w-40 border flex justify-between items-center bg-[#F7FBF7] border-history-select-border text-[#1E2939] font-semibold text-sm px-3 py-2 rounded-[8px]">
+                        Status <ChevronDown strokeWidth={2.5} size={15} />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-40">
+                      {FILTER_OPTIONS.STATUS.map((option) => (
+                        <DropdownMenuItem
+                          key={option.value}
+                          onSelect={(e) => e.preventDefault()}
+                          onClick={() =>
+                            handleDropDownToggle(option.value, "statuses")
+                          }
+                        >
+                          <Checkbox
+                            className="data-[state=checked]:!bg-green-500 data-[state=checked]:!border-green-500"
+                            checked={filters.statuses.includes(option.value)}
+                          />
+                          {option.label}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
 
-                    <Select
-                      value={filters.dateRange}
-                      onValueChange={(val) => updateFilter("dateRange", val)}
-                    >
-                      <SelectTrigger className="w-40 border bg-[#F7FBF7] border-history-select-border rounded-[8px] text-black font-semibold text-sm px-3 py-2">
-                        <SelectValue placeholder="All" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {FILTER_OPTIONS.DATE_RANGE.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <Select
+                    value={filters.dateRange}
+                    onValueChange={(val) => updateFilter("dateRange", val)}
+                  >
+                    <SelectTrigger className="w-40 border bg-[#F7FBF7] border-history-select-border rounded-[8px] text-[#1E2939] font-semibold text-sm px-3 py-2">
+                      <SelectValue placeholder="All" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {FILTER_OPTIONS.DATE_RANGE.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
-            </section>
-
+            </div>
+          </section>
+          {loading ? (
+            <Loading />
+          ) : (
             <div className="flex-1 overflow-y-auto mt-4 space-y-4 pr-2">
               <div
                 style={{ boxShadow: "0px 2px 10px 0px #959DA533" }}
@@ -399,7 +421,7 @@ export function HistoryLog() {
                                 article.status
                               )}`}
                             >
-                              <span className="!font-semibold text-[14px]">
+                              <span className="font-semibold! text-[14px]">
                                 {article.status}
                               </span>
                             </Badge>
@@ -455,8 +477,8 @@ export function HistoryLog() {
                 </div>
               </div>
             </div>
-          </>
-        )}
+          )}
+        </>
       </main>
 
       {!loading && totalPages && (

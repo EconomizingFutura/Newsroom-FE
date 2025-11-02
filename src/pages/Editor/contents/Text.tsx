@@ -78,7 +78,7 @@ const Text: React.FC<TextProps> = ({
         </div>
       )}
       {readOnly && (
-        <div className="flex justify-between px-4">
+        <div className="flex justify-between gap-4 px-4">
           <div>
             <h1 className="text-[#101828] font-bold text-2xl">
               {content?.title || ""}

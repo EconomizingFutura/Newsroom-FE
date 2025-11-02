@@ -172,6 +172,7 @@ export interface HistoryResponse {
 export const historyStatus = (status: string) => {
   switch (status) {
     case "SUBMITTED":
+    case "POSTED":
       return "bg-green-100 text-green-800 border-green-200";
     case "REVERTED":
       return "bg-red-100 text-red-800 border-red-200";
