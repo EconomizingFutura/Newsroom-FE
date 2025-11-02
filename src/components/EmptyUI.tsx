@@ -87,6 +87,7 @@ export function PendingReviewEmptyState() {
     <EmptyState
       icon={<Search className="h-10 w-10 text-blue-500/70" />}
       title="No pending reviews"
+      className="w-full"
       description="All submissions have been reviewed. New submissions will appear here when they're ready for review."
       action={{
         label: "Refresh",

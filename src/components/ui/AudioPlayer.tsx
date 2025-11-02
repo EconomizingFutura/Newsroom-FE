@@ -6,13 +6,18 @@ const AudioPlayer = ({ src, fileName }: { src: any; fileName: string }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
-  const srcBob = useMemo(() => URL.createObjectURL(src), [src]);
+
+  const srcBob = useMemo(() => {
+    if (!src) return "";
+    if (typeof src === "string") return src;
+    return URL.createObjectURL(src);
+  }, [src]);
+
   useEffect(() => {
-    // reset when new file is loaded
-    setIsPlaying(false);
-    setProgress(0);
-    setDuration(0);
-    
+    if (src && typeof src !== "string") {
+      const objectUrl = URL.createObjectURL(src);
+      return () => URL.revokeObjectURL(objectUrl);
+    }
   }, [src]);
 
   const formatTime = (time: number) => {
@@ -28,7 +33,7 @@ const AudioPlayer = ({ src, fileName }: { src: any; fileName: string }) => {
     if (isPlaying) {
       audio.pause();
     } else {
-      audio.play().catch(err => {
+      audio.play().catch((err) => {
         console.error("Play error:", err);
       });
     }
@@ -82,7 +87,15 @@ const AudioPlayer = ({ src, fileName }: { src: any; fileName: string }) => {
         onClick={togglePlay}
         className="flex items-center gap-2 px-4 py-2 border border-green-600 rounded-lg text-green-700 font-medium hover:bg-green-50"
       >
-        {isPlaying ? <><Pause className="w-4 h-4" /> Pause</> : <><Play className="w-4 h-4" /> Play</>}
+        {isPlaying ? (
+          <>
+            <Pause className="w-4 h-4" /> Pause
+          </>
+        ) : (
+          <>
+            <Play className="w-4 h-4" /> Play
+          </>
+        )}
       </button>
 
       {/* Hidden audio tag */}

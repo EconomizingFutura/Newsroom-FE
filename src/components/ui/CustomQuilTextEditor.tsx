@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import ReactQuill from "react-quill-new"; // ✅ use react-quill-new for React 19
 import "react-quill-new/dist/quill.snow.css";
 import { cn } from "./utils";
-import "./quillTextEditor.css"
+import "./quillTextEditor.css";
 
 type CustomQuilTextEditorProps = {
   placeholder?: string;
@@ -33,10 +33,10 @@ const CustomQuilTextEditor: React.FC<CustomQuilTextEditorProps> = ({
   const formats = ["bold", "italic", "underline", "strike", "image"];
 
   return (
-    <div className="w-full h-full">
+    <div className={cn("w-full h-full", readOnly && "pt-6 ")}>
       <div
         className={cn(
-          "relative  rounded-lg bg-[#F7FBF7] overflow-hidden",
+          "relative  rounded-lg overflow-hidden ",
           readOnly ? "border border-transparent" : "border border-[#ECECEC]"
         )}
       >
@@ -47,7 +47,11 @@ const CustomQuilTextEditor: React.FC<CustomQuilTextEditorProps> = ({
           modules={!readOnly ? modules : { toolbar: false }}
           formats={formats}
           placeholder={placeholder}
-          className={cn("pb-20 max-h-48 overflow-y-auto", className)}
+          className={cn(
+            "overflow-y-auto",
+            className,
+            !readOnly ? "h-56 bg-[#F7FBF7]" : "h-56 no-toolbar bg-transparent"
+          )}
           onChange={(_, __, ___, editor) => {
             const delta = editor.getHTML(); // Delta JSON
             setContent(delta);

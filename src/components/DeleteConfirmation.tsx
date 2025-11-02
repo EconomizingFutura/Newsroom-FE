@@ -5,11 +5,13 @@ import Delete from "@/assets/Delete.png";
 interface DeleteConfirmationProps {
   onConfirm: () => void;
   onCancel: () => void;
+  wordings?: boolean;
 }
 
 const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
   onConfirm,
   onCancel,
+  wordings,
 }) => {
   const handleConfirm = () => {
     onConfirm();
@@ -26,21 +28,26 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
             alt="delete"
             className="max-h-24 max-w-24 h-full w-full"
           />
-
-          <p className="text-lg text-center py-4 font-semibold">
-            Are you sure want to Delete <br /> the Article ?
-          </p>
+          {wordings !== null || wordings !== undefined ? (
+            <p className="text-lg text-center py-4 font-semibold">
+              Are you sure want to cancel <br /> the scheduled post ?
+            </p>
+          ) : (
+            <p className="text-lg text-center py-4 font-semibold">
+              Are you sure want to Delete <br /> the Article ?
+            </p>
+          )}
 
           <div className="flex w-full justify-center gap-4 my-2">
             <button
               onClick={handleConfirm}
-              className="px-6 py-2 w-1/2  rounded-lg border border-[#008001] text-[#008001] "
+              className="px-6 py-2 w-1/2 font-semibold  rounded-lg border border-[#008001] text-[#008001] "
             >
               Yes
             </button>
             <button
               onClick={onCancel}
-              className="px-6 py-2 w-1/2 rounded-lg bg-[#008001] text-white "
+              className="px-6 py-2 w-1/2 font-semibold  rounded-lg bg-[#008001] text-white "
             >
               No
             </button>

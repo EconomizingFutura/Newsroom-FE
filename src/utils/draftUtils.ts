@@ -1,22 +1,19 @@
-import type {
-  DraftArticle
-} from "@/types/draftPageTypes";
+import type { DraftArticle } from "@/types/draftPageTypes";
 import { DELETE } from "@/api/apiMethods";
 import { API_LIST } from "@/api/endpoints";
 export const getTypeColor = (type: string) => {
   switch (type) {
-  case "text":
-    return "!bg-[#DBEAFE] !border !border-[#BEDBFF] !text-[#193CB8]";
-  case "Audio":
-  case "audio":
-    return "!bg-[#F3E8FF] !border !border-[#EAD4FF] !text-[#6D11B0]";
-  case "Video":
-  case "video":
-    return "!bg-[#FFEDD4] !border !border-[#FFD6A7] !text-[#9F2E00]";
-  default:
-    return "!bg-[#DBEAFE] !border !border-[#BEDBFF] !text-[#193CB8]";
-}
-
+    case "text":
+      return "!bg-[#DBEAFE] !border !border-[#BEDBFF] !text-[#193CB8]";
+    case "Audio":
+    case "audio":
+      return "!bg-[#F3E8FF] !border !border-[#EAD4FF] !text-[#6D11B0]";
+    case "Video":
+    case "video":
+      return "!bg-[#FFEDD4] !border !border-[#FFD6A7] !text-[#9F2E00]";
+    default:
+      return "!bg-[#DBEAFE] !border !border-[#BEDBFF] !text-[#193CB8]";
+  }
 };
 
 export const getStatusColor = (status: string) => {
@@ -33,8 +30,10 @@ export const DELETE_DRAFT_MODAL_ID = async (
   callBack: (draftArticles: DraftArticle[]) => void,
   state: DraftArticle[]
 ) => {
-  const response: any = await DELETE(`${API_LIST.BASE_URL}${API_LIST.DELETE_ARTICLE}${id}`);
-  if(!response?.error) {
+  const response: any = await DELETE(
+    `${API_LIST.BASE_URL}${API_LIST.DELETE_ARTICLE}${id}`
+  );
+  if (!response?.error) {
     const filteredDrafts = state.filter((article) => article.id !== id);
     callBack(filteredDrafts);
   }
@@ -71,6 +70,6 @@ export const HISTORY_STATUS = (status: string) => {
     case "draft":
       return "bg-orange-100 text-orange-800";
     default:
-      return "";
+      return "bg-green-100 text-green-800";
   }
 };

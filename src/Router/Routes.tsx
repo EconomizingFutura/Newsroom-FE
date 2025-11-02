@@ -1,5 +1,11 @@
 import React, { useEffect, useMemo } from "react";
-import { Routes, Route, useNavigate, useLocation, Navigate } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  useNavigate,
+  useLocation,
+  Navigate,
+} from "react-router-dom";
 
 import Dashboard from "@/pages/Reporter/Dashboard";
 import ContentUploader from "@/pages/Reporter/ArticleCreation/ContentUploader";
@@ -9,7 +15,6 @@ import HistoryLogPage from "@/pages/HistoryLogPage";
 import NewsFeedsPage from "@/pages/NewsFeedsPage";
 import SideBar from "@/components/SideBar";
 import Navigation from "@/components/Navigation";
-import { CalendarView } from "@/pages/Editor/CalendarView";
 import { HistoryLog } from "@/pages/Editor/HistoryLog";
 import { PublishCenter } from "@/pages/Editor/PublishCenter";
 import { ReviewQueue } from "@/pages/Editor/ReviewQueue";
@@ -21,6 +26,7 @@ import AuthRoute from "./AuthRoutes";
 import ProtectedRoutes from "./ProtectedRoutes";
 import PublicRoute from "./PublicRoutes";
 import ViewContent from "@/pages/Editor/ViewContent";
+import CalendarPage from "@/pages/Editor/CalendarPage";
 const Layout: React.FC = () => {
   const navigate = useNavigate();
   const getCurrentView = useCurrentView();
@@ -37,6 +43,8 @@ const Layout: React.FC = () => {
     "/video": "Video",
     "/login": "Login",
     "/reviewQueue": "Review Queue",
+    "/calendarView": "calendar",
+    "/publishCenter": "Publish Center",
   };
 
   useEffect(() => {
@@ -154,7 +162,7 @@ const Layout: React.FC = () => {
               element={
                 <AuthRoute>
                   {/* <ProtectedRoutes allowedRoles="REPORTER"> */}
-                    <NewsFeedsPage />
+                  <NewsFeedsPage />
                   {/* </ProtectedRoutes> */}
                 </AuthRoute>
               }
@@ -198,7 +206,7 @@ const Layout: React.FC = () => {
               element={
                 <AuthRoute>
                   <ProtectedRoutes allowedRoles="EDITOR">
-                    <CalendarView />
+                    <CalendarPage />
                   </ProtectedRoutes>
                 </AuthRoute>
               }

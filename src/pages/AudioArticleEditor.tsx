@@ -99,7 +99,7 @@ export default function AudioArticleEditor({
         {/* Main Content */}
         <div className="max-w-4xl mx-auto p-6 space-y-6">
           {/* Content Editor Header */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center py-4 justify-between">
             <h2 className="text-lg font-medium">Content Editor</h2>
             <span className="text-sm text-gray-500">Auto-saved</span>
           </div>

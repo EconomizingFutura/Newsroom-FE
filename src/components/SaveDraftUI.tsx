@@ -4,7 +4,7 @@ import Success from "@/assets/Success.gif";
 
 interface SaveDraftUIProps {
   onCancel: () => void;
-  saveType: "DRAFT" | "SUBMIT";
+  saveType: "DRAFT" | "SUBMIT" | "SCHEDULE" | "PUBLISHED";
 }
 
 const SaveDraftsUI: React.FC<SaveDraftUIProps> = ({ onCancel, saveType }) => {
@@ -12,6 +12,12 @@ const SaveDraftsUI: React.FC<SaveDraftUIProps> = ({ onCancel, saveType }) => {
     saveType == "DRAFT"
       ? "Successfully Article Stored in the Draft  !"
       : "Successfully Article Submit for the review  !";
+  const SCHEDULEDTYPE =
+    saveType == "SCHEDULE"
+      ? "Successfully Article Scheduled!"
+      : saveType
+      ? "Successfully Article Scheduled!"
+      : wordings;
   useEffect(() => {
     const timer = setTimeout(() => {
       onCancel();
@@ -34,7 +40,7 @@ const SaveDraftsUI: React.FC<SaveDraftUIProps> = ({ onCancel, saveType }) => {
           />
 
           <div className="flex w-full text-[#03101F] font-semibold justify-center gap-4 text-xl">
-            {wordings}
+            {SCHEDULEDTYPE}
           </div>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { X } from "lucide-react";
-import Success from "@/assets/Success.gif";
+import Success from "@/assets/Success.json";
+import Lottie from "lottie-react";
 
 interface SuccessUIProps {
   onCancel: () => void;
@@ -23,14 +24,11 @@ const SuccessUI: React.FC<SuccessUIProps> = ({ onCancel, label }) => {
         <button className=" bg-white rounded-full p-1" onClick={onCancel}>
           <X size={20} />
         </button>
-        <div className="bg-white rounded-2xl flex flex-col items-center shadow-lg p-6 max-h-80 h-full w-96 text-center">
-          <img
-            src={Success}
-            alt="delete"
-            className="max-h-48 max-w-48 h-full w-full"
-          />
-
-          <div className="flex w-full text-[#03101F] font-semibold justify-center gap-4 text-[18px]">
+        <div className="bg-white rounded-2xl flex flex-col items-center shadow-lg p-6  max-h-80 h-full w-96 text-center">
+          <div className='w-40 pb-[10px]'>
+            <Lottie animationData={Success} loop={true} />
+          </div>
+          <div className="flex w-full text-[#03101F] justify-center gap-4 text-[18px]">
             {wordings}
           </div>
         </div>

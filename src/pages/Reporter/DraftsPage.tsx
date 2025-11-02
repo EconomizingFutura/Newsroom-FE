@@ -145,81 +145,94 @@ export default function DraftsPage() {
     return () => controller.abort();
   }, [currentPage, pageSize]);
 
-  if (loading) {
-    return <Loading />;
-  }
-  return (
-    <div className="flex-1 py-16 h-screen bg-gray-50">
-      <div
-        style={{ paddingTop: "32px" }}
-        className=" flex flex-col gap-[24px] px-[24px] bg-[#F6FAF6]"
-      >
-        <ContentHeader
-          text="Drafts"
-          description="Your saved drafts and work in progress."
-          number={filteredArticles?.length}
-          iconName="Drafts"
-          showGrid
-          onClickGridList={[
-            () => setViewMode("grid"),
-            () => setViewMode("list"),
-            viewMode,
-          ]}
-        />
 
+ return (
+    <div className="min-h-screen flex flex-col pt-16 bg-[#F6FAF6]">
+    {/* Main Wrapper */}
+    <div
+      style={{ paddingTop: "32px" }}
+      className="flex flex-col flex-1 gap-[24px] px-[24px] bg-[#F6FAF6]"
+    >
+      {/* Header */}
+      <ContentHeader
+        text="Drafts"
+        description="Your saved drafts and work in progress."
+        number={filteredArticles?.length}
+        iconName="Drafts"
+        showGrid
+        onClickGridList={[
+          () => setViewMode("grid"),
+          () => setViewMode("list"),
+          viewMode,
+        ]}
+      />
+
+      {/* Sticky Search + Filter */}
+      <div className="sticky top-16 z-30 bg-[#F6FAF6] pb-2">
         <SearchFilterTab
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           filterOptions={filterOptions}
+          className="shadow-[0px_2px_10px_0px_#959DA533]"
           activeFilter={activeFilter}
           setActiveFilter={(filter: string) =>
             setActiveFilter(filter as "All Type" | "TEXT" | "AUDIO" | "VIDEO")
           }
         />
-
-        {/* Content Area - Show empty state or filtered content */}
-        <div className="flex-1 bg-gray-50">
-          {filteredArticles?.length === 0 ? (
-            renderEmptyState()
-          ) : viewMode === "grid" ? (
-            <RenderGridView
-              filteredArticles={filteredArticles}
-              handleDeletePost={(id) => setDeletePost({ id, isOpen: true })}
-              handleEdit={handleEdit}
-              status="DRAFT"
-            />
-          ) : (
-            <RenderListViewDraft
-              handleDeletePost={(id) => setDeletePost({ id, isOpen: true })}
-              handleEdit={handleEdit}
-              filteredArticles={filteredArticles}
-            />
-          )}
-        </div>
       </div>
-      <div className="py-5">
-        {pageMetaData.totalPages > 1 && (
-          <Pagination
-            currentPage={pageMetaData.page}
-            pageCount={pageMetaData.totalPages}
-            onPageChange={handlePageChange}
-            setCurrentPage={setCurrentPage}
-            setSortConfig={handlePageSize}
+      {
+        loading ? (
+          <Loading />
+        ) : ( <div className="flex-1 mt-4 overflow-y-auto rounded-md bg-transparent ">
+        {filteredArticles?.length === 0 ? (
+          renderEmptyState()
+        ) : viewMode === "grid" ? (
+          <RenderGridView
+            filteredArticles={filteredArticles}
+            handleDeletePost={(id) => setDeletePost({ id, isOpen: true })}
+            handleEdit={handleEdit}
+            status="DRAFT"
+          />
+        ) : (
+          <RenderListViewDraft
+            handleDeletePost={(id) => setDeletePost({ id, isOpen: true })}
+            handleEdit={handleEdit}
+            filteredArticles={filteredArticles}
           />
         )}
-      </div>
+      </div>)
+      }
 
-      {deletePost.isOpen && (
-        <DeleteConfirmation
-          onConfirm={handleDelete}
-          onCancel={() =>
-            setDeletePost((pre) => ({
-              id: null,
-              isOpen: !pre.isOpen,
-            }))
-          }
-        />
-      )}
+      {/* Scrollable Content */}
+     
     </div>
-  );
+
+    {/* Sticky Pagination */}
+    {pageMetaData.totalPages >= 1 && (
+      <div className="sticky bottom-0 bg-gray-50 border-t py-5 z-20">
+        <Pagination
+          currentPage={pageMetaData.page}
+          pageCount={pageMetaData.totalPages}
+          onPageChange={handlePageChange}
+          setCurrentPage={setCurrentPage}
+          setSortConfig={handlePageSize}
+        />
+      </div>
+    )}
+
+    {/* Delete Modal */}
+    {deletePost.isOpen && (
+      <DeleteConfirmation
+        onConfirm={handleDelete}
+        onCancel={() =>
+          setDeletePost((pre) => ({
+            id: null,
+            isOpen: !pre.isOpen,
+          }))
+        }
+      />
+    )}
+  </div>
+);
+
 }

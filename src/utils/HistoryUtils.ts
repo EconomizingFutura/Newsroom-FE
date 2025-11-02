@@ -91,11 +91,11 @@ export const getStatusColor = (status: string) => {
 export const FILTER_OPTIONS = Object.freeze({
   CATEGORY: [
     { value: "all", label: "All Categories" },
-    { value: "politics", label: "Politics" },
-    { value: "business", label: "Business" },
-    { value: "entertainment", label: "Entertainment" },
-    { value: "sports", label: "Sports" },
-    { value: "environment", label: "Environment" },
+    { value: "Politics", label: "Politics" },
+    { value: "Business", label: "Business" },
+    { value: "Entertainment", label: "Entertainment" },
+    { value: "Sports", label: "Sports" },
+    { value: "Environment", label: "Environment" },
   ],
   AUTHOR: [
     { value: "all", label: "All Authors" },

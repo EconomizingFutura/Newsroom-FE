@@ -49,6 +49,7 @@ const HistoryLogPage: React.FC = () => {
   const handlePageSize = (val: string) => {
     const size = val.split(" ")[0];
     setPageSize(Number(size));
+    setCurrentPage(1);
   };
   const [historyArticles, setHistoryArticles] = useState<
     RevertedArticleTypes[]
@@ -202,23 +203,19 @@ const HistoryLogPage: React.FC = () => {
     return "text"; // default fallback
   }
 
-  if (loading) {
-    return <Loading />;
-  }
+
   return (
-    <div className=" flex-1 py-16 h-screen bg-gray-50">
-      {/* Main Content */}
-      <div
-        style={{ paddingTop: "32px" }}
-        className=" flex flex-col gap-[24px] p-[24px] bg-[#F6FAF6]"
-      >
-        {/* Top Header */}
-        <div className="flex items-center gap-[8px]">
-          <HeaderIcon className=" text-[#008001]" name="History" />
+  <div className="min-h-screen flex flex-col pt-16 bg-[#F6FAF6]">
+    <main className="flex-1 p-8 flex flex-col">
+      <>
+        {/* Header */}
+        <div className="flex items-center gap-2">
+          <HeaderIcon className="text-[#008001]" name="History" />
           <p className="font-bold text-2xl text-[#101828]">History Log</p>
         </div>
 
-        <div className="grid grid-cols-5 gap-6">
+        {/* Stats Section */}
+        <div className="grid grid-cols-5 py-5 gap-6">
           {stats.map((item, index) => (
             <HistoryCard
               key={index}
@@ -230,12 +227,16 @@ const HistoryLogPage: React.FC = () => {
           ))}
         </div>
 
-        {/* Search and Filters */}
-        <div className="border-b border-gray-200 px-[24px] py-[16px] bg-white rounded-2xl shadow-md">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4 flex-1 justify-between">
+        {/* Sticky Toolbar */}
+        <section className="sticky top-16 bg-[#F6FAF6] z-10">
+          <div
+            style={{ boxShadow: "0px 2px 10px 0px #959DA533" }}
+            className="bg-white rounded-lg border border-gray-200 p-6 mb-2"
+          >
+            <div className="flex items-center justify-between space-x-4">
+              {/* Search */}
               <div className="relative max-w-96 w-full border border-[#ECECEC] bg-[#F7FBF7] rounded-[8px]">
-                <Search className="absolute  left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <Input
                   placeholder="Search Articles..."
                   value={searchQuery}
@@ -244,7 +245,9 @@ const HistoryLogPage: React.FC = () => {
                 />
               </div>
 
-              <div className="flex gap-[24px]">
+              {/* Filters */}
+              <div className="flex gap-4">
+                {/* Status */}
                 <div className="border border-[#ECECEC] bg-[#F7FBF7] rounded-[8px]">
                   <Select value={statusFilter} onValueChange={setStatusFilter}>
                     <SelectTrigger className="w-40 font-semibold bg-[#F6FAF6] ![&>svg]:text-black text-black">
@@ -259,6 +262,8 @@ const HistoryLogPage: React.FC = () => {
                     </SelectContent>
                   </Select>
                 </div>
+
+                {/* Type */}
                 <div className="border border-[#ECECEC] bg-[#F7FBF7] rounded-[8px]">
                   <Select value={typeFilter} onValueChange={setTypeFilter}>
                     <SelectTrigger className="w-40 font-semibold bg-[#F6FAF6] ![&>svg]:text-black text-black">
@@ -273,6 +278,8 @@ const HistoryLogPage: React.FC = () => {
                     </SelectContent>
                   </Select>
                 </div>
+
+                {/* Date Range */}
                 <div className="border border-[#ECECEC] bg-[#F7FBF7] rounded-[8px]">
                   <Select value={dateRange} onValueChange={setDateRange}>
                     <SelectTrigger className="w-40 font-semibold bg-[#F6FAF6] ![&>svg]:text-black text-black">
@@ -289,118 +296,131 @@ const HistoryLogPage: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div className="flex-1 px-4 overflow-auto  bg-white rounded-2xl shadow-md">
-          <div className="bg-white">
-            {/* Table Header */}
-            <div className="grid grid-cols-12 gap-4 p-6 border-b border-gray-200 text-sm font-bold text-gray-500 uppercase tracking-wide">
-              <div className="col-span-3 font-bold text-sm text-gray-500">
-                Title
-              </div>
-              <div className="col-span-2  px-4 font-bold text-sm text-gray-500">
-                Type
-              </div>
-              <div className="col-span-2  font-bold text-sm text-gray-500">
-                Status
-              </div>
-              <div className="col-span-2 font-bold text-sm text-gray-500">
-                Category
-              </div>
-              <div className="col-span-2 font-bold text-sm text-gray-500">
-                Last Updated
-              </div>
-              <div className="col-span-1 font-bold text-sm text-gray-500">
-                Action
-              </div>
+        {/* Table Section */}
+        {loading ? (
+          <Loading />
+        ) : (
+          <div className="flex-1 overflow-y-auto mt-4 space-y-4 pr-2">
+            <div
+              style={{ boxShadow: "0px 2px 10px 0px #959DA533" }}
+              className="bg-white rounded-lg border px-3 border-gray-200 overflow-hidden"
+            >
+              <div className="overflow-x-auto px-3">
+                <table className="w-full p-2">
+  <thead className="border-b border-gray-200">
+    <tr>
+      <th className="text-left py-3 px-4 font-bold text-[14px] text-[#999999] whitespace-nowrap">
+        Title
+      </th>
+      <th className="text-left py-3 px-4 font-bold text-[14px] text-[#999999] whitespace-nowrap">
+        Type
+      </th>
+      <th className="text-left py-3 px-4 font-bold text-[14px] text-[#999999] whitespace-nowrap">
+        Status
+      </th>
+      <th className="text-left py-3 px-4 font-bold text-[14px] text-[#999999] whitespace-nowrap">
+        Category
+      </th>
+      <th className="text-left py-3 px-4 font-bold text-[14px] text-[#999999] whitespace-nowrap">
+        Last Updated
+      </th>
+      <th className="text-left py-3 px-4 font-bold text-[14px] text-[#999999] whitespace-nowrap">
+        Action
+      </th>
+    </tr>
+  </thead>
+  <tbody className="divide-y divide-gray-200">
+    {historyArticles.length > 0 ? (
+      historyArticles.map((article: any) => (
+        <tr
+          key={article.id}
+          onClick={() => handleEdit(article.id)}
+          className="hover:bg-gray-50 cursor-pointer"
+        >
+          <td className="py-4 px-4 max-w-[250px] whitespace-nowrap">
+            <div
+              className="font-medium text-[#1E2939] truncate"
+              title={article.title}
+            >
+              {article.title}
             </div>
+          </td>
 
-            {/* Table Rows */}
-            <div className="divide-y divide-gray-200">
-              {historyArticles.length > 0 ? (
-                historyArticles.map((article: any) => (
-                  <div
-                    key={article.id}
-                    onClick={() => handleEdit(article.id)}
-                    className="grid cursor-pointer grid-cols-12 gap-4 p-6 hover:bg-gray-50 transition-colors items-center"
-                  >
-                    <div className="col-span-3  cursor-pointer truncate">
-                      <h3 className="text-sm font-normal text-[14px] text-[#1E2939] truncate">
-                        {article.title}
-                      </h3>
-                    </div>
+          <td className="py-4 px-4 whitespace-nowrap">
+            <div className="flex items-center space-x-2">
+              {typeIcons[getArticleType(article) as PostType]}
+              <span className="capitalize text-[#1E2939]">
+                {getArticleType(article)}{" "}
+                {getArticleType(article) === "text" ? "Article" : "Post"}
+              </span>
+            </div>
+          </td>
 
-                    <div className="col-span-2 cursor-pointer px-4">
-                      <div className="text-[14px] flex items-center gap-[8px]">
-                        {typeIcons[getArticleType(article) as PostType]}
-                        <span className=" first-letter:uppercase">
-                          {getArticleType(article)}
-                        </span>{" "}
-                        {getArticleType(article) == "text" ? "Article" : "Post"}
-                      </div>
-                    </div>
+          <td className="py-4 px-4 whitespace-nowrap">
+            <Badge
+              className={`px-[16px] font-medium py-[4px] !text-[14px] ${HISTORY_STATUS(article.status)}`}
+            >
+              {article.status === "REVIEWED" ? "APPROVED" : article.status}
+            </Badge>
+          </td>
 
-                    <div className="col-span-2 cursor-pointer">
-                      <Badge
-                        className={`px-[16px] font-medium py-[4px] !text-[14px] ${HISTORY_STATUS(
-                          article.status
-                        )}`}
-                      >
-                        <span>
-                          {article.status === "REVIEWED"
-                            ? "APPROVED"
-                            : article.status}
-                        </span>
-                      </Badge>
-                    </div>
+          <td className="py-4 px-4 text-[#1E2939] whitespace-nowrap">
+            {article.category}
+          </td>
 
-                    <div className="col-span-2 cursor-pointer">
-                      <div className="text-[14px] text-gray-900">
-                        {article.category}
-                      </div>
-                    </div>
+          <td className="py-4 px-4 text-[#1E2939] whitespace-nowrap">
+            <div className="flex items-center gap-2">
+              <Calendar size={16} color="#4B5563" />
+              <span>{moment(article.updatedAt).format("DD MMM YYYY hh:mm A")}</span>
+            </div>
+          </td>
 
-                    <div className="col-span-2 cursor-pointer flex items-center gap-[8px]">
-                      <Calendar className="w-4 h-4" />
-                      <div className="text-[14px] text-gray-900">
-                        {moment(article.updatedAt).format(
-                          "DD MMM YYYY hh:mm A"
-                        )}
-                      </div>
-                    </div>
+          <td className="py-4 px-4 whitespace-nowrap">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-gray-600 border border-[#4F668133] h-8 w-8 hover:text-gray-900"
+              onClick={() => handleEdit(article.id)}
+            >
+              <Eye className="w-4 h-4" />
+            </Button>
+          </td>
+        </tr>
+      ))
+    ) : (
+      <tr>
+        <td colSpan={6} className="py-8 text-center text-gray-500 text-sm">
+          No log available
+        </td>
+      </tr>
+    )}
+  </tbody>
+</table>
 
-                    <div className="col-span-1 cursor-pointer">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="gap-2"
-                        onClick={() => handleEdit(article.id)}
-                      >
-                        <Eye className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="p-6 text-center text-gray-500 text-[14px]">
-                  No log available
-                </div>
-              )}
+              </div>
             </div>
           </div>
-        </div>
-        {pageMetaData.totalPages > 1 && (
-          <Pagination
-            currentPage={pageMetaData.page}
-            pageCount={pageMetaData.totalPages}
-            onPageChange={handlePageChange}
-            setCurrentPage={setCurrentPage}
-            setSortConfig={handlePageSize}
-          />
         )}
+      </>
+    </main>
+
+    {/* Sticky Pagination */}
+    {pageMetaData.totalPages >= 1 && (
+      <div className="sticky bottom-0 bg-gray-50 border-t py-5 z-20">
+        <Pagination
+          currentPage={pageMetaData.page}
+          pageCount={pageMetaData.totalPages}
+          onPageChange={handlePageChange}
+          setCurrentPage={setCurrentPage}
+          setSortConfig={handlePageSize}
+        />
       </div>
-    </div>
-  );
+    )}
+  </div>
+);
+
 };
 
 export default HistoryLogPage;

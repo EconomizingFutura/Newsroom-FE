@@ -4,12 +4,14 @@
   border: 1px solid #ececec;
 }
 
-/* Restrict editor content area below toolbar */
 .ql-container {
-  max-height: 9rem;   /* limit height */
-  overflow-y: auto;    /* scrollable */
+  height: 100%; /* ✅ fill parent height */
+  max-height: none; /* ✅ remove height restriction */
+  overflow-y: auto;
   border: 1px solid #ececec;
-  border-top: none;    /* seamless join with toolbar */
+  border-top: none;
   border-radius: 0 0 6px 6px;
-  background: #F7FBF7;
+}
+.ql-toolbar.ql-snow {
+  background-color: #ffffff;
 }

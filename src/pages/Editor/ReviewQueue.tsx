@@ -119,47 +119,42 @@ export function ReviewQueue() {
     setPageSize(Number(size));
   };
 
-  if (isLoading) {
-    return <Loading />;
-  }
-
   return (
-    <div className="min-h-screen pt-16 bg-[#F6FAF6]">
-      <div className="flex">
-        <main className="flex-1 p-8">
-          <ContentHeader
-            text="Review Queue"
-            iconName="Drafts"
-            description="Review and approve content submissions from reporters."
-          />
+    <div className="min-h-screen flex flex-col pt-16 bg-[#F6FAF6]">
+      <main className="flex-1 p-8 flex flex-col">
+        <ContentHeader
+          text="Review Queue"
+          iconName="Drafts"
+          description="Review and approve content submissions from reporters."
+        />
 
-          <div className="my-6 flex items-center justify-between bg-white py-2 px-6 rounded-lg">
-            <div className="flex space-x-2.5 bg-[#6A72821A] p-1 rounded-lg w-fit">
-              {categories.map((category) => (
-                <button
-                  key={category.name}
-                  onClick={() => setActiveCategory(category.name)}
-                  className={`px-4 py-2 cursor-pointer text-sm  transition-all ${
-                    activeCategory === category.name
-                      ? " text-black bg-[#FFFFFF] rounded-md font-bold "
-                      : "text-[#999999]  hover:text-[#999999]"
+        {/* CATEGORY FILTER STAYS FIXED */}
+        <div className="my-3 flex items-center justify-between bg-white py-2 px-6 rounded-lg sticky top-16 z-10">
+          <div className="flex space-x-2.5 bg-[#6A72821A] p-1 rounded-lg w-fit">
+            {categories.map((category) => (
+              <button
+                key={category.name}
+                onClick={() => setActiveCategory(category.name)}
+                className={`px-4 py-2 cursor-pointer text-sm transition-all ${activeCategory === category.name
+                  ? "text-black bg-[#FFFFFF] rounded-md font-bold"
+                  : "text-[#999999]"
                   }`}
-                >
-                  {category.name}
-                </button>
-              ))}
-            </div>
+              >
+                {category.name}
+              </button>
+            ))}
           </div>
+        </div>
 
-          {/* Stories List */}
+        {isLoading ? <Loading /> :
 
-          {pendingStories.length === 0 ? (
-            <div className=" justify-center items-center h-full w-full">
-              <PendingReviewEmptyState />
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {pendingStories.map((story) => (
+          <div className="flex-1 overflow-y-auto my-3 space-y-4 pr-2">
+            {pendingStories.length === 0 ? (
+              <div className="flex justify-center  items-center h-full !w-full">
+                <PendingReviewEmptyState />
+              </div>
+            ) : (
+              pendingStories.map((story) => (
                 <div
                   key={story.id}
                   className="bg-white rounded-[12px] shadow-[0px_2px_15px_0px_#64646F1A] border border-gray-200 p-6"
@@ -194,9 +189,7 @@ export function ReviewQueue() {
                     </Button>
 
                     <Button
-                      onClick={() =>
-                        handleApprove(story.id.toString().toString())
-                      }
+                      onClick={() => handleApprove(story.id.toString())}
                       className="bg-[#008001] font-semibold hover:bg-[#008001] text-white"
                     >
                       <CircleCheckBig className="w-4 h-4 mr-2" />
@@ -206,37 +199,43 @@ export function ReviewQueue() {
                     <Button
                       variant="outline"
                       onClick={() => handleReject(story.id.toString())}
-                      className="text-white bg-[#FB2C36] hover:text-white hover:bg-[#FB2C36] border-red-300 "
+                      className="text-white bg-[#FB2C36] hover:text-white hover:bg-[#FB2C36] border-red-300"
                     >
                       <ShieldAlert className="w-4 h-4 mr-2" />
                       Reverted
                     </Button>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </main>
-        {show.success && (
-          <SuccessUI
-            onCancel={toggleSuccess}
-            label={"Article Approved and Moved to Publish Successfully!"}
+              ))
+            )}
+          </div>
+        }
+      </main>
+
+      {/* ✅ FIXED PAGINATION AT BOTTOM */}
+      {pageMetaData.totalPages > 1 && (
+        <div className="sticky bottom-0 bg-[#F6FAF6] border-t py-4 z-20">
+          <Pagination
+            currentPage={pageMetaData.page}
+            pageCount={pageMetaData.totalPages}
+            onPageChange={handlePageChange}
+            setCurrentPage={setCurrentPage}
+            setSortConfig={handlePageSize}
           />
-        )}
-        {show.remarks && (
-          <RemarksModal
-            onCancel={toggleRemarks}
-            onConfirm={handleRemarksConfirm}
-          />
-        )}
-      </div>
-      {pendingStories.length !== 0 && (
-        <Pagination
-          currentPage={pageMetaData.page}
-          pageCount={pageMetaData.totalPages}
-          onPageChange={handlePageChange}
-          setCurrentPage={setCurrentPage}
-          setSortConfig={handlePageSize}
+        </div>
+      )}
+
+      {/* MODALS */}
+      {show.success && (
+        <SuccessUI
+          onCancel={toggleSuccess}
+          label="Article Approved and Moved to Publish Successfully!"
+        />
+      )}
+      {show.remarks && (
+        <RemarksModal
+          onCancel={toggleRemarks}
+          onConfirm={handleRemarksConfirm}
         />
       )}
     </div>

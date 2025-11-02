@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @custom-variant dark (&:is(.dark *));
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap");
 
 :root {
   --font-size: 14px;
@@ -47,7 +47,7 @@
   --screen-3xl: 1920px; /* Full HD */
   --screen-4xl: 2560px; /* 2K */
   --screen-5xl: 3840px; /* 4K UHD */
-  --screen-6xl: 6016px;  /*Imac*/
+  --screen-6xl: 6016px; /*Imac*/
 }
 
 .dark {
@@ -203,30 +203,40 @@ html {
   color: #c10007 !important;
 }
 
-body{
-  font-family: 'Open Sans', sans-serif;
+body {
+  font-family: "Open Sans", sans-serif;
 }
 
 .ql-toolbar {
   position: absolute;
   bottom: 0 !important;
-  z-index: 100;
+  z-index: 50;
   width: 100%;
   border: none !important;
-  border-top: 1px solid #ECECEC !important;
+  border-top: 1px solid #ececec !important;
 }
 
 .ql-container {
   border: 0 !important;
 }
 
-.ql-editor {
+:not(.no-toolbar) .ql-editor {
   height: calc(100% - 53px) !important;
 }
 
+.no-toolbar .ql-editor {
+  height: 100% !important;
+}
+
+.no-toolbar .ql-toolbar {
+  display: none !important;
+  height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+}
 
 @layer base {
-
   h1,
   h2,
   h3,
@@ -239,4 +249,100 @@ body{
   p {
     @apply cursor-default select-none;
   }
+}
+
+.rbc-toolbar {
+  display: none !important;
+}
+
+.rbc-off-range-bg {
+  background-color: #f6f7f8 !important;
+  color: #282c3f;
+}
+
+.rbc-show-more {
+  margin-right: auto !important;
+  margin-left: auto !important;
+  color: #076122 !important;
+}
+
+.rbc-month-header {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.rbc-header + .rbc-header {
+  border-left: none !important;
+}
+
+.rbc-current .rbc-button-link {
+  background-color: #76a32e !important;
+  color: white !important;
+  border-radius: 9999px !important;
+  height: 24px;
+  margin: 2px;
+  width: 24px;
+}
+/* Fix popup container */
+.rbc-overlay {
+  z-index: 5 !important;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Popup header */
+.rbc-overlay-header {
+  font-weight: 600;
+  text-align: center;
+  padding: 6px 0;
+  border-bottom: 1px solid #eee;
+  background-color: #fafafa;
+  border-radius: 6px 6px 0 0;
+}
+
+/* Event items inside popup */
+.rbc-overlay .rbc-event {
+  background-color: #f3f4f6; /* light gray background */
+  border: none; /* remove outlines/borders */
+  border-radius: 4px;
+  color: #111827; /* dark text */
+  padding: 4px 6px;
+  margin: 3px 0;
+  font-size: 0.85rem;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+/* Optional hover effect */
+.rbc-overlay .rbc-event:hover {
+  background-color: #e5e7eb;
+}
+
+/* Prevent other frameworks (Bootstrap/Tailwind) from centering text */
+.rbc-event,
+.rbc-event-content {
+  display: block !important;
+  text-align: left !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+.rbc-overlay {
+  min-width: unset !important;
+  width: fit-content !important;
+}
+
+.fc-event.custom-event {
+  border-left-width: 3px !important;
+  border-left-style: solid !important;
 }
