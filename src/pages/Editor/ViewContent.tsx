@@ -416,7 +416,7 @@ const ViewContent: React.FC = () => {
                                 contentData.status
                               )}`}
                             >
-                              <span className="!font-semibold text-[14px]">
+                              <span className=" text-[14px]">
                                 {contentData.status}
                               </span>
                             </Badge>
@@ -603,7 +603,7 @@ const ViewContent: React.FC = () => {
                               contentData.status
                             )}`}
                           >
-                            <span className="!font-semibold text-[14px]">
+                            <span className=" text-[14px]">
                               {contentData.status}
                             </span>
                           </Badge>
@@ -766,14 +766,14 @@ const ViewContent: React.FC = () => {
                       <Button
                         type="button"
                         variant="outline"
-                        className="text-[14px] w-28 font-semibold"
+                        className="text-[14px] w-28 "
                         onClick={handleCancel}
                       >
                         Cancel
                       </Button>
                       <Button
                         type="submit"
-                        className="bg-[#006601] text-[14px] w-28 font-semibold hover:bg-[#005001]"
+                        className="bg-[#006601] text-[14px] w-28 hover:bg-[#005001]"
                         onClick={() => {
                           if (!isDirty) {
                             toast.warning("No changes detected", {
@@ -794,16 +794,18 @@ const ViewContent: React.FC = () => {
                       <div className="flex flex-wrap justify-end gap-3">
                         <Button
                           variant="outline"
+                          type="button"
                           onClick={toggleRemarks}
-                          className="text-white bg-[#FB2C36] hover:text-white hover:bg-[#FB2C36] border-red-300"
+                          className="text-[#FB2C36] bg-white hover:text-[#FB2C36] w-[120px] hover:bg-white border-[#FB2C36]"
                         >
-                          Reverted
+                          Revert
                         </Button>
                         <Button
-                          onClick={() =>
-                            contentData && handleMoveToPublish(contentData?.id)
-                          }
-                          className="bg-[#008001] font-semibold hover:bg-[#008001] text-white"
+                        type="button"
+                          onClick={() => {
+                            contentData && handleMoveToPublish(contentData?.id);
+                          }}
+                          className="bg-[#008001] hover:bg-[#008001] text-white"
                         >
                           Approve & Move to publish
                         </Button>
@@ -820,14 +822,14 @@ const ViewContent: React.FC = () => {
                           if (from === "publishCenter") navigate(-1);
                         }}
                         variant="outline"
-                        className="text-[14px] hover:bg-white hover:text-[#006601] w-28 font-semibold text-[#006601]"
+                        className="text-[14px] hover:bg-white hover:text-[#006601] w-28 text-[#006601]"
                       >
                         Update
                       </Button>
                       <Button
                         type="button"
                         variant="outline"
-                        className="text-[14px] hover:bg-white hover:text-[#006601] w-28 font-semibold text-[#006601]"
+                        className="text-[14px] hover:bg-white hover:text-[#006601] w-28  text-[#006601]"
                         onClick={() => setScheduleModalOpen((p) => !p)}
                       >
                         {contentData?.scheduledTime
@@ -837,7 +839,7 @@ const ViewContent: React.FC = () => {
                       <Button
                         type="button"
                         onClick={handlePublishNowClick}
-                        className="bg-[#006601] text-[14px] w-28 font-semibold hover:bg-[#005001]"
+                        className="bg-[#006601] text-[14px] w-28  hover:bg-[#005001]"
                       >
                         Publish Now
                       </Button>

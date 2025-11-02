@@ -1,6 +1,7 @@
 import { Search } from "lucide-react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { cn } from "./ui/utils";
 
 interface SearchFilterTabProps {
   searchQuery: string;
@@ -8,6 +9,7 @@ interface SearchFilterTabProps {
   filterOptions: string[];
   activeFilter: string;
   setActiveFilter: (filter: string) => void;
+  className?: string;
 }
 
 const SearchFilterTab: React.FC<SearchFilterTabProps> = ({
@@ -15,10 +17,11 @@ const SearchFilterTab: React.FC<SearchFilterTabProps> = ({
   setSearchQuery,
   filterOptions,
   activeFilter,
+  className,
   setActiveFilter,
 }) => {
   return (
-    <div className=" bg-[#FFFFFF] shadow-md rounded-xl px-4 sm:px-6 py-3 sm:py-4">
+    <div className={cn(` bg-[#FFFFFF] shadow-md rounded-xl px-4 sm:px-6 py-3 sm:py-4`, className)}>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         {/* Search Box */}
         <div className="relative w-full rounded-lg  border-[#ECECEC] bg-[#F7FBF7] sm:w-72">

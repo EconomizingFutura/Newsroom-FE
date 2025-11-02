@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "./ui/button";
 import {
+  BookCheck,
   Calendar,
   FileText,
   Heart,
@@ -94,7 +95,7 @@ const menuConfig = {
     {
       key: "publish-center",
       label: "Publish Center",
-      icon: <RotateCcw className="w-4 h-4" />,
+      icon: <BookCheck className="w-4 h-4" />,
       action: "onNavigateEditorPublishCenter",
       badge: 4,
     },
@@ -147,7 +148,7 @@ const SideBar: React.FC<SidebarTypes> = (props) => {
     <div className="w-60 mt-16 py-4 bg-[#F8FAF9] border-r border-gray-200 flex flex-col">
       <div className="flex-1 px-2">
         {/* Top Menu */}
-        <div className="space-y-1  p-2 ">
+        <div className="space-y-2  p-2 ">
           {menuConfig[currentRole]?.map((item, index) => {
             // const active = isActive(item.key as currentPageType);
             const isAfterActive = menuConfig[currentRole]

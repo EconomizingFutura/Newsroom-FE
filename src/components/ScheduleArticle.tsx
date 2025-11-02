@@ -165,10 +165,10 @@ const ScheduleArticle = ({
         <div className="bg-[#FFFFFF] relative pt-5 space-y-3 rounded-2xl">
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="px-5">
-              <h1 className="font-bold text-[#101828] text-xl">
+              <h1 className="font-semibold text-[#101828] text-xl">
                 Schedule an Article
               </h1>
-              <div className="border border-[rgba(0, 0, 0, 0.2)] my-2" />
+              <div className="border-b-[1px] border-[rgba(0, 0, 0, 0.2)] my-4" />
 
               {/* Platform Tabs */}
               <div className="flex items-center justify-between py-2 bg-[#ffffff] border border-[#6A728233] shadow-[0px_2px_15px_0px_rgba(100,100,111,0.1)] px-3 max-w-max h-min rounded-[8px]">
@@ -194,7 +194,7 @@ const ScheduleArticle = ({
               <div className="w-full gap-6 py-4 flex">
                 {/* Date Picker */}
                 <div className="min-w-96">
-                  <label className="block text-[16px] font-semibold text-[#03101F] mb-1">
+                  <label className="block text-[15px]  text-[#03101F] mb-1">
                     Select Date
                   </label>
                   <Controller
@@ -211,9 +211,9 @@ const ScheduleArticle = ({
                         onChange={(selectedDate: string) =>
                           field.onChange(new Date(selectedDate))
                         }
-                        placeholder="Select Date"
+                        placeholder="Date"
                         className={cn(
-                          "border border-[#ECECEC] bg-[#F7FBF7]",
+                          "border border-[#ECECEC] bg-[#F7FBF7] hover:bg-[#F7FBF7] placeholder:text-[#03101F]",
                           errors.date && "border-red-500"
                         )}
                       />
@@ -228,8 +228,8 @@ const ScheduleArticle = ({
 
                 {/* Time Picker */}
                 <div className="min-w-96 w-full">
-                  <label className="block text-[16px] font-semibold text-[#03101F] mb-1">
-                    Select Time
+                  <label className="block text-[15px] text-[#03101F] mb-1">
+                    Enter Time
                   </label>
                   <div
                     className={cn(
@@ -254,6 +254,7 @@ const ScheduleArticle = ({
                         register("time").ref(e);
                         inputRef.current = e;
                       }}
+                      placeholder="00:00"
                       className="bg-transparent outline-none w-full
                         [&::-webkit-calendar-picker-indicator]:opacity-0"
                     />
@@ -307,20 +308,20 @@ const ScheduleArticle = ({
             </div>
 
             {/* Buttons */}
-            <div className="flex w-full relative border-t border-white justify-end">
-              <div className="flex gap-6 p-4">
+            <div className="flex w-full relative  border-t border-white justify-end">
+              <div className="flex gap-6 p-4 bg-[#FFFFFF] shadow-[0px_2px_10px_0px_#0000001A,_0px_0px_2px_0px_#00000033] w-full justify-end rounded-b-2xl">
                 <Button
                   type="button"
-                  className="border rounded-[8px] h-10 w-32 border-[#008001] text-[#008001] bg-[#fff] font-semibold text-[14px] hover:bg-white"
+                  className="border rounded-[8px] h-10 w-32 border-[#008001] text-[#008001] bg-[#fff]  text-[14px] hover:bg-white"
                   onClick={onCancel}
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
-                  className="border rounded-[8px] h-10 w-32 border-[#008001] text-[#fff] bg-[#008001] font-semibold text-[14px] hover:bg-[#008001]"
+                  className="border rounded-[8px] h-10 w-32 border-[#008001] text-[#fff] bg-[#008001]  text-[14px] hover:bg-[#008001]"
                 >
-                  Submit
+                  Schedule
                 </Button>
               </div>
             </div>

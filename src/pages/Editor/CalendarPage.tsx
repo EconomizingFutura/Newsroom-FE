@@ -121,8 +121,8 @@ const CalendarPage: React.FC = () => {
       v === "month"
         ? "dayGridMonth"
         : v === "week"
-        ? "timeGridWeek"
-        : "timeGridDay";
+          ? "timeGridWeek"
+          : "timeGridDay";
     setView(newView);
     api.changeView(newView);
   };
@@ -212,8 +212,15 @@ const CalendarPage: React.FC = () => {
                   </Button>
                 </div>
                 <h2 className="text-xl font-semibold text-gray-900">
-                  {moment(currentDate).format("MMMM YYYY")}
-                </h2>
+                  {view === "dayGridMonth"
+                    ? moment(currentDate).format("MMMM YYYY")
+                    : view === "timeGridWeek"
+                      ? `${moment(currentDate).startOf("week").format("MMM D")} – ${moment(currentDate)
+                        .endOf("week")
+                        .format("MMM D, YYYY")}`
+                      : view === "timeGridDay"
+                        ? moment(currentDate).format("MMMM D, YYYY")
+                        : ""}                </h2>
               </div>
 
               <div className="flex items-center text-[#333333] space-x-2">
@@ -231,12 +238,12 @@ const CalendarPage: React.FC = () => {
                     view === "dayGridMonth"
                       ? "month"
                       : view === "timeGridWeek"
-                      ? "week"
-                      : "day"
+                        ? "week"
+                        : "day"
                   }
                   onValueChange={handleViewChange}
                 >
-                  <SelectTrigger className="w-[120px]">
+                  <SelectTrigger className="border border-[#E0E0E0] w-[94px] bg-[#FFFFFF] text-[#282C3F] rounded-[4px]">
                     <SelectValue placeholder="View" />
                   </SelectTrigger>
                   <SelectContent>
@@ -275,6 +282,22 @@ const CalendarPage: React.FC = () => {
                 eventMinHeight={20}
                 eventOverlap={(stillEvent, movingEvent) => {
                   return stillEvent.startStr === movingEvent?.startStr;
+                }}
+                dayHeaderFormat={{
+                  weekday: "short", // 'Sun', 'Mon', 'Tue'
+                  day: "numeric",   // 3, 4, 5
+                }}
+                dayHeaderContent={(arg) => {
+                  const weekday = arg.date.toLocaleDateString("en-US", { weekday: "short" });
+                  const day = arg.date.getDate();
+                  return {
+                    html: `
+      <div class="flex flex-col items-center leading-tight">
+        <span class="text-xs text-gray-500">${weekday}</span>
+        <span class="text-base font-semibold text-gray-900">${day}</span>
+      </div>
+    `,
+                  };
                 }}
                 dayCellClassNames={() => "px-1 py-2"}
               />

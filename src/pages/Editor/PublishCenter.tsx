@@ -277,14 +277,14 @@ export function PublishCenter() {
 
   return (
     <div className="min-h-screen flex flex-col pt-16 bg-[#F6FAF6]">
-      <main className="flex-1 p-8 flex flex-col">
+      <main className="flex-1 p-8 flex gap-2 flex-col">
         <ContentHeader
           text="Publish Center"
           description="Finalize and publish approved content across platforms."
           iconName="Publish Center"
         />
 
-        <section className="sticky top-16 bg-gray-50 z-10">
+        <section className="sticky top-16 mt-3 bg-gray-50 z-10">
           <div className="my-3 flex items-center justify-between bg-white py-2 px-6 rounded-lg">
             <div className="flex space-x-2.5 bg-[#6A72821A] p-1 rounded-lg w-fit">
               {CONTENT_TABS.map((tab) => (
@@ -294,7 +294,7 @@ export function PublishCenter() {
                     setState((prev) => ({ ...prev, activeTab: tab }));
                     setCurrentPage(1);
                   }}
-                  className={`px-4 py-2 rounded-md text-sm font-medium ${state.activeTab === tab
+                  className={`px-4 py-2 rounded-md text-sm ${state.activeTab === tab
                     ? "font-bold bg-white"
                     : "text-gray-500"
                     }`}
@@ -304,7 +304,7 @@ export function PublishCenter() {
               ))}
             </div>
 
-            <div className="relative max-w-sm w-full">
+            <div className="relative max-w-sm border border-[#ECECEC] rounded-lg w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
               <Input
                 placeholder="Search..."

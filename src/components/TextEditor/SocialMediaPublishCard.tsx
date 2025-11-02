@@ -87,7 +87,7 @@ export function SocialMediaPublishCard({
   if (!isOpen) return null;
 
   return (
-    <Card className="bg-white !z-[999] rounded-[12px] h-min !gap-2 shadow-lg border !w-[200px]  border-gray-200 p-2 ">
+    <Card className="bg-white  rounded-[12px] h-min !gap-2 shadow-lg border !w-[200px]  border-gray-200 p-2 ">
       <div className="space-y-3 px-4 py-2">
         {platforms.map((platform) => (
           <div key={platform.id} className="flex py-1 items-center space-x-3">

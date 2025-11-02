@@ -212,7 +212,7 @@ const getHistoryList = useCallback(
         queryParams.append("authorId", filters.authors.join(","));
       }
       if (filters.dateRange !== "all") {
-        queryParams.append("range", filters.dateRange);
+        queryParams.append("dateRange", filters.dateRange);
       }
       if (debouncedSearch.trim() !== "") {
         queryParams.append("search", debouncedSearch.trim());
@@ -301,7 +301,35 @@ const getHistoryList = useCallback(
 
   const isEmpty = !loading && paginatedArticles.length === 0;
 
-  console.log(filters);
+const PAGINATION = useMemo(() => {
+  if (!loading && totalPages) {
+    return (
+      <div className="sticky bottom-0 bg-gray-50 border-t py-5 z-20">
+        <Pagination
+          currentPage={currentPage}
+          pageCount={pageMetaData.totalPages}
+          onPageChange={(p) => {
+            handlePageChange(p);
+            setCurrentPage(p.selected);
+          }}
+          setCurrentPage={setCurrentPage}
+          setSortConfig={(val) => {
+            const size = Number(val.split(" ")[0]);
+            setPageSize(size);
+            setCurrentPage(1);
+          }}
+        />
+      </div>
+    );
+  }
+  return null;
+}, [
+  totalPages,
+  currentPage,
+  pageMetaData.totalPages,
+]);
+
+
 
   return (
     <div className="min-h-screen flex flex-col pt-16 bg-[#F6FAF6]">
@@ -475,13 +503,13 @@ const getHistoryList = useCallback(
                               </span>
                             </div>
                           </td>
-                          <td className="py-4 font-semibold px-4">
+                          <td className="py-4  px-4">
                             <Badge
                               className={`px-2 py-1 ${historyStatus(
                                 article.status
                               )}`}
                             >
-                              <span className="font-semibold! text-[14px]">
+                              <span className=" text-[14px]">
                                 {article.status}
                               </span>
                             </Badge>
@@ -514,7 +542,7 @@ const getHistoryList = useCallback(
                               variant="ghost"
                               size="sm"
                               className="text-gray-600 border border-[#4F668133] h-8 w-8 hover:text-gray-900"
-                              onClick={() => handleViewStory(article.id)}
+                              onClick={() => handleViewStory(article.id.toString())}
                             >
                               <Eye className="w-4 h-4" />
                             </Button>
@@ -540,12 +568,14 @@ const getHistoryList = useCallback(
           )}
         </>
       </main>
+      { PAGINATION }
 
-      {!loading && totalPages && (
+
+      {/* {!loading && totalPages && (
         <div className="sticky bottom-0 bg-gray-50 border-t py-5 z-20">
           <Pagination
             currentPage={currentPage}
-            pageCount={pageMetaData?.totalPages}
+            pageCount={pageMetaData.totalPages}
             onPageChange={(p) => {
               handlePageChange(p);
               setCurrentPage(p.selected);
@@ -558,7 +588,7 @@ const getHistoryList = useCallback(
             }}
           />
         </div>
-      )}
+      )} */}
     </div>
   );
 }

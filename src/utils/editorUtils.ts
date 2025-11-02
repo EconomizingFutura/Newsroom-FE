@@ -1,9 +1,9 @@
 import {
   Captions,
-  FileStack,
   ShieldX,
   CircleCheckBig,
   CalendarCheck,
+  SquareChartGantt,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -33,7 +33,7 @@ export const statusConfig: StatusType[] = [
     key: "pendingReviews",
     title: "Pending Reviews",
     color: "#6A7282",
-    icon: FileStack,
+    icon: SquareChartGantt,
   },
   {
     key: "revertedSubmissions",

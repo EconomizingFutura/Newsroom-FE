@@ -33,10 +33,10 @@ const CustomQuilTextEditor: React.FC<CustomQuilTextEditorProps> = ({
   const formats = ["bold", "italic", "underline", "strike", "image"];
 
   return (
-    <div className={cn("w-full h-full", readOnly && "pt-6")}>
+    <div className={cn("w-full h-full", readOnly && "pt-6 ")}>
       <div
         className={cn(
-          "relative  rounded-lg bg-[#F7FBF7] overflow-hidden",
+          "relative  rounded-lg overflow-hidden ",
           readOnly ? "border border-transparent" : "border border-[#ECECEC]"
         )}
       >
@@ -48,9 +48,9 @@ const CustomQuilTextEditor: React.FC<CustomQuilTextEditorProps> = ({
           formats={formats}
           placeholder={placeholder}
           className={cn(
-            " bg-amber-300 overflow-y-auto",
+            "overflow-y-auto",
             className,
-            !readOnly ? "h-56" : "h-56 no-toolbar"
+            !readOnly ? "h-56 bg-[#F7FBF7]" : "h-56 no-toolbar bg-transparent"
           )}
           onChange={(_, __, ___, editor) => {
             const delta = editor.getHTML(); // Delta JSON

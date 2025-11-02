@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { SocialMediaPublishCard } from "./TextEditor/SocialMediaPublishCard";
 import type { scheduledPost } from "@/types/apitypes";
 import { convertISOToReadable } from "@/utils/utils";
+import { createPortal } from "react-dom";
+
 
 interface StoryCardProps {
   story: scheduledPost;
@@ -25,6 +27,36 @@ const StoryCard: React.FC<StoryCardProps> = ({
   const [showPublishCard, setShowPublishCard] = useState(false);
   const publishCardRef = useRef<HTMLDivElement>(null);
   const publishButtonRef = useRef<HTMLButtonElement>(null);
+
+  const [buttonRect, setButtonRect] = useState<DOMRect | null>(null);
+
+  const handlePublishNowClick = () => {
+    if (publishButtonRef.current) {
+      setButtonRect(publishButtonRef.current.getBoundingClientRect());
+    }
+    setShowPublishCard((p) => !p);
+  };
+
+    const updatePosition = () => {
+    if (publishButtonRef.current) {
+      const rect = publishButtonRef.current.getBoundingClientRect();
+      setButtonRect(rect);
+    }
+  };
+
+  useEffect(() => {
+    if (showPublishCard) {
+      updatePosition();
+      window.addEventListener("scroll", updatePosition, true);
+      window.addEventListener("resize", updatePosition);
+    }
+    return () => {
+      window.removeEventListener("scroll", updatePosition, true);
+      window.removeEventListener("resize", updatePosition);
+    };
+  }, [showPublishCard]);
+
+  
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -47,9 +79,7 @@ const StoryCard: React.FC<StoryCardProps> = ({
     };
   }, [showPublishCard]);
 
-  const handlePublishNowClick = () => {
-    setShowPublishCard(!showPublishCard);
-  };
+
 
   const handlePublishCardClose = () => {
     setShowPublishCard(false);
@@ -116,7 +146,28 @@ const StoryCard: React.FC<StoryCardProps> = ({
                 Publish Now
               </Button>
 
-              {showPublishCard && (
+              {showPublishCard && 
+              createPortal(
+                <div
+                  ref={publishCardRef}
+                  className="fixed z-50 bg-white shadow-lg rounded-lg"
+                  style={{
+                    top: buttonRect?.top ?? 0,
+                    left: buttonRect?.left ?? 0,
+                    transform: "translateY(-105%)", 
+                  }}
+                >
+                  <SocialMediaPublishCard
+                    isOpen={showPublishCard}
+                    onClose={handlePublishCardClose}
+                    onPublish={handlePublishCardPublish}
+                  />
+                </div>,
+                document.body
+              )}
+
+
+              {/* {showPublishCard && (
                 <div
                   ref={publishCardRef}
                   className="absolute bottom-full right-0 mb-2 z-10"
@@ -127,7 +178,7 @@ const StoryCard: React.FC<StoryCardProps> = ({
                     onPublish={handlePublishCardPublish}
                   />
                 </div>
-              )}
+              )} */}
             </div>
             {story.type == "REVIEWED" && (
               <Button

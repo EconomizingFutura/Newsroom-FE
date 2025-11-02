@@ -68,7 +68,7 @@ export function DatePickerComponent({
           )}
           disabled={disabled}
         >
-          <span className="text-sm font-semibold">
+          <span className="text-sm font-medium !text-[#03101F]">
             {dateValue ? format(dateValue, "PPP") : placeholder}
           </span>
           <CalendarIcon className="ml-2 h-4 w-4 shrink-0 " />

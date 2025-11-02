@@ -24,21 +24,15 @@ const RevertedPostPage: React.FC = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [data, setData] = useState<RevertedArticleTypes[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-
   const [deletePost, setDeletePost] = useState<DeleteArticleProps>({
     id: null,
     isOpen: false,
   });
+
   const filterOptions = ["All Type", "TEXT", "AUDIO", "VIDEO"];
   const navigate = useNavigate();
-  const [pageMetaData, setPageMetaData] = useState<{
-    total: number;
-    page: number;
-    pageSize: number;
-    totalPages: number;
-    hasNextPage: boolean;
-    hasPrevPage: boolean;
-  }>({
+
+  const [pageMetaData, setPageMetaData] = useState({
     total: 11,
     page: 1,
     pageSize: 10,
@@ -82,7 +76,6 @@ const RevertedPostPage: React.FC = () => {
         );
         setData(response.data);
         setPageMetaData(response.pagination);
-
         setLoading(false);
       } catch (error: any) {
         if (error.name !== "AbortError") {
@@ -97,9 +90,8 @@ const RevertedPostPage: React.FC = () => {
   }, [currentPage, pageSize]);
 
   const handleDelete = () => {
-    if (!deletePost.id) {
-      return;
-    }
+    if (!deletePost.id) return;
+
     DELETE_DRAFT_MODAL_ID(
       deletePost.id,
       (draftArticles) => {
@@ -112,9 +104,10 @@ const RevertedPostPage: React.FC = () => {
       },
       data
     );
-    setDeletePost((pre) => ({
+
+    setDeletePost((prev) => ({
       id: null,
-      isOpen: !pre.isOpen,
+      isOpen: !prev.isOpen,
     }));
   };
 
@@ -122,21 +115,16 @@ const RevertedPostPage: React.FC = () => {
     const size = val.split(" ")[0];
     setPageSize(Number(size));
   };
+
   const handleEdit = (id: string) => {
     const articleType = EDIT_DRAFT_NAVIGATE(id, filteredArticles);
     navigate(`/${articleType}/${id}?from=reverted`);
   };
 
-  if (loading) {
-    return <Loading />;
-  }
   return (
-    <div className=" flex-1 py-16 h-screen bg-gray-50">
-      {/* Main Content */}
-      <div
-        style={{ paddingTop: "32px" }}
-        className=" flex flex-col gap-[24px] px-[24px] bg-[#F6FAF6]"
-      >
+    <div className="min-h-screen flex flex-col pt-16 bg-[#F6FAF6]">
+      <main className="flex-1 p-8 flex flex-col">
+        {/* Header */}
         <ContentHeader
           text="Reverted Post"
           description="Your saved drafts and work in progress."
@@ -150,19 +138,23 @@ const RevertedPostPage: React.FC = () => {
           ]}
         />
 
-        {/* Search and Filters */}
-        <SearchFilterTab
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          filterOptions={filterOptions}
-          activeFilter={activeFilter}
-          setActiveFilter={(filter: string) =>
-            setActiveFilter(filter as "All Type" | "TEXT" | "AUDIO" | "VIDEO")
-          }
-        />
-        {/* Content Area */}
-        <div className="flex-1 pb-10">
-          {filteredArticles.length > 0 ? (
+        {/* Sticky Toolbar (Filters + Search) */}
+        <section className="sticky top-16 z-20 bg-[#F6FAF6] my-3 pb-2">
+         
+            <SearchFilterTab
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              filterOptions={filterOptions}
+              activeFilter={activeFilter}
+              setActiveFilter={(filter: string) =>
+                setActiveFilter(filter as "All Type" | "TEXT" | "AUDIO" | "VIDEO")
+              }
+            />
+        </section>
+ {loading ? (
+            <Loading />
+          ) :( <div className="flex-1 overflow-y-auto mt-4 pb-10">
+         {filteredArticles.length > 0 ? (
             viewMode === "grid" ? (
               <RenderGridView
                 filteredArticles={filteredArticles}
@@ -190,9 +182,14 @@ const RevertedPostPage: React.FC = () => {
               </p>
             </div>
           )}
-        </div>
+        </div>) }
+        {/* Main Content */}
+       
+      </main>
 
-        {pageMetaData.totalPages > 1 && (
+      {/* Sticky Pagination */}
+      {pageMetaData.totalPages >= 1 && (
+        <div className="sticky bottom-0 bg-gray-50 border-t py-5 z-20">
           <Pagination
             currentPage={pageMetaData.page}
             pageCount={pageMetaData.totalPages}
@@ -200,15 +197,17 @@ const RevertedPostPage: React.FC = () => {
             setCurrentPage={setCurrentPage}
             setSortConfig={handlePageSize}
           />
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation */}
       {deletePost.isOpen && (
         <DeleteConfirmation
           onConfirm={handleDelete}
           onCancel={() =>
-            setDeletePost((pre) => ({
+            setDeletePost((prev) => ({
               id: null,
-              isOpen: !pre.isOpen,
+              isOpen: !prev.isOpen,
             }))
           }
         />

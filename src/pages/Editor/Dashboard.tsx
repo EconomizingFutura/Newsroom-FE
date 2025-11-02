@@ -1,5 +1,5 @@
 import StoryCard, { StatCard } from "@/components/ui/card";
-import { SquareChartGantt } from "lucide-react";
+import {  SquareChartGantt } from "lucide-react";
 import ContentHeader from "@/components/ContentHeader";
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
@@ -65,7 +65,7 @@ export function Dashboard() {
           text={`Welcome back, ${USERNAME ?? "Editor"}!`}
           description="Here's what's happening in your newsroom today."
         />
-        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-6 mb-8">
+        <div className="flex flex-col sm:flex-row flex-1 w-full sm:flex-wrap gap-6 mb-8">
           {stats.map((stat, index) => (
             <StatCard
               key={index}

@@ -104,7 +104,7 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
 
 function StatCard({ title, count, icon: Icon, color }: StatCardProps) {
   return (
-    <div className="flex items-center justify-between rounded-2xl shadow-md bg-white p-5 max-w-[230px] w-full">
+    <div className="flex items-center justify-between rounded-2xl shadow-md bg-white px-5 py-4 max-w-[210px] w-full">
       {/* Left Section */}
       <div>
         <p className="text-gray-500 text-sm max-w-28 font-medium">{title}</p>
@@ -130,14 +130,14 @@ function DashboardListCard({
     <div className="flex items-center justify-between bg-red-50 rounded-xl p-4 shadow-sm">
       {/* Left Section */}
       <div>
-        <p className="font-semibold warning-color mb-[8px]">{title}</p>
+        <p className=" warning-color mb-[8px]">{title}</p>
         <p className="text-[#E7000B]">{message}</p>
       </div>
 
       {/* Right Button */}
       <button
         onClick={() => onClick(id)}
-        className="px-4 py-2 cursor-pointer rounded-lg bg-[linear-gradient(90deg,#FB2C36_0%,#E7000B_100%)] text-white font-semibold w-max text-[14px] transition"
+        className="px-4 py-2 cursor-pointer rounded-lg bg-[linear-gradient(90deg,#FB2C36_0%,#E7000B_100%)] text-white  w-max text-[14px] transition"
       >
         {buttonText}
       </button>
@@ -177,7 +177,7 @@ export default function StoryCard({
   onView,
 }: StoryCardProps) {
   return (
-    <div className="flex items-center justify-between rounded-md bg-green-50 px-6 py-4">
+    <div className="flex items-center justify-between rounded-md bg-green-50 px-4 gap-2 py-3">
       <div className="flex flex-col gap-2">
         <h4 className="text-sm font-semibold text-[#1E2939]">
           Article For Review
