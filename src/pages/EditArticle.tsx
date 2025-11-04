@@ -7,6 +7,7 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import {
+  Loader2,
   Mic,
   MoveLeft,
   Plus,
@@ -89,67 +90,67 @@ const EditArticle: React.FC = () => {
     content:
       path === "textArticle"
         ? yup.string().test("non-empty", "Content is required", (val) => {
-            // allow empty string early, treat "<p><br></p>" as empty too
-            if (!val) return false;
-            return val.replace(/<p><br><\/p>/g, "").trim().length > 0;
-          })
+          // allow empty string early, treat "<p><br></p>" as empty too
+          if (!val) return false;
+          return val.replace(/<p><br><\/p>/g, "").trim().length > 0;
+        })
         : yup.string().notRequired(),
     tags: yup.array().of(yup.string()).min(1, "At least one tag is required"),
     // audio: if audio page, require audio file or a valid URL string from API
     audio:
       path === "audio"
         ? yup
-            .mixed()
-            .test("present", "Audio is required", (value) => {
-              if (!value) return false;
-              return true;
-            })
-            .test("is-audio", "Unsupported audio type", (value: any) => {
-              if (!value) return false;
-              // if server returned URL string, assume valid
-              if (typeof value === "string") return true;
-              // if it's a File, check MIME
-              if (value instanceof File) {
-                const allowed = [
-                  "audio/mpeg",
-                  "audio/wav",
-                  "audio/ogg",
-                  "audio/x-m4a",
-                  "audio/mp4",
-                ];
-                return allowed.includes(value.type);
-              }
-              return false;
-            })
-            .test("size", "Audio exceeds max size (100MB)", (value: any) => {
-              if (!value) return false;
-              if (typeof value === "string") return true;
-              if (value instanceof File) return value.size <= 100 * 1024 * 1024;
-              return false;
-            })
+          .mixed()
+          .test("present", "Audio is required", (value) => {
+            if (!value) return false;
+            return true;
+          })
+          .test("is-audio", "Unsupported audio type", (value: any) => {
+            if (!value) return false;
+            // if server returned URL string, assume valid
+            if (typeof value === "string") return true;
+            // if it's a File, check MIME
+            if (value instanceof File) {
+              const allowed = [
+                "audio/mpeg",
+                "audio/wav",
+                "audio/ogg",
+                "audio/x-m4a",
+                "audio/mp4",
+              ];
+              return allowed.includes(value.type);
+            }
+            return false;
+          })
+          .test("size", "Audio exceeds max size (100MB)", (value: any) => {
+            if (!value) return false;
+            if (typeof value === "string") return true;
+            if (value instanceof File) return value.size <= 100 * 1024 * 1024;
+            return false;
+          })
         : yup.mixed().notRequired(),
     video:
       path === "video"
         ? yup
-            .mixed()
-            .test("present", "Video is required", (value) => {
-              if (!value) return false;
-              return true;
-            })
-            .test("is-video", "Unsupported video type", (value: any) => {
-              if (!value) return false;
-              if (typeof value === "string") return true;
-              if (value instanceof File) {
-                return value.type.startsWith("video/");
-              }
-              return false;
-            })
-            .test("size", "Video exceeds max size (500MB)", (value: any) => {
-              if (!value) return false;
-              if (typeof value === "string") return true;
-              if (value instanceof File) return value.size <= 500 * 1024 * 1024;
-              return false;
-            })
+          .mixed()
+          .test("present", "Video is required", (value) => {
+            if (!value) return false;
+            return true;
+          })
+          .test("is-video", "Unsupported video type", (value: any) => {
+            if (!value) return false;
+            if (typeof value === "string") return true;
+            if (value instanceof File) {
+              return value.type.startsWith("video/");
+            }
+            return false;
+          })
+          .test("size", "Video exceeds max size (500MB)", (value: any) => {
+            if (!value) return false;
+            if (typeof value === "string") return true;
+            if (value instanceof File) return value.size <= 500 * 1024 * 1024;
+            return false;
+          })
         : yup.mixed().notRequired(),
     status: yup.string().nullable(),
     thumbnail: yup.mixed<File | string>().nullable().notRequired(),
@@ -163,7 +164,7 @@ const EditArticle: React.FC = () => {
     setValue,
     getValues,
     watch,
-    formState: { errors, dirtyFields },
+    formState: { errors, dirtyFields, isValid, isSubmitting },
   } = useForm<ArticleFormValues>({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -176,7 +177,7 @@ const EditArticle: React.FC = () => {
       thumbnail: null,
       status: null,
     },
-    mode: "onSubmit",
+    mode: "onChange",
     reValidateMode: "onChange",
   });
 
@@ -323,7 +324,6 @@ const EditArticle: React.FC = () => {
 
       // navigate("/drafts");
     } else if (status === "SUBMIT") {
-      setLoading(true);
 
       const API_DATA = {
         ...data,
@@ -332,7 +332,6 @@ const EditArticle: React.FC = () => {
       };
 
       await POST(API_LIST.SUBMIT_ARTICLE, API_DATA);
-      setLoading(false);
       navigate("/history");
     }
   };
@@ -346,7 +345,7 @@ const EditArticle: React.FC = () => {
       {/* Header */}
       <Toaster position="top-center" richColors />
 
-      <header className="sticky top-0 z-10 bg-[#f6faf6]  pt-[60px]">
+      <header className="sticky top-0 z-10 bg-[#f6faf6] pt-[70px]">
         <div className="px-4 py-3 flex flex-col gap-[24px]">
           <div className="flex flex-row items-center gap-4">
             <Button
@@ -373,6 +372,7 @@ const EditArticle: React.FC = () => {
                 <Button
                   form="myForm"
                   type="button"
+                  disabled={!isValid || isSubmitting || loading}
                   onClick={handleSubmit((data) => {
                     // save draft -> update status and show UI
                     // setValue("status", "DRAFT");
@@ -380,23 +380,34 @@ const EditArticle: React.FC = () => {
                   })}
                   variant="outline"
                   size="sm"
-                  className="gap-2 border-[#B3E6B3] bg-[#F0F9F0] text-[#008001] hover:bg-[#F0F9F0] hover:text-[#008001]"
+                  className="gap-2 border-[#B3E6B3] bg-[#F0F9F0] text-[#008001] hover:bg-[#F0F9F0] hover:text-[#008001] h-[40px] rounded-md"
                 >
                   <Save className="w-4 h-4" />
                   Save Draft
                 </Button>
+                {console.log(isSubmitting, "isSubmitting")}
                 <Button
                   form="myForm"
                   type="button"
+                  disabled={!isValid || isSubmitting}
                   onClick={handleSubmit((data) => {
                     // setValue("status", "SUBMIT");
                     onSubmit(data, "SUBMIT");
                   })}
                   size="sm"
-                  className="bg-green-700 hover:bg-green-700 text-white gap-2"
+                  className={`bg-green-700 hover:bg-green-700 h-[40px] text-white gap-2 ${
+                    (!isValid || isSubmitting) && "opacity-50 cursor-not-allowed"
+                  }`}
                 >
-                  <Send className="w-4 h-4" />
-                  Submit for Review
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="animate-spin w-4 h-4" /> Submitting...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" /> Submit for Review
+                    </>
+                  )}
                 </Button>
               </div>
             )}
@@ -407,15 +418,9 @@ const EditArticle: React.FC = () => {
               <div className="flex items-center py-2 justify-between ">
                 <h2 className="text-[20px] font-semibold">Content Editor</h2>
                 <div className="flex gap-2">
-                  {/* <StatusBadge
-                    label={getValues("status") || ''}
-                    active={getValues("status") === "DRAFT"}
-                    activeClass="text-[#6A7282] bg-[#F8FAF9] border-[#E5E7EB]"
-                    inactiveClass="text-[#6A7282] opacity-50 border border-transparent"
-                  /> */}
 
                   <Badge
-                    className={`px-[16px] font-semibold py-[6px] text-[14px] ${HISTORY_STATUS(
+                    className={`px-[16px] h-[30px] font-semibold py-[6px] text-[12px] ${HISTORY_STATUS(
                       getValues("status") || ""
                     )}`}
                   >

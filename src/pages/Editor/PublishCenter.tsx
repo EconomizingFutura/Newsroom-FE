@@ -277,14 +277,14 @@ export function PublishCenter() {
 
   return (
     <div className="min-h-screen flex flex-col pt-16 bg-[#F6FAF6]">
-      <main className="flex-1 p-8 flex gap-2 flex-col">
+      <main className="flex-1 p-8 flex gap-3 flex-col">
         <ContentHeader
           text="Publish Center"
           description="Finalize and publish approved content across platforms."
           iconName="Publish Center"
         />
 
-        <section className="sticky top-16 mt-3 bg-gray-50 z-10">
+        <section className="sticky top-16 space-y-1  bg-gray-50 z-10">
           <div className="my-3 flex items-center justify-between bg-white py-2 px-6 rounded-lg">
             <div className="flex space-x-2.5 bg-[#6A72821A] p-1 rounded-lg w-fit">
               {CONTENT_TABS.map((tab) => (
@@ -350,7 +350,7 @@ export function PublishCenter() {
         </section>
         {(loading) ? <Loading /> :
 
-          <div className="flex-1 overflow-y-auto mt-4 space-y-4 pr-2">
+          <div className="flex-1 overflow-y-auto space-y-4 pr-2">
             {data.length > 0 ? (
               data.map((story) => (
                 <StoryCard

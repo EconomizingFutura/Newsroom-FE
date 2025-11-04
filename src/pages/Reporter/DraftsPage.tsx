@@ -79,8 +79,8 @@ export default function DraftsPage() {
       activeFilter === "AUDIO"
         ? "audio"
         : activeFilter === "VIDEO"
-        ? "video"
-        : "textArticle";
+          ? "video"
+          : "textArticle";
     const handleNav = () => {
       navigate(`/${isAudio}`);
     };
@@ -146,93 +146,94 @@ export default function DraftsPage() {
   }, [currentPage, pageSize]);
 
 
- return (
+  return (
     <div className="min-h-screen flex flex-col pt-16 bg-[#F6FAF6]">
-    {/* Main Wrapper */}
-    <div
-      style={{ paddingTop: "32px" }}
-      className="flex flex-col flex-1 gap-[24px] px-[24px] bg-[#F6FAF6]"
-    >
-      {/* Header */}
-      <ContentHeader
-        text="Drafts"
-        description="Your saved drafts and work in progress."
-        number={filteredArticles?.length}
-        iconName="Drafts"
-        showGrid
-        onClickGridList={[
-          () => setViewMode("grid"),
-          () => setViewMode("list"),
-          viewMode,
-        ]}
-      />
+      {/* Main Wrapper */}
+      <div
+        style={{ paddingTop: "32px" }}
+        className="flex flex-col flex-1 gap-[24px] px-[24px] bg-[#F6FAF6]"
+      >
+        {/* Header */}
+        <ContentHeader
+          text="Drafts"
+          description="Your saved drafts and work in progress."
+          number={filteredArticles?.length}
+          iconName="Drafts"
+          showGrid
+          onClickGridList={[
+            () => setViewMode("grid"),
+            () => setViewMode("list"),
+            viewMode,
+          ]}
+        />
 
-      {/* Sticky Search + Filter */}
-      <div className="sticky top-16 z-30 bg-[#F6FAF6] pb-2">
-        <SearchFilterTab
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          filterOptions={filterOptions}
-          className="shadow-[0px_2px_10px_0px_#959DA533]"
-          activeFilter={activeFilter}
-          setActiveFilter={(filter: string) =>
-            setActiveFilter(filter as "All Type" | "TEXT" | "AUDIO" | "VIDEO")
+        {/* Sticky Search + Filter */}
+        <div className="sticky top-16 z-30 bg-[#F6FAF6]">
+          <SearchFilterTab
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            filterOptions={filterOptions}
+            className="shadow-[0px_2px_10px_0px_#959DA533]"
+            activeFilter={activeFilter}
+            setActiveFilter={(filter: string) =>
+              setActiveFilter(filter as "All Type" | "TEXT" | "AUDIO" | "VIDEO")
+            }
+          />
+        </div>
+        {
+          loading ? (
+            <Loading />
+          ) : (
+            <div className="flex-1 overflow-y-auto rounded-md bg-transparent ">
+              {filteredArticles?.length === 0 ? (
+                renderEmptyState()
+              ) : viewMode === "grid" ? (
+                <RenderGridView
+                  filteredArticles={filteredArticles}
+                  handleDeletePost={(id) => setDeletePost({ id, isOpen: true })}
+                  handleEdit={handleEdit}
+                  status="DRAFT"
+                />
+              ) : (
+                <RenderListViewDraft
+                  handleDeletePost={(id) => setDeletePost({ id, isOpen: true })}
+                  handleEdit={handleEdit}
+                  filteredArticles={filteredArticles}
+                />
+              )}
+            </div>)
+        }
+
+        {/* Scrollable Content */}
+
+      </div>
+
+      {/* Sticky Pagination */}
+      {pageMetaData.totalPages >= 1 && (
+        <div className="sticky bottom-0 bg-gray-50 border-t py-5 z-20">
+          <Pagination
+            currentPage={pageMetaData.page}
+            pageCount={pageMetaData.totalPages}
+            onPageChange={handlePageChange}
+            setCurrentPage={setCurrentPage}
+            setSortConfig={handlePageSize}
+          />
+        </div>
+      )}
+
+      {/* Delete Modal */}
+      {deletePost.isOpen && (
+        <DeleteConfirmation
+          onConfirm={handleDelete}
+          onCancel={() =>
+            setDeletePost((pre) => ({
+              id: null,
+              isOpen: !pre.isOpen,
+            }))
           }
         />
-      </div>
-      {
-        loading ? (
-          <Loading />
-        ) : ( <div className="flex-1 mt-4 overflow-y-auto rounded-md bg-transparent ">
-        {filteredArticles?.length === 0 ? (
-          renderEmptyState()
-        ) : viewMode === "grid" ? (
-          <RenderGridView
-            filteredArticles={filteredArticles}
-            handleDeletePost={(id) => setDeletePost({ id, isOpen: true })}
-            handleEdit={handleEdit}
-            status="DRAFT"
-          />
-        ) : (
-          <RenderListViewDraft
-            handleDeletePost={(id) => setDeletePost({ id, isOpen: true })}
-            handleEdit={handleEdit}
-            filteredArticles={filteredArticles}
-          />
-        )}
-      </div>)
-      }
-
-      {/* Scrollable Content */}
-     
+      )}
     </div>
-
-    {/* Sticky Pagination */}
-    {pageMetaData.totalPages >= 1 && (
-      <div className="sticky bottom-0 bg-gray-50 border-t py-5 z-20">
-        <Pagination
-          currentPage={pageMetaData.page}
-          pageCount={pageMetaData.totalPages}
-          onPageChange={handlePageChange}
-          setCurrentPage={setCurrentPage}
-          setSortConfig={handlePageSize}
-        />
-      </div>
-    )}
-
-    {/* Delete Modal */}
-    {deletePost.isOpen && (
-      <DeleteConfirmation
-        onConfirm={handleDelete}
-        onCancel={() =>
-          setDeletePost((pre) => ({
-            id: null,
-            isOpen: !pre.isOpen,
-          }))
-        }
-      />
-    )}
-  </div>
-);
+  );
 
 }

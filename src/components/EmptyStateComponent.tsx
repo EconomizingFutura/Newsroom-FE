@@ -14,7 +14,7 @@ const EmptyStateComponent: React.FC<EmptyStateProps> = ({
   return (
     <div
       style={{ boxShadow: "0px 2px 15px 0px #64646F1A" }}
-      className="flex flex-col items-center  justify-center py-20"
+      className="flex flex-col items-center bg-white justify-center py-20"
     >
       <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mb-6">
         <FolderOpen className="w-8 h-8 text-gray-400" />

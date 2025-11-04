@@ -116,7 +116,7 @@ export default function Dashboard() {
         />
 
         {/* Stats Section */}
-        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-6 mb-8">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-6 mb-1">
           {stats.map((stat) => (
             <StatCard
               key={stat.title}
@@ -135,7 +135,7 @@ export default function Dashboard() {
             <div className="mb-4 p-4  rounded-full">
               <CheckCircle className="w-12 h-12 text-green-500" />
             </div>
-            <h3 className="text-4xl font-semibold text-gray-900 mb-2">
+            <h3 className="text-4xl text-gray-900 mb-2">
               All caught up!
             </h3>
             <p className="text-gray-500 text-lg max-w-md">
@@ -151,9 +151,9 @@ export default function Dashboard() {
             >
               <div className="flex flex-col gap-[16px]">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 warning-color font-semibold text-[16px]">
+                  <div className="flex items-center gap-2 warning-color text-[16px]">
                     <RotateCcw className="w-5 h-5 warning-color" />
-                    <span className="font-semibold">
+                    <span className="">
                       {" "}
                       Urgent Actions Required
                     </span>

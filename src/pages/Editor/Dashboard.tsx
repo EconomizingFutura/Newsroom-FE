@@ -65,7 +65,7 @@ export function Dashboard() {
           text={`Welcome back, ${USERNAME ?? "Editor"}!`}
           description="Here's what's happening in your newsroom today."
         />
-        <div className="flex flex-col sm:flex-row flex-1 w-full sm:flex-wrap gap-6 mb-8">
+        <div className="flex flex-col sm:flex-row flex-1 w-full sm:flex-wrap gap-6 mb-1">
           {stats.map((stat, index) => (
             <StatCard
               key={index}
@@ -87,7 +87,7 @@ export function Dashboard() {
               <div className="flex flex-col gap-[16px]">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-[16px] flex gap-2 font-semibold text-[#1E2939]">
+                    <h3 className="text-[16px] flex gap-2 text-[#1E2939]">
                       <SquareChartGantt color="#2676FE" />{" "}
                       <span> Pending for Review</span>
                       <span className="px-3 py-0.5 rounded-full bg-blue-100 text-blue-500 border border-blue-200 text-sm font-medium">
