@@ -1,8 +1,8 @@
 @import "tailwindcss";
 @custom-variant dark (&:is(.dark *));
-@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap");
 
 :root {
+  
   --font-size: 14px;
   --background: #ffffff;
   --foreground: oklch(0.145 0 0);
@@ -137,6 +137,7 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: "Open Sans", sans-serif;
   }
 }
 
@@ -345,4 +346,25 @@ body {
 .fc-event.custom-event {
   border-left-width: 3px !important;
   border-left-style: solid !important;
+}
+
+@font-face {
+  font-family: "Open Sans";
+  src: url("@/assets/fonts/OpenSans-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Open Sans";
+  src: url("@/assets/fonts/OpenSans-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Open Sans";
+  src: url("@/assets/fonts/OpenSans-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
 }
