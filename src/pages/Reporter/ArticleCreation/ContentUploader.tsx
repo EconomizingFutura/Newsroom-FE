@@ -313,9 +313,9 @@ const ContentUploader = () => {
       <Toaster position="top-center" richColors />
 
       <header className="sticky top-0 z-10 bg-[#f6faf6] border-b pt-[60px]">
-        <div className="px-4 py-3 flex flex-col gap-[24px]">
+        <div className="px-4 py-3 flex flex-col gap-[16px]">
           {/* Top row */}
-          <div className="flex flex-row items-center gap-4">
+          <div className="flex flex-row mt-4 items-center gap-4">
             <Button
               type="button"
               variant="ghost"
@@ -336,7 +336,7 @@ const ContentUploader = () => {
                 name="draft"
                 variant="outline"
                 size="sm"
-                className="gap-2 border-[#B3E6B3] bg-[#F0F9F0] text-[#008001] hover:bg-[#F0F9F0] hover:text-[#008001]"
+                className="gap-2 border-[#B3E6B3] bg-[#F0F9F0] h-[40px] text-[#008001] hover:bg-[#F0F9F0] hover:text-[#008001]"
                 onClick={throttledSaveDraft}
               >
                 {isSavingDraft ? (
@@ -355,7 +355,7 @@ const ContentUploader = () => {
                 name="save"
                 size="sm"
                 disabled={isSavingDraft} // disable while saving draft
-                className="bg-green-700 hover:bg-green-700 text-white gap-2"
+                className="bg-green-700 hover:bg-green-700 h-[40px] text-white gap-2"
               >
                 <Send className="w-4 h-4" />
                 Submit for Review
@@ -434,7 +434,7 @@ const ContentUploader = () => {
                 <Input
                   placeholder="Title"
                   {...register("title", { required: "Title is required" })}
-                  className={`bg-[#f7fbf8] border-[#ECECEC] ${
+                  className={`bg-[#f7fbf8] border-[#ECECEC] h-[40px] ${
                     errors.title ? "border-red-500" : ""
                   }`}
                 />

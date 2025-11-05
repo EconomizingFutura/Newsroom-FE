@@ -1,6 +1,5 @@
 import StoryCard, { StatCard } from "@/components/ui/card";
 import {  SquareChartGantt } from "lucide-react";
-import ContentHeader from "@/components/ContentHeader";
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import { useEditorReviewArticle } from "@/hooks/useEditorReviewArticle";
@@ -61,11 +60,11 @@ export function Dashboard() {
         style={{ paddingTop: "32px" }}
         className="flex flex-col gap-[24px] px-[24px] bg-[#F6FAF6]"
       >
-        <ContentHeader
-          text={`Welcome back, ${USERNAME ?? "Editor"}!`}
-          description="Here's what's happening in your newsroom today."
-        />
-        <div className="flex flex-col sm:flex-row flex-1 w-full sm:flex-wrap gap-6 mb-8">
+        <div className="flex flex-col gap-3">
+          <h1 className="text-[#101828] font-bold text-[24px]">{`Welcome back, ${USERNAME ?? "Editor"}!`}</h1>
+          <p className="text-[#4A5565] leading-5 tracking-wide font-medium text-[14px]">Here's what's happening in your newsroom today.</p>
+        </div>
+        <div className="flex flex-col sm:flex-row flex-1 w-full sm:flex-wrap gap-6 mb-1">
           {stats.map((stat, index) => (
             <StatCard
               key={index}
@@ -87,7 +86,7 @@ export function Dashboard() {
               <div className="flex flex-col gap-[16px]">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-[16px] flex gap-2 font-semibold text-[#1E2939]">
+                    <h3 className="text-[16px] flex gap-2 text-[#1E2939]">
                       <SquareChartGantt color="#2676FE" />{" "}
                       <span> Pending for Review</span>
                       <span className="px-3 py-0.5 rounded-full bg-blue-100 text-blue-500 border border-blue-200 text-sm font-medium">

@@ -1,7 +1,6 @@
 import { Clock, X } from "lucide-react";
 import { useForm, Controller } from "react-hook-form";
-import { useRef, useEffect } from "react";
-
+import { useRef, useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { cn } from "./ui/utils";
 import { DatePickerComponent, PlatformIcon } from "@/utils/calendarUtils";
@@ -58,21 +57,46 @@ const ScheduleArticle = ({
       date: undefined,
     },
   });
+  const [hovered, setHovered] = useState(false);
+
+
+  const [platformSchedules, setPlatformSchedules] = useState<
+    Record<string, { date?: Date; time?: string } | null>
+  >({
+    "All Platform": null,
+    Web: null,
+    Instagram: null,
+    Twitter: null,
+    Facebook: null,
+  });
 
   useEffect(() => {
     if (contentData) {
+      const initialDate = contentData.scheduledDate
+        ? new Date(contentData.scheduledDate)
+        : undefined;
+      const initialTime = contentData.scheduledTime || "";
+
+      const updatedSchedules: Record<string, any> = {};
+      CONTENT_TABS.forEach((tab) => {
+        updatedSchedules[tab.name] = {
+          date: initialDate,
+          time: initialTime,
+        };
+      });
+
       reset({
-        time: contentData.scheduledTime || "",
-        date: contentData.scheduledDate
-          ? new Date(contentData.scheduledDate)
-          : undefined,
+        time: initialTime,
+        date: initialDate,
         primaryPlatform:
-          contentData.scheduledPlatforms.length == 1
+          contentData.scheduledPlatforms.length === 1
             ? contentData.scheduledPlatforms[0]
             : "All Platform",
         additionalPlatforms: contentData.scheduledPlatforms || [],
         type: [],
       });
+
+      setPlatformSchedules(updatedSchedules);
     }
   }, [contentData, reset]);
 
@@ -81,32 +105,61 @@ const ScheduleArticle = ({
     if (platform === "All Platform") {
       setValue("additionalPlatforms", []);
     }
+
+    const current = platformSchedules[platform];
+    if (current?.date) setValue("date", current.date);
+    else setValue("date", undefined);
+    if (current?.time) setValue("time", current.time);
+    else setValue("time", "");
   };
 
-  const handleOtherPlatforms = (platform: string) => {
-    const currentAdditionalPlatforms = watch("additionalPlatforms");
-    const newAdditionalPlatforms = currentAdditionalPlatforms.includes(platform)
-      ? currentAdditionalPlatforms.filter((p) => p !== platform)
-      : [...currentAdditionalPlatforms, platform];
-    setValue("additionalPlatforms", newAdditionalPlatforms);
+  const handleAllPlatformSchedule = (date: Date, time: string) => {
+    const updated = Object.fromEntries(
+      Object.keys(platformSchedules).map((p) => [p, { date, time }])
+    );
+    setPlatformSchedules(updated);
+    setValue("date", date);
+    setValue("time", time);
   };
+
+  const handleIndividualPlatformSchedule = (
+    platform: string,
+    date: Date,
+    time: string
+  ) => {
+    setPlatformSchedules((prev) => ({
+      ...prev,
+      [platform]: { date, time },
+      "All Platform": null, // clear global schedule
+    }));
+    setValue("date", date);
+    setValue("time", time);
+  };
+
+  const handleSameAs = (currentPlatform: string, sourcePlatform: string) => {
+    const source = platformSchedules[sourcePlatform];
+    if (!source?.date || !source?.time) return;
+
+    setPlatformSchedules((prev) => ({
+      ...prev,
+      [currentPlatform]: { ...source },
+    }));
+    setValue("date", source.date);
+    setValue("time", source.time);
+  };
+
+
 
   const validateFutureDateTime = () => {
     const { date, time } = getValues();
-    if (!date || !time) {
-      return "Date and time are required.";
-    }
+    if (!date || !time) return "Date and time are required.";
 
     const selectedDateTime = new Date(date);
     const [hours, minutes] = time.split(":").map(Number);
     selectedDateTime.setHours(hours, minutes, 0, 0);
 
     const now = new Date();
-
-    if (selectedDateTime < now) {
-      return "Selected time cannot be in the past.";
-    }
-
+    if (selectedDateTime < now) return "Selected time cannot be in the past.";
     return true;
   };
 
@@ -116,7 +169,6 @@ const ScheduleArticle = ({
       toast.error(validationResult);
       return;
     }
-
     if (!data.date) return;
 
     const platforms =
@@ -124,36 +176,39 @@ const ScheduleArticle = ({
         ? CONTENT_TABS.slice(1).map((tab) => tab.name)
         : [data.primaryPlatform, ...data.additionalPlatforms];
 
-    const oldDate = contentData?.scheduledDate
-      ? new Date(contentData.scheduledDate).toISOString().split("T")[0]
-      : null;
-    const newDate = data.date.toISOString().split("T")[0];
-
-    const oldTime = contentData?.scheduledTime || "";
-    const newTime = data.time;
-
-    const oldPlatforms = contentData?.scheduledPlatforms?.sort() || [];
-    const newPlatforms = platforms.sort();
-
-    const isSameDate = oldDate === newDate;
-    const isSameTime = oldTime === newTime;
-    const isSamePlatforms =
-      JSON.stringify(oldPlatforms) === JSON.stringify(newPlatforms);
-
-    if (isSameDate && isSameTime && isSamePlatforms) {
-      toast.error("Please modify date, time, or platforms before submitting.");
-      return;
-    }
     const isEdit = Boolean(contentData?.scheduledTime);
-
     await handlePublish(platforms, data.time, data.date.toISOString(), isEdit);
     toast.success("Schedule updated successfully!");
     onCancel();
   };
 
   const primaryPlatform = watch("primaryPlatform");
-  const additionalPlatforms = watch("additionalPlatforms");
   const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleDateChange = (selectedDate: string) => {
+    const newDate = new Date(selectedDate);
+    const currentTime = getValues("time");
+    if (primaryPlatform === "All Platform") {
+      handleAllPlatformSchedule(newDate, currentTime);
+    } else {
+      handleIndividualPlatformSchedule(primaryPlatform, newDate, currentTime);
+    }
+  };
+
+  const handleTimeChange = (newTime: string) => {
+    const currentDate = getValues("date");
+    if (!currentDate) return;
+    if (primaryPlatform === "All Platform") {
+      handleAllPlatformSchedule(currentDate, newTime);
+    } else {
+      handleIndividualPlatformSchedule(primaryPlatform, currentDate, newTime);
+    }
+  };
+
+  const hasAnyPlatformScheduled = Object.entries(platformSchedules).some(
+  ([name, val]) =>
+    name !== primaryPlatform && val?.date && val?.time
+);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
@@ -178,10 +233,10 @@ const ScheduleArticle = ({
                       type="button"
                       key={tab.name}
                       onClick={() => handlePrimaryPlatform(tab.name)}
-                      className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center space-x-2 ${
+                      className={`px-4 py-2 rounded-md text-sm text-[14px]  transition-all flex items-center space-x-2 ${
                         primaryPlatform === tab.name
-                          ? "bg-white text-gray-900"
-                          : "text-gray-500 hover:text-gray-700"
+                          ? "bg-white text-[#1E2939] font-bold"
+                          : "text-gray-500 hover:text-gray-700 font-medium"
                       }`}
                     >
                       <span>{tab.name}</span>
@@ -192,7 +247,6 @@ const ScheduleArticle = ({
 
               {/* Date and Time */}
               <div className="w-full gap-6 py-4 flex">
-                {/* Date Picker */}
                 <div className="min-w-96">
                   <label className="block text-[15px]  text-[#03101F] mb-1">
                     Select Date
@@ -208,9 +262,7 @@ const ScheduleArticle = ({
                             ? field.value.toISOString().split("T")[0]
                             : ""
                         }
-                        onChange={(selectedDate: string) =>
-                          field.onChange(new Date(selectedDate))
-                        }
+                        onChange={handleDateChange}
                         placeholder="Date"
                         className={cn(
                           "border border-[#ECECEC] bg-[#F7FBF7] hover:bg-[#F7FBF7] placeholder:text-[#03101F]",
@@ -226,7 +278,6 @@ const ScheduleArticle = ({
                   )}
                 </div>
 
-                {/* Time Picker */}
                 <div className="min-w-96 w-full">
                   <label className="block text-[15px] text-[#03101F] mb-1">
                     Enter Time
@@ -245,18 +296,15 @@ const ScheduleArticle = ({
                       type="time"
                       {...register("time", {
                         required: "Time is required",
-                        validate: () => {
-                          const result = validateFutureDateTime();
-                          return result === true || result;
-                        },
                       })}
                       ref={(e) => {
                         register("time").ref(e);
                         inputRef.current = e;
                       }}
+                      onChange={(e) => handleTimeChange(e.target.value)}
+                      value={getValues("time")}
                       placeholder="00:00"
-                      className="bg-transparent outline-none w-full
-                        [&::-webkit-calendar-picker-indicator]:opacity-0"
+                      className="bg-transparent outline-none w-full [&::-webkit-calendar-picker-indicator]:opacity-0"
                     />
                     <Clock className="h-5" />
                   </div>
@@ -267,59 +315,56 @@ const ScheduleArticle = ({
                   )}
                 </div>
               </div>
+                  <div className="min-h-24">
+                      {/* Same As Section */}
+              {primaryPlatform !== "All Platform" && hasAnyPlatformScheduled &&(
+                <>
+                  <p className="text-[12px] pb-2 font-semibold text-[#6A7282]">
+                    Same as:
+                  </p>
+                  <div className="flex gap-4 flex-wrap">
+                    {Object.entries(platformSchedules)
+                      .filter(
+                        ([name, val]) =>
+                          name !== primaryPlatform &&
+                          name !== "All Platform" &&
+                          val?.date &&
+                          val?.time
+                      )
+                      .map(([name]) => (
+                        <div
+                          key={name}
+                            onMouseEnter={() => setHovered(true)}
+  onMouseLeave={() => setHovered(false)}
+                          onClick={() => handleSameAs(primaryPlatform, name)}
+                          className="flex items-center bg-[#F0F1F2] text-[#6A7282] w-max py-2 px-3 rounded-[8px] space-x-2 cursor-pointer hover:bg-[#008001] hover:text-white"
+                        >
+                                                    <PlatformIcon name={name} color={!hovered ? "#2C3E50" : "#ffffff"} />
 
-              {/* Additional Platforms */}
-              <div className="min-h-20">
-                {primaryPlatform !== "All Platform" && (
-                  <>
-                    <p className="text-[12px] pb-2 font-semibold text-[#6A7282]">
-                      Same as:
-                    </p>
-                    <div className="flex gap-4 flex-wrap">
-                      {CONTENT_TABS.slice(1)
-                        .filter((a) => a.name !== primaryPlatform)
-                        .map((tab) => (
-                          <div
-                            key={tab.name}
-                            onClick={() => handleOtherPlatforms(tab.name)}
-                            className={cn(
-                              "flex items-center bg-[#F0F1F2] text-[#6A7282] w-max py-2 px-3 rounded-[8px] space-x-2 cursor-pointer",
-                              additionalPlatforms.includes(tab.name) &&
-                                "!bg-[#008001] !text-[#F0F1F2]"
-                            )}
-                          >
-                            <p className="font-semibold text-[14px]">
-                              {tab.name}
-                            </p>
-                            <PlatformIcon
-                              name={tab.name}
-                              color={
-                                additionalPlatforms.includes(tab.name)
-                                  ? "#FFFFFF"
-                                  : "#2C3E50"
-                              }
-                            />
-                          </div>
-                        ))}
-                    </div>
-                  </>
-                )}
-              </div>
+                          <p className="font-semibold  text-[14px]">{name}</p>
+                        </div>
+                      ))}
+                  </div>
+                </>
+              )}
+
+                  </div>
+            
             </div>
 
             {/* Buttons */}
-            <div className="flex w-full relative  border-t border-white justify-end">
+            <div className="flex w-full relative border-t border-white justify-end">
               <div className="flex gap-6 p-4 bg-[#FFFFFF] shadow-[0px_2px_10px_0px_#0000001A,_0px_0px_2px_0px_#00000033] w-full justify-end rounded-b-2xl">
                 <Button
                   type="button"
-                  className="border rounded-[8px] h-10 w-32 border-[#008001] text-[#008001] bg-[#fff]  text-[14px] hover:bg-white"
+                  className="border rounded-[8px] h-10 w-32 border-[#008001] text-[#008001] bg-[#fff] text-[14px] hover:bg-white"
                   onClick={onCancel}
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
-                  className="border rounded-[8px] h-10 w-32 border-[#008001] text-[#fff] bg-[#008001]  text-[14px] hover:bg-[#008001]"
+                  className="border rounded-[8px] h-10 w-32 border-[#008001] text-[#fff] bg-[#008001] text-[14px] hover:bg-[#008001]"
                 >
                   Schedule
                 </Button>

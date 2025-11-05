@@ -104,7 +104,7 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
 
 function StatCard({ title, count, icon: Icon, color }: StatCardProps) {
   return (
-    <div className="flex items-center justify-between rounded-2xl shadow-md bg-white px-5 py-4 max-w-[210px] w-full">
+    <div className="flex items-center justify-between rounded-2xl shadow-md bg-white px-5 py-4 max-w-[225px] w-full">
       {/* Left Section */}
       <div>
         <p className="text-gray-500 text-sm max-w-28 font-medium">{title}</p>
@@ -179,7 +179,7 @@ export default function StoryCard({
   return (
     <div className="flex items-center justify-between rounded-md bg-green-50 px-4 gap-2 py-3">
       <div className="flex flex-col gap-2">
-        <h4 className="text-sm font-semibold text-[#1E2939]">
+        <h4 className="text-sm text-[#1E2939]">
           Article For Review
         </h4>
         <p className="text-sm text-[#6A7282]">

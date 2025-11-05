@@ -36,6 +36,7 @@ import { InputLabel } from "@/components/ui/form";
 import { toast, Toaster } from "sonner";
 import type { AxiosError } from "axios";
 import EditorRemarks from "@/components/EditorRemarks";
+import { cn } from "@/components/ui/utils";
 
 interface ContentForm {
   content: string;
@@ -352,7 +353,7 @@ const ViewContent: React.FC = () => {
           <form
             ref={formRef}
             onSubmit={methods.handleSubmit(onSubmit)}
-            className="flex flex-col  bg-white shadow-[0px_2px_10px_0px_#959DA533] space-y-6"
+            className="flex flex-col bg-white shadow-[0px_2px_10px_0px_#959DA533] space-y-6"
           >
             <div className="flex flex-col px-6 space-y-6 p-4 sm:p-6 mb-2">
               {contentData?.type === "TEXT" && (
@@ -397,7 +398,7 @@ const ViewContent: React.FC = () => {
                           <h1 className="text-[#101828] font-bold text-2xl">
                             {contentData?.title || ""}
                           </h1>
-                          <div className="flex items-center my-2 gap-1">
+            <div className="flex items-center my-2 gap-3 ">
                             <InfoBadge
                               type="date"
                               value={formatToIST(contentData?.updatedAt)}
@@ -580,21 +581,15 @@ const ViewContent: React.FC = () => {
                     </div>
                   ) : (
                     <div className=" flex justify-between items-center">
-                      <div>
-                        <h1 className="text-[#101828] font-bold text-2xl">
-                          {contentData?.title || ""}
-                        </h1>
-                        <div className="flex items-center my-2 gap-1">
-                          <InfoBadge
-                            type="date"
-                            value={formatToIST(contentData?.updatedAt)}
-                          />
-                          <InfoBadge
-                            type="user"
-                            value={contentData?.reporter.username}
-                          />
-                        </div>
-                      </div>
+                        <div className="flex flex-col gap-3">
+            <h1 className="text-[#101828] font-bold text-2xl">
+              {contentData?.title || ""}
+            </h1>
+            <div className="flex items-center mb-2 gap-3 ">
+              <InfoBadge type="date" value={formatToIST(contentData?.updatedAt)} />
+              <InfoBadge type="user" value={contentData?.reporter.username} />
+            </div>
+          </div>
 
                       {ISPOSTED && (
                         <div>
@@ -687,7 +682,7 @@ const ViewContent: React.FC = () => {
                 </>
               )}
 
-              <div className="space-y-3 mt-6">
+              <div className={cn("space-y-3 ")}>
                 {enableEdit && (
                   <>
                     <label className="flex items-center gap-2 font-medium">

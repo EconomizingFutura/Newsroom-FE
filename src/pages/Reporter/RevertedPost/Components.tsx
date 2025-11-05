@@ -91,7 +91,7 @@ export const RenderListView: React.FC<ListViewProps> = ({
 
               <Button
                 size="sm"
-                className="bg-red-600 hover:bg-red-700 text-white gap-2 ml-4"
+                className="bg-red-600 hover:bg-red-700 h-[40px] text-white gap-2 ml-4"
                 onClick={() => handleEdit?.(article.id)}
               >
                 <PenLine className="w-3 h-3" />
@@ -164,7 +164,7 @@ export const RenderListViewDraft: React.FC<ListViewProps> = ({
             <div className="flex items-center gap-3 ml-4">
               <Button
                 size="sm"
-                className="bg-[#008001] py-2 px-4 w-[120px] hover:bg-green-700 text-white gap-2"
+                className="bg-[#008001] py-2 px-4 w-[120px] h-[40px] hover:bg-green-700 text-white gap-2"
                 onClick={() => handleEdit?.(article.id)}
               >
                 <PenLine className="w-5 h-5" />
@@ -174,7 +174,7 @@ export const RenderListViewDraft: React.FC<ListViewProps> = ({
                 onClick={() => handleDeletePost(article.id)}
                 size="sm"
                 variant="outline"
-                className="border-red-200 text-red-600 hover:bg-red-50 w-8 h-8 p-0"
+                className="border-red-200 text-red-600 hover:bg-red-50 w-[40px] h-[40px] p-0"
               >
                 <Trash2 className="w-3 h-3" />
               </Button>

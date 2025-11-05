@@ -128,8 +128,7 @@ export function ReviewQueue() {
           description="Review and approve content submissions from reporters."
         />
 
-        {/* CATEGORY FILTER STAYS FIXED */}
-        <div className="my-3 flex items-center justify-between bg-white py-2 px-6 rounded-lg sticky top-16 z-10">
+        <div className="my-5 flex items-center justify-between bg-white py-2 px-6 rounded-lg sticky top-16 z-10">
           <div className="flex space-x-2.5 bg-[#6A72821A] p-1 rounded-lg w-fit">
             {categories.map((category) => (
               <button
@@ -148,7 +147,7 @@ export function ReviewQueue() {
 
         {isLoading ? <Loading /> :
 
-          <div className="flex-1 overflow-y-auto my-3 space-y-4 pr-2">
+          <div className="flex-1 overflow-y-auto mb-3 space-y-4 pr-2">
             {pendingStories.length === 0 ? (
               <div className="flex justify-center  items-center h-full !w-full">
                 <PendingReviewEmptyState />

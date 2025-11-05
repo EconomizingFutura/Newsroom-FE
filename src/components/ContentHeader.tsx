@@ -67,7 +67,7 @@ const ContentHeader: React.FC<ContentHeaderProps> = ({
               {iconName && (
                 <HeaderIcon className=" text-[#008001]" name={iconName} />
               )}
-              <p className=" ">{text}</p>
+              <p className="text-[#101828] ">{text}</p>
               {number !== undefined && number > 0 && (
                 <p className=" border border-[#B3E6B3] p-0.5 px-2.5 text-[#006601] rounded-full font-font1 font-medium text-[10.5px] leading-[14px] tracking-normal text-center align-middle text-[#006601 border border-[#B3E6B3] h-min w-min font-medium text-[10.5px] leading-3.5 bg-[#D9F2D9]  top-0 left-">
                   {number}
