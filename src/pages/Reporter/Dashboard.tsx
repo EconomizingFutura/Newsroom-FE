@@ -1,6 +1,5 @@
 import { GET } from "@/api/apiMethods";
 import { API_LIST } from "@/api/endpoints";
-import ContentHeader from "@/components/ContentHeader";
 import { StatCard, DashboardListCard } from "@/components/ui/card";
 import type { RevertedArticleTypes } from "@/types/draftPageTypes";
 import { Clock, CheckCircle, RotateCcw, FilePen } from "lucide-react";
