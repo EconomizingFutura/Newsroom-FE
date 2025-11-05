@@ -45,7 +45,7 @@ const SearchFilterTab: React.FC<SearchFilterTabProps> = ({
               className={
                 activeFilter === filter
                   ? "bg-[#f9faf9] border border-[#B3E6B3] text-[#006601] rounded-md shadow-sm"
-                  : "border border-gray-300 text-gray-700 hover:bg-gray-100 rounded-md"
+                  : "border border-gray-300 text-[#6A7282] hover:bg-gray-100 rounded-md"
               }
             >
               {filter}

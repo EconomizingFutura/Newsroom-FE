@@ -287,7 +287,7 @@ const PAGINATION = useMemo(() => {
     <div className="min-h-screen flex flex-col pt-16 bg-[#F6FAF6]">
       <main className="flex-1 p-8 flex flex-col">
         <>
-          <ContentHeader text="History" iconName="History" />
+          <ContentHeader text="History Logs" iconName="History" />
 
           <div className="grid grid-cols-4 py-5 gap-6">
             {stats?.map((item, index) => (
@@ -450,7 +450,7 @@ const PAGINATION = useMemo(() => {
                           <td className="py-4 px-4">
                             <div className="flex items-center space-x-2">
                               <FileText className="w-4 h-4 text-gray-500" />
-                              <span className="text-[#1E2939]">
+                              <span className="text-[#1E2939] font-medium text-[14px]">
                                 {article.type}
                               </span>
                             </div>
@@ -461,7 +461,7 @@ const PAGINATION = useMemo(() => {
                                 article.status
                               )}`}
                             >
-                              <span className=" text-[14px]">
+                              <span className=" font-semibold text-[14px]">
                                 {article.status}
                               </span>
                             </Badge>

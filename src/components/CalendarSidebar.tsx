@@ -67,7 +67,7 @@ const Article = ({ event, onConfirmDelete }: ArticleCardProps) => {
     });
   };
   return (
-    <div className="bg-[#F3FFF3] flex flex-col p-4 gap-2.5 rounded-2xl">
+    <div className="bg-[#F3FFF3] flex flex-col p-4 gap-4 rounded-2xl">
       <h1 className="text-[16px] font-semibold line-clamp-1">{event.title}</h1>
       {RETURN_CONTENT(event)}
       <div className="flex h-[34px] gap-4 text-[14px]">
@@ -106,14 +106,14 @@ const CalendarSidebar = ({
   return (
     <div className="fixed inset-0 flex items-center justify-end bg-black/50 z-50">
       <div className="flex p-4 flex-col gap-3 max-w-xl w-full h-full bg-[#FFFFFF]">
-        <div className="flex border-b border-[#E0E0E0] justify-between w-full">
-          <h1 className="text-[#1E2939] text-[21px] font-bold ">
+        <div className="flex border-b border-[#E0E0E0] py-2 items-center justify-between w-full">
+          <h1 className="text-[#1E2939]  text-[21px] font-bold ">
             {moment(events[0]?.start).format("MMMM Do, YYYY")}
           </h1>
           <X size={24} onClick={onToggle} />
         </div>
 
-        <div className="flex flex-col gap-3 overflow-y-auto ">
+        <div className="flex flex-col gap-3 py-2 overflow-y-auto ">
           {events.length > 0 ? (
             events.map((event) => (
               <Article

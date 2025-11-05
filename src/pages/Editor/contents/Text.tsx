@@ -79,11 +79,11 @@ const Text: React.FC<TextProps> = ({
       )}
       {readOnly && (
         <div className="flex justify-between gap-4 px-4">
-          <div>
+          <div className="flex flex-col gap-3">
             <h1 className="text-[#101828] font-bold text-2xl">
               {content?.title || ""}
             </h1>
-            <div className="flex items-center my-2 gap-1 ">
+            <div className="flex items-center mb-2 gap-3 ">
               <InfoBadge type="date" value={formatToIST(content?.updatedAt)} />
               <InfoBadge type="user" value={content?.reporter.username} />
             </div>

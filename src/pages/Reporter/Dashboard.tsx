@@ -110,10 +110,10 @@ export default function Dashboard() {
         style={{ paddingTop: "32px" }}
         className="flex flex-col gap-[24px] px-[24px] bg-[#F6FAF6]"
       >
-        <ContentHeader
-          text={`Welcome back, ${username ?? "Guest"}!`}
-          description="Here's what's happening in your newsroom today."
-        />
+          <div className="flex flex-col gap-3">
+          <h1 className="text-[#101828] font-bold text-[24px]">{`Welcome back, ${username ?? "Editor"}!`}</h1>
+          <p className="text-[#4A5565] leading-5 tracking-wide font-medium text-[14px]">Here's what's happening in your newsroom today.</p>
+        </div>
 
         {/* Stats Section */}
         <div className="flex flex-col sm:flex-row sm:flex-wrap gap-6 mb-1">
