@@ -10,9 +10,7 @@ import { Toaster, toast } from "sonner";
 interface ScheduleArticleProps {
   onCancel: () => void;
   handlePublish: (
-    platforms: string[],
-    time: string,
-    date: string,
+    platformSchedules: { platformName: string; date: string; time: string }[],
     isEdit: boolean
   ) => void;
   contentData?: contentResponse | null;
@@ -98,29 +96,49 @@ const ScheduleArticle = ({
 
       setPlatformSchedules(updatedSchedules);
     }
-  }, [contentData, reset]);
+  }, []);
 
-  const handlePrimaryPlatform = (platform: string) => {
-    setValue("primaryPlatform", platform);
-    if (platform === "All Platform") {
+  const handlePrimaryPlatform = (newPlatform: string) => {
+    const currentPlatform = getValues("primaryPlatform");
+    const currentDate = getValues("date");
+    const currentTime = getValues("time");
+
+    console.log("Switching from", currentPlatform, "to", newPlatform);
+    console.log("Switching from", platformSchedules);
+
+    // ✅ Save current platform’s values before switching
+    if (currentPlatform && (currentDate || currentTime)) {
+      setPlatformSchedules((prev) => ({
+        ...prev,
+        [currentPlatform]: { date: currentDate, time: currentTime },
+      }));
+    }
+
+    // ✅ Now switch to new platform
+    setValue("primaryPlatform", newPlatform);
+
+    if (newPlatform === "All Platform") {
       setValue("additionalPlatforms", []);
     }
 
-    const current = platformSchedules[platform];
-    if (current?.date) setValue("date", current.date);
-    else setValue("date", undefined);
-    if (current?.time) setValue("time", current.time);
-    else setValue("time", "");
+    // ✅ Load that platform’s previous schedule (if any)
+    const current = platformSchedules[newPlatform];
+    setValue("date", current?.date || undefined);
+    setValue("time", current?.time || "");
   };
 
-  const handleAllPlatformSchedule = (date: Date, time: string) => {
-    const updated = Object.fromEntries(
-      Object.keys(platformSchedules).map((p) => [p, { date, time }])
-    );
-    setPlatformSchedules(updated);
-    setValue("date", date);
-    setValue("time", time);
-  };
+const handleAllPlatformSchedule = (date: Date, time: string) => {
+  const updated = Object.fromEntries(
+    Object.keys(platformSchedules).map((p) => [
+      p,
+      p === "All Platform" ? { date, time } : { date, time },
+    ])
+  );
+
+  setPlatformSchedules(updated);
+  setValue("date", date);
+  setValue("time", time);
+};
 
   const handleIndividualPlatformSchedule = (
     platform: string,
@@ -162,25 +180,51 @@ const ScheduleArticle = ({
     if (selectedDateTime < now) return "Selected time cannot be in the past.";
     return true;
   };
+const onSubmit = async (data: PublishForm) => {
+  const validationResult = validateFutureDateTime();
+  if (validationResult !== true) {
+    toast.error(validationResult);
+    return;
+  }
 
-  const onSubmit = async (data: PublishForm) => {
-    const validationResult = validateFutureDateTime();
-    if (validationResult !== true) {
-      toast.error(validationResult);
-      return;
-    }
-    if (!data.date) return;
+  const currentPlatform = getValues("primaryPlatform");
+  const currentDate = getValues("date");
+  const currentTime = getValues("time");
 
-    const platforms =
-      data.primaryPlatform === "All Platform"
-        ? CONTENT_TABS.slice(1).map((tab) => tab.name)
-        : [data.primaryPlatform, ...data.additionalPlatforms];
+  // ✅ Persist the current tab’s changes before submission
+  setPlatformSchedules((prev) => ({
+    ...prev,
+    [currentPlatform]: { date: currentDate, time: currentTime },
+  }));
 
-    const isEdit = Boolean(contentData?.scheduledTime);
-    await handlePublish(platforms, data.time, data.date.toISOString(), isEdit);
-    toast.success("Schedule updated successfully!");
+  // ✅ Build final payload using stored platformSchedules
+  const finalSchedules = Object.entries(platformSchedules)
+    .filter(([name, value]) => name !== "All Platform" && value?.date && value?.time)
+    .map(([platformName, value]) => ({
+      platformName,
+      date: value!.date!.toISOString().split("T")[0],
+      time: value!.time!,
+    }));
+
+  // ✅ If “All Platform” is selected, override everything
+  if (currentPlatform === "All Platform" && currentDate && currentTime) {
+    const allPayload = CONTENT_TABS.slice(1).map((tab) => ({
+      platformName: tab.name,
+      date: currentDate.toISOString().split("T")[0],
+      time: currentTime,
+    }));
+    console.log("📦 Final Payload (All Platforms):", allPayload);
+    handlePublish(allPayload, Boolean(contentData?.scheduledTime));
+    toast.success("Scheduled for all platforms!");
     onCancel();
-  };
+    return;
+  }
+
+  console.log("📦 Final Payload:", finalSchedules);
+  handlePublish(finalSchedules, Boolean(contentData?.scheduledTime));
+  toast.success("Schedule updated successfully!");
+ // onCancel();
+};
 
   const primaryPlatform = watch("primaryPlatform");
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -206,9 +250,9 @@ const ScheduleArticle = ({
   };
 
   const hasAnyPlatformScheduled = Object.entries(platformSchedules).some(
-  ([name, val]) =>
-    name !== primaryPlatform && val?.date && val?.time
-);
+    ([name, val]) =>
+      name !== primaryPlatform && val?.date && val?.time
+  );
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
@@ -233,11 +277,10 @@ const ScheduleArticle = ({
                       type="button"
                       key={tab.name}
                       onClick={() => handlePrimaryPlatform(tab.name)}
-                      className={`px-4 py-2 rounded-md text-sm text-[14px]  transition-all flex items-center space-x-2 ${
-                        primaryPlatform === tab.name
-                          ? "bg-white text-[#1E2939] font-bold"
-                          : "text-gray-500 hover:text-gray-700 font-medium"
-                      }`}
+                      className={`px-4 py-2 rounded-md text-sm text-[14px]  transition-all flex items-center space-x-2 ${primaryPlatform === tab.name
+                        ? "bg-white text-[#1E2939] font-bold"
+                        : "text-gray-500 hover:text-gray-700 font-medium"
+                        }`}
                     >
                       <span>{tab.name}</span>
                     </button>
@@ -315,41 +358,41 @@ const ScheduleArticle = ({
                   )}
                 </div>
               </div>
-                  <div className="min-h-24">
-                      {/* Same As Section */}
-              {primaryPlatform !== "All Platform" && hasAnyPlatformScheduled &&(
-                <>
-                  <p className="text-[12px] pb-2 font-semibold text-[#6A7282]">
-                    Same as:
-                  </p>
-                  <div className="flex gap-4 flex-wrap">
-                    {Object.entries(platformSchedules)
-                      .filter(
-                        ([name, val]) =>
-                          name !== primaryPlatform &&
-                          name !== "All Platform" &&
-                          val?.date &&
-                          val?.time
-                      )
-                      .map(([name]) => (
-                        <div
-                          key={name}
+              <div className="min-h-24">
+                {/* Same As Section */}
+                {primaryPlatform !== "All Platform" && hasAnyPlatformScheduled && (
+                  <>
+                    <p className="text-[12px] pb-2 font-semibold text-[#6A7282]">
+                      Same as:
+                    </p>
+                    <div className="flex gap-4 flex-wrap">
+                      {Object.entries(platformSchedules)
+                        .filter(
+                          ([name, val]) =>
+                            name !== primaryPlatform &&
+                            name !== "All Platform" &&
+                            val?.date &&
+                            val?.time
+                        )
+                        .map(([name]) => (
+                          <div
+                            key={name}
                             onMouseEnter={() => setHovered(true)}
-  onMouseLeave={() => setHovered(false)}
-                          onClick={() => handleSameAs(primaryPlatform, name)}
-                          className="flex items-center bg-[#F0F1F2] text-[#6A7282] w-max py-2 px-3 rounded-[8px] space-x-2 cursor-pointer hover:bg-[#008001] hover:text-white"
-                        >
-                                                    <PlatformIcon name={name} color={!hovered ? "#2C3E50" : "#ffffff"} />
+                            onMouseLeave={() => setHovered(false)}
+                            onClick={() => handleSameAs(primaryPlatform, name)}
+                            className="flex items-center bg-[#F0F1F2] text-[#6A7282] w-max py-2 px-3 rounded-[8px] space-x-2 cursor-pointer hover:bg-[#008001] hover:text-white"
+                          >
+                            <PlatformIcon name={name} color={!hovered ? "#2C3E50" : "#ffffff"} />
 
-                          <p className="font-semibold  text-[14px]">{name}</p>
-                        </div>
-                      ))}
-                  </div>
-                </>
-              )}
+                            <p className="font-semibold  text-[14px]">{name}</p>
+                          </div>
+                        ))}
+                    </div>
+                  </>
+                )}
 
-                  </div>
-            
+              </div>
+
             </div>
 
             {/* Buttons */}

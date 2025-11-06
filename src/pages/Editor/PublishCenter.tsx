@@ -210,58 +210,44 @@ export function PublishCenter() {
       cancelPopId: story.id,
     }));
   };
-  const handlePublish = async (
-    platforms: string[],
-    time: string,
-    date: string,
-    isEdit: boolean
-  ) => {
-    const controller = new AbortController();
-    try {
-      setLoading(true);
-      const url = API_LIST.BASE_URL + API_LIST.SCHEDULED_POST;
-      if (isEdit) {
-        await PUT(
-          url,
-          {
-            id: state.cancelPopId,
-            date: date,
-            time: time,
-            platforms,
-          },
-          { signal: controller.signal }
-        );
-      } else {
-        await POST(
-          url,
-          {
-            id: state.cancelPopId,
-            date: date,
-            time: time,
-            platforms,
-          },
-          { signal: controller.signal }
-        );
-      }
+const handlePublish = async (
+  platforms: { platformName: string; date: string; time: string }[],
+  isEdit: boolean
+) => {
+  const controller = new AbortController();
 
-      getDraftArticle();
+  try {
+    setLoading(true);
+    const url = API_LIST.BASE_URL + API_LIST.SCHEDULED_POST;
 
-      console.log("Story scheduled successfully!");
-    } catch (error: unknown) {
-      const err = error as AxiosError;
-      if (err.name === "AbortError") {
-        console.warn("Request aborted");
-      } else {
-        console.error("Error scheduling story:", error);
-      }
-    } finally {
-      setLoading(false);
-      setState((p) => ({
-        ...p,
-        id: "",
-      }));
+    const payload = {
+      id: state.cancelPopId,
+      platforms, // ✅ full platform list with date & time per platform
+    };
+
+    if (isEdit) {
+      await PUT(url, payload, { signal: controller.signal });
+    } else {
+      await POST(url, payload, { signal: controller.signal });
     }
-  };
+
+    getDraftArticle();
+    console.log("✅ Story scheduled successfully!");
+  } catch (error: unknown) {
+    const err = error as AxiosError;
+    if (err.name === "AbortError") {
+      console.warn("⚠️ Request aborted");
+    } else {
+      console.error("❌ Error scheduling story:", error);
+    }
+  } finally {
+    setLoading(false);
+    setState((p) => ({
+      ...p,
+      id: "",
+    }));
+  }
+};
 
   const handleCancelPopup = async () => {
     await handleCancelAPI(state.cancelPopId);
