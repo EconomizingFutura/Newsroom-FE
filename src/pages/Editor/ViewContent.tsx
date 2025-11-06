@@ -275,35 +275,27 @@ const ViewContent: React.FC = () => {
   };
 
   const handlePublish = async (
-    platforms: string[],
-    time: string,
-    date: string,
+    platforms: { platformName: string; date: string; time: string }[],
     isEdit: boolean
   ) => {
     const controller = new AbortController();
     try {
       setLoading(true);
+      const payload = {
+        id: contentData?.id,
+        platforms, // ✅ full platform list with date & time per platform
+      };
       const url = API_LIST.BASE_URL + API_LIST.SCHEDULED_POST;
       if (isEdit) {
         await PUT(
           url,
-          {
-            id: contentData?.id,
-            date: date,
-            time: time,
-            platforms,
-          },
+          payload,
           { signal: controller.signal }
         );
       } else {
         await POST(
           url,
-          {
-            id: contentData?.id,
-            date: date,
-            time: time,
-            platforms,
-          },
+          payload,
           { signal: controller.signal }
         );
       }
@@ -398,7 +390,7 @@ const ViewContent: React.FC = () => {
                           <h1 className="text-[#101828] font-bold text-2xl">
                             {contentData?.title || ""}
                           </h1>
-            <div className="flex items-center my-2 gap-3 ">
+                          <div className="flex items-center my-2 gap-3 ">
                             <InfoBadge
                               type="date"
                               value={formatToIST(contentData?.updatedAt)}
@@ -581,15 +573,15 @@ const ViewContent: React.FC = () => {
                     </div>
                   ) : (
                     <div className=" flex justify-between items-center">
-                        <div className="flex flex-col gap-3">
-            <h1 className="text-[#101828] font-bold text-2xl">
-              {contentData?.title || ""}
-            </h1>
-            <div className="flex items-center mb-2 gap-3 ">
-              <InfoBadge type="date" value={formatToIST(contentData?.updatedAt)} />
-              <InfoBadge type="user" value={contentData?.reporter.username} />
-            </div>
-          </div>
+                      <div className="flex flex-col gap-3">
+                        <h1 className="text-[#101828] font-bold text-2xl">
+                          {contentData?.title || ""}
+                        </h1>
+                        <div className="flex items-center mb-2 gap-3 ">
+                          <InfoBadge type="date" value={formatToIST(contentData?.updatedAt)} />
+                          <InfoBadge type="user" value={contentData?.reporter.username} />
+                        </div>
+                      </div>
 
                       {ISPOSTED && (
                         <div>
@@ -796,7 +788,7 @@ const ViewContent: React.FC = () => {
                           Revert
                         </Button>
                         <Button
-                        type="button"
+                          type="button"
                           onClick={() => {
                             contentData && handleMoveToPublish(contentData?.id);
                           }}
