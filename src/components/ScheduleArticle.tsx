@@ -181,6 +181,7 @@ const handleAllPlatformSchedule = (date: Date, time: string) => {
     return true;
   };
 const onSubmit = async (data: PublishForm) => {
+  console.log(data)
   const validationResult = validateFutureDateTime();
   if (validationResult !== true) {
     toast.error(validationResult);
