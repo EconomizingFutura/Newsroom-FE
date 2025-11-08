@@ -1,124 +1,169 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Globe, Instagram, Facebook, Twitter, Send, Calendar } from "lucide-react";
+import { Globe, Instagram, Facebook, Twitter, Calendar } from "lucide-react";
 import { Card } from "../ui/card";
+import type { scheduledPostArray } from "@/types/apitypes";
 
 interface PublishPlatform {
-    id: string;
-    name: string;
-    icon: React.ReactNode;
-    checked: boolean;
+  id: string;
+  name: string;
+  icon: React.ReactNode;
+  checked: boolean;
+  date?: string;
+  time?: string;
 }
 
 interface PublishPlatformSelectorProps {
-    isOpen: boolean;
-    onClose: () => void;
-    onPublish: (selectedPlatforms: string[]) => void;
+  schedulePost: scheduledPostArray[];
+  isOpen: boolean;
+  onClose: () => void;
+  onPublish: (selectedPlatforms: string[]) => void;
 }
 
 export function SchedulePlatformCard({
-    isOpen,
-    onClose,
-    onPublish,
+  schedulePost,
+  isOpen,
+  onClose,
+  onPublish,
 }: PublishPlatformSelectorProps) {
-    const [platforms, setPlatforms] = useState<PublishPlatform[]>([
-        { id: "all", name: "All", icon: null, checked: false },
-        {
-            id: "web",
-            name: "Web",
-            icon: <Globe className="w-4 h-4" />,
-            checked: false,
-        },
-        {
-            id: "instagram",
-            name: "Instagram",
-            icon: <Instagram className="w-4 h-4" />,
-            checked: false,
-        },
-        {
-            id: "facebook",
-            name: "Facebook",
-            icon: <Facebook className="w-4 h-4" />,
-            checked: false,
-        },
-        {
-            id: "twitter",
-            name: "Twitter",
-            icon: <Twitter className="w-4 h-4" />,
-            checked: false,
-        },
-    ]);
+  const platformIcons: Record<string, React.ReactNode> = {
+    web: <Globe className="w-4 h-4" />,
+    instagram: <Instagram className="w-4 h-4" />,
+    facebook: <Facebook className="w-4 h-4" />,
+    twitter: <Twitter className="w-4 h-4" />,
+  };
 
-    const handlePlatformToggle = (platformId: string) => {
-        setPlatforms((prevPlatforms) => {
-            if (platformId === "all") {
-                const newCheckedState = !prevPlatforms[0].checked;
-                return prevPlatforms.map((platform) => ({
-                    ...platform,
-                    checked: newCheckedState,
-                }));
-            } else {
-                return prevPlatforms.map((platform) => {
-                    if (platform.id === platformId) {
-                        return { ...platform, checked: !platform.checked };
-                    }
-                    return platform;
-                });
-            }
-        });
-    };
+  const [platforms, setPlatforms] = useState<PublishPlatform[]>([]);
+  const cardRef = useRef<HTMLDivElement>(null);
 
-    const handlePublish = () => {
-        const selectedPlatforms = platforms
-            .filter((platform) => platform.checked)
-            .map((platform) => platform.id);
-
-        if (selectedPlatforms.length === 0) {
-            return;
-        }
-
-        onPublish(selectedPlatforms);
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
         onClose();
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
     };
+  }, [isOpen, onClose]);
 
-    const selectedCount = platforms.filter((platform) => platform.checked).length;
+  useEffect(() => {
+    const unposted = schedulePost
+      .filter((p) => !p.isPosted)
+      .map((p) => ({
+        id: p.platform,
+        name: p.platform.charAt(0).toUpperCase() + p.platform.slice(1),
+        icon: platformIcons[p.platform] ?? null,
+        checked: false,
+        date:
+          typeof p.date === "string"
+            ? p.date
+            : p.date.toISOString().split("T")[0],
+        time: p.time,
+      }));
 
-    if (!isOpen) return null;
+    const withAll: PublishPlatform[] = [
+      { id: "all", name: "All", icon: null, checked: false },
+      ...unposted,
+    ];
 
-    return (
-        <Card className="bg-white  rounded-[12px] h-min !gap-2 shadow-lg border !w-[200px]  border-gray-200 p-2 ">
-            <div className="space-y-3 px-4 py-2">
-                {platforms.map((platform) => (
-                    <div key={platform.id} className="flex py-1 items-center space-x-3">
-                        <Checkbox
-                            id={platform.id}
-                            checked={platform.checked}
-                            onCheckedChange={() => handlePlatformToggle(platform.id)}
-                            className="data-[state=checked]:bg-green-600 h-4 w-4 data-[state=checked]:border-green-600"
-                        />
-                        <label
-                            htmlFor={platform.id}
-                            className="flex items-center space-x-2 text-sm font-semibold text-[#6A7282] cursor-pointer"
-                        >
-                            {platform.icon}
-                            <span>{platform.name === 'All' ? platform.name : ''}</span>
-                        </label>
-                    </div>
-                ))}
+    setPlatforms(withAll);
+  }, [schedulePost]);
+
+  const handlePlatformToggle = (platformId: string) => {
+    setPlatforms((prev) => {
+      if (platformId === "all") {
+        const newChecked = !prev[0].checked;
+        return prev.map((p) => ({ ...p, checked: newChecked }));
+      } else {
+        const updated = prev.map((p) =>
+          p.id === platformId ? { ...p, checked: !p.checked } : p
+        );
+
+        // auto-check “All” if all others selected
+        const allSelected = updated
+          .filter((p) => p.id !== "all")
+          .every((p) => p.checked);
+        updated[0].checked = allSelected;
+
+        return updated;
+      }
+    });
+  };
+
+  const handlePublish = () => {
+    const selectedPlatforms = platforms
+      .filter((p) => p.checked && p.id !== "all")
+      .map((p) => p.id);
+    if (selectedPlatforms.length === 0) return;
+    onPublish(selectedPlatforms);
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  const unpostedPlatforms = platforms.filter((p) => p.id !== "all");
+  const hasNoPlatforms = unpostedPlatforms.length === 0;
+
+  return (
+    <Card
+      ref={cardRef}
+      className="bg-white rounded-[12px] shadow-lg border border-gray-200 p-3 max-w-[238px]"
+    >
+      <div className="space-y-2">
+        {hasNoPlatforms ? (
+          <p className="text-sm text-gray-500 text-center">
+            All posts are already published.
+          </p>
+        ) : (
+          platforms.map((platform) => (
+            <div key={platform.id} className="flex items-center gap-3 py-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id={platform.id}
+                  checked={platform.checked}
+                  onCheckedChange={() => handlePlatformToggle(platform.id)}
+                  className="data-[state=checked]:bg-green-600 h-4 w-4 data-[state=checked]:border-green-600"
+                />
+                <label
+                  htmlFor={platform.id}
+                  className="flex items-center space-x-2 text-sm font-semibold text-[#6A7282] cursor-pointer"
+                >
+                  {platform.icon}
+                  {platform.id === "all" && <span>{platform.name}</span>}{" "}
+                  {/* ✅ Now always shows name */}
+                </label>
+              </div>
+
+              {platform.id !== "all" && (
+                <div className="text-xs flex gap-1 text-gray-400">
+                  <span>{platform.date}</span>{" "}
+                  <span className="me-1 text-slate-400 h-0.5 text-[12px]"></span>
+                  <span>{platform.time}</span>
+                </div>
+              )}
             </div>
+          ))
+        )}
+      </div>
 
-            <Button
-                variant="outline"
-                onClick={handlePublish}
-                disabled={selectedCount === 0}
-                className="bg-[#ffffff] text-[#FB2C36] border hover:bg-[#ffffff] hover:text-[#FB2C36] cursor-pointer border-[#FB2C36]"
-            >
-                <Calendar className="w-4 h-4 mr-2" color="#FB2C36" />
-                Cancel
-            </Button>
-
-
-        </Card>
-    );
+      {!hasNoPlatforms && (
+        <Button
+          variant="outline"
+          onClick={handlePublish}
+          disabled={platforms.every((p) => !p.checked || p.id === "all")}
+          className=" bg-white text-[#FB2C36] border border-[#FB2C36] hover:bg-white hover:text-[#FB2C36]"
+        >
+          <Calendar className="w-4 h-4 mr-2" color="#FB2C36" />
+          Cancel
+        </Button>
+      )}
+    </Card>
+  );
 }

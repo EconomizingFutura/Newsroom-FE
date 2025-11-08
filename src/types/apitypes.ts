@@ -64,6 +64,13 @@ export type EditorStatsResponse = {
   data: EditorStatsData;
 };
 
+export type scheduledPostArray = {
+  platform: string;
+  date: Date | string;
+  time: string;
+  isPosted: boolean;
+};
+
 export type scheduledPost = {
   id: string;
   title: string;
@@ -76,6 +83,7 @@ export type scheduledPost = {
   thumbnailurl: string;
   category: string;
   type: "SCHEDULED" | "REVIEWED";
+  scheduledPosts: scheduledPostArray[];
 };
 
 export type scheduledPostsResponse = {

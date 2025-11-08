@@ -6,6 +6,7 @@ import { SocialMediaPublishCard } from "./TextEditor/SocialMediaPublishCard";
 import { SchedulePlatformCard } from "./TextEditor/SchedulePlatformCard";
 import type { scheduledPost } from "@/types/apitypes";
 import { createPortal } from "react-dom";
+import { scheduledPlatformsUI } from "./ui/PublisCenterUI";
 
 interface StoryCardProps {
   story: scheduledPost;
@@ -27,13 +28,17 @@ const StoryCard: React.FC<StoryCardProps> = ({
   const [showPublishCard, setShowPublishCard] = useState(false);
   const publishCardRef = useRef<HTMLDivElement>(null);
   const publishButtonRef = useRef<HTMLButtonElement>(null);
-  const [publishButtonRect, setPublishButtonRect] = useState<DOMRect | null>(null);
+  const [publishButtonRect, setPublishButtonRect] = useState<DOMRect | null>(
+    null
+  );
 
   // --- Schedule card states
   const [showScheduleCard, setShowScheduleCard] = useState(false);
   const scheduleCardRef = useRef<HTMLDivElement>(null);
   const scheduleButtonRef = useRef<HTMLButtonElement>(null);
-  const [scheduleButtonRect, setScheduleButtonRect] = useState<DOMRect | null>(null);
+  const [scheduleButtonRect, setScheduleButtonRect] = useState<DOMRect | null>(
+    null
+  );
 
   // ------------------ Publish Now ------------------
   const handlePublishNowClick = () => {
@@ -117,11 +122,16 @@ const StoryCard: React.FC<StoryCardProps> = ({
 
   // ------------------ Render ------------------
   return (
-    <div key={story.id} className="bg-white rounded-lg border border-gray-200 p-6 relative">
+    <div
+      key={story.id}
+      className="bg-white rounded-lg border border-gray-200 p-6 relative"
+    >
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center space-x-3 mb-2">
-            <h3 className="text-lg font-semibold text-[#101828]">{story.title}</h3>
+            <h3 className="text-lg font-semibold text-[#101828]">
+              {story.title}
+            </h3>
           </div>
           <div className="flex items-center space-x-4 text-sm text-gray-500 mb-3">
             <div className="flex items-center space-x-1">
@@ -135,6 +145,8 @@ const StoryCard: React.FC<StoryCardProps> = ({
           </div>
         </div>
       </div>
+
+      <div className="mb-4">{scheduledPlatformsUI(story.scheduledPosts)}</div>
 
       {/* Actions */}
       <div className="flex items-center justify-between">
@@ -187,17 +199,15 @@ const StoryCard: React.FC<StoryCardProps> = ({
                 document.body
               )}
           </div>
-
-          {/* Schedule Button */}
           {story.type === "REVIEWED" && (
-              <Button
-                variant="outline"
-                onClick={() => handleSchedulePublish(story)}
-                className="bg-[#f0f9f0] text-[#006601] border hover:bg-[#f0f9f0] hover:text-[#006601] cursor-pointer border-[#B3E6B3]"
-              >
-                <Calendar className="w-4 h-4 mr-2" />
-                Schedule
-              </Button>
+            <Button
+              variant="outline"
+              onClick={() => handleSchedulePublish(story)}
+              className="bg-[#f0f9f0] text-[#006601] border hover:bg-[#f0f9f0] hover:text-[#006601] cursor-pointer border-[#B3E6B3]"
+            >
+              <Calendar className="w-4 h-4 mr-2" />
+              Schedule
+            </Button>
           )}
 
           {/* Cancel Scheduled */}
@@ -207,9 +217,10 @@ const StoryCard: React.FC<StoryCardProps> = ({
                 ref={scheduleButtonRef}
                 variant="outline"
                 onClick={() => {
-                  // instead of directly cancelling, open the popup first
                   if (scheduleButtonRef.current) {
-                    setScheduleButtonRect(scheduleButtonRef.current.getBoundingClientRect());
+                    setScheduleButtonRect(
+                      scheduleButtonRef.current.getBoundingClientRect()
+                    );
                   }
                   setShowScheduleCard(true);
                 }}
@@ -232,6 +243,7 @@ const StoryCard: React.FC<StoryCardProps> = ({
                     }}
                   >
                     <SchedulePlatformCard
+                      schedulePost={story.scheduledPosts}
                       isOpen={showScheduleCard}
                       onClose={() => setShowScheduleCard(false)}
                       onPublish={(platforms) => {
