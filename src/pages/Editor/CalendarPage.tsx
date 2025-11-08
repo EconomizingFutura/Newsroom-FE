@@ -55,7 +55,8 @@ const CalendarPage: React.FC = () => {
   const { handleShow, handleDelete } = {
     handleShow: () => setShowSidebar((p) => !p),
     handleDelete: async (id: string) => {
-      await handleCancelAPI(id);
+      console.log("Delete event with id:", id, selectedEvents, selectedEvents[0]?.platform);
+      await handleCancelAPI(id.split('-')[0], selectedEvents[0]?.platform?.split(',') || []);
       setShowSidebar((p) => !p);
     },
   };
@@ -135,6 +136,7 @@ const CalendarPage: React.FC = () => {
     );
     setSelectedEvents(dayEvents);
     setShowSidebar(true);
+    console.log("Event clicked:", dayEvents);
   };
 
   const handleSelect = (selectInfo: DateSelectArg) => {
@@ -145,6 +147,8 @@ const CalendarPage: React.FC = () => {
     if (dayEvents.length > 0) {
       setSelectedEvents(dayEvents);
       setShowSidebar(true);
+      console.log("dayEvents clicked:", selectInfo);
+
     }
   };
 

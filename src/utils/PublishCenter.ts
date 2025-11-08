@@ -48,6 +48,7 @@ export interface TransformedItem {
   videoUrl: string;
   thumbnailUrl: string;
   content: string;
+  scheduledPosts: ScheduledPost[];
 }
 
 export const transformScheduleData = (
@@ -81,6 +82,7 @@ export const transformScheduleData = (
           videoUrl: article.videoUrl,
           thumbnailUrl: article.thumbnailUrl,
           content: article.content,
+          scheduledPosts: article.scheduledPosts,
         });
       });
     } else {
@@ -111,6 +113,7 @@ export const transformScheduleData = (
           videoUrl: article.videoUrl,
           thumbnailUrl: article.thumbnailUrl,
           content: article.content,
+          scheduledPosts: article.scheduledPosts,
         });
       });
     }

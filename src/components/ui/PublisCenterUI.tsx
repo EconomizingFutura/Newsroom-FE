@@ -1,6 +1,11 @@
 import { Globe, Facebook, Instagram, Twitter } from "lucide-react";
 import type { scheduledPostArray } from "@/types/apitypes";
 
+interface ScheduledPlatformsUIProps {
+  scheduledArr: scheduledPostArray[];
+  columns?: number; // 👈 control how many columns in grid (default 4)
+}
+
 export const returnPlatformIcon = (platform: string, isPublished: boolean) => {
   const colorClass = isPublished
     ? "text-[#00B401] h-5 w-5"
@@ -20,45 +25,67 @@ export const returnPlatformIcon = (platform: string, isPublished: boolean) => {
   }
 };
 
-export const scheduledPlatformsUI = (scheduledArr: scheduledPostArray[]) => {
+export const ScheduledPlatformsUI: React.FC<ScheduledPlatformsUIProps> = ({
+  scheduledArr,
+  columns = 4, // 👈 default 4 columns
+}) => {
   const published = scheduledArr.filter((a) => a.isPosted);
   const upcoming = scheduledArr.filter((a) => !a.isPosted);
 
+  // 🧩 dynamically build grid-cols-{n} class
+  const gridClass = `grid grid-cols-2 sm:grid-cols-${columns} gap-x-4 gap-y-2`;
+
   return (
-    <div className="flex items-center gap-3 text-sm text-slate-700">
+    <div className="flex flex-col gap-2 text-sm text-slate-700">
+      {/* ✅ Published Section */}
       {published.length > 0 && (
-        <>
-          <span className="font-semibold text-[#00B401] text-[12px]">
+        <div>
+          <div className="font-semibold text-[#00B401] text-[12px] mb-1">
             Published:
-          </span>
-
-          {published.map((a, idx) => (
-            <span
-              key={idx}
-              className="flex items-center gap-1 text-[12px] text-[#00B401]"
-            >
-              {returnPlatformIcon(a.platform, true)}
-            </span>
-          ))}
-
-          {upcoming.length > 0 && (
-            <span className="text-[#4A5565] text-[12px]">|</span>
-          )}
-        </>
+          </div>
+          <div className={gridClass}>
+            {published.map((a, idx) => (
+              <div
+                key={`${a.platform}-published-${idx}`}
+                className="flex flex-wrap items-center gap-1 text-[12px] text-[#00B401]"
+              >
+                {returnPlatformIcon(a.platform, true)}
+                <span className="whitespace-normal break-words leading-tight">
+                  {a.date.toString()} {a.time}
+                </span>
+                {idx !== published.length - 1 && (
+                  <span className="text-slate-400">|</span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
-      {upcoming.map((a, idx) => (
-        <span
-          key={idx}
-          className="flex items-center gap-1 text-[12px] text-slate-700"
-        >
-          {returnPlatformIcon(a.platform, false)}
-          {a.date.toString()} {a.time}
-          {idx !== upcoming.length - 1 && (
-            <span className="me-1 text-slate-400 text-[12px]">|</span>
+      {/* ✅ Upcoming Section */}
+      {upcoming.length > 0 && (
+        <div>
+          {upcoming.length > 0 && (
+            <div className="text-[#4A5565] text-[12px] mb-1">Upcoming:</div>
           )}
-        </span>
-      ))}
+          <div className={gridClass}>
+            {upcoming.map((a, idx) => (
+              <div
+                key={`${a.platform}-upcoming-${idx}`}
+                className="flex flex-wrap items-center gap-1 text-[12px] text-slate-700"
+              >
+                {returnPlatformIcon(a.platform, false)}
+                <span className="whitespace-normal break-words leading-tight">
+                  {a.date.toString()} {a.time}
+                </span>
+                {/* {idx !== upcoming.length - 1 && (
+                  <span className="text-slate-400">|</span>
+                )} */}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

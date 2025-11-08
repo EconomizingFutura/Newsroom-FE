@@ -71,7 +71,7 @@ const ViewContent: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
   const [saveDraftPopup, setSaveDraftPopup] = useState(false);
-  const [cancelPlatforms, setCancelPlatforms] = useState<string[]>([]);
+  const [cancelPlatforms, setCancelPlatforms] = useState<any>(null);
   const [show, setShow] = useState({
     success: false,
     remarks: false,
@@ -253,7 +253,8 @@ const ViewContent: React.FC = () => {
   // };
 
   const handleAPI = async () => {
-    handleCancelAPI(id as string);
+    console.log('coming isnide',cancelPlatforms)
+    await handleCancelAPI(cancelPlatforms.id, cancelPlatforms.platforms);
     setShowEditPopup((prev) => !prev);
     handleBack();
   };
@@ -326,8 +327,12 @@ const ViewContent: React.FC = () => {
           text="Content Review"
           onClickBack={handleBack}
           showBackButton
+          story={contentData}
           showEdit={contentData?.status == "POSTED" ? false : showEnableEdit}
           handleEdit={handleEditToggle}
+          handleCancel={(id, platforms) => {
+            setCancelPlatforms({ id, platforms })
+          }}
           showCancelSchedule={
             contentData?.status == "POSTED" ? false : showEnableEdit
           }

@@ -6,7 +6,7 @@ import { SocialMediaPublishCard } from "./TextEditor/SocialMediaPublishCard";
 import { SchedulePlatformCard } from "./TextEditor/SchedulePlatformCard";
 import type { scheduledPost } from "@/types/apitypes";
 import { createPortal } from "react-dom";
-import { scheduledPlatformsUI } from "./ui/PublisCenterUI";
+import { ScheduledPlatformsUI } from "./ui/PublisCenterUI";
 
 interface StoryCardProps {
   story: scheduledPost;
@@ -146,7 +146,10 @@ const StoryCard: React.FC<StoryCardProps> = ({
         </div>
       </div>
 
-      <div className="mb-4">{scheduledPlatformsUI(story.scheduledPosts)}</div>
+      <div className="mb-4">
+        <ScheduledPlatformsUI scheduledArr={story.scheduledPosts} columns={4} />
+
+      </div>
 
       {/* Actions */}
       <div className="flex items-center justify-between">
@@ -234,7 +237,7 @@ const StoryCard: React.FC<StoryCardProps> = ({
               {showScheduleCard &&
                 createPortal(
                   <div
-                    ref={publishCardRef}
+                    ref={scheduleCardRef}
                     className="fixed z-50 bg-white shadow-lg rounded-lg"
                     style={{
                       top: scheduleButtonRect?.top ?? 0,
