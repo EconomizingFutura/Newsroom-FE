@@ -1,3 +1,5 @@
+import type { ScheduledPost } from "@/utils/PublishCenter";
+
 export type LoginResponse = {
   accessToken: string;
 };
@@ -115,6 +117,7 @@ export interface calendarEvent {
   status: "SCHEDULED" | "POSTED";
   content: string;
   type: "TEXT" | "VIDEO" | "AUDIO";
+  scheduledPosts: ScheduledPost[];
 }
 
 export interface CalendarEventsResponse {

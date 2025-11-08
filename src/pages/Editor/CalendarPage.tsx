@@ -80,8 +80,9 @@ const CalendarPage: React.FC = () => {
         setLoading(true);
         const data = await getCalendarEvents();
         if (data) {
-          const transformed = transformScheduleData(data);
+          const transformed = transformScheduleData(data,view === "dayGridMonth" ? "month" : view === "timeGridWeek" ? "week" : "day");
           setEvents(transformed);
+          console.log(transformed)
         }
       } catch (error: unknown) {
         const err = error as AxiosError;
@@ -91,7 +92,7 @@ const CalendarPage: React.FC = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [view]);
 
   const fullCalendarEvents: EventInput[] = events.map((e) => ({
     id: e.id.toString(),
@@ -280,9 +281,9 @@ const CalendarPage: React.FC = () => {
                 slotMinTime="00:00:00"
                 slotMaxTime="24:00:00"
                 eventMinHeight={20}
-                eventOverlap={(stillEvent, movingEvent) => {
-                  return stillEvent.startStr === movingEvent?.startStr;
-                }}
+                // eventOverlap={(stillEvent, movingEvent) => {
+                //   return stillEvent.startStr === movingEvent?.startStr;
+                // }}
                 dayHeaderFormat={{
                   weekday: "short", // 'Sun', 'Mon', 'Tue'
                   day: "numeric",   // 3, 4, 5
@@ -299,6 +300,9 @@ const CalendarPage: React.FC = () => {
     `,
                   };
                 }}
+                 eventOverlap={true}
+  slotEventOverlap={true}
+  eventOrder="title"
                 dayCellClassNames={() => "px-1 py-2"}
               />
             </div>
