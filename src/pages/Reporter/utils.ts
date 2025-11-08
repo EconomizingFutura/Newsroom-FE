@@ -67,10 +67,29 @@ export default processAndUploadImages;
 export const transformPlatformsToScheduledPosts = (
   platforms: { platformName: string; date: string; time: string }[]
 ): scheduledPostArray[] => {
-  return platforms.map((p) => ({
-    platform: p.platformName.trim().toLowerCase(),
-    date: p.date,
-    time: p.time,
-    isPosted: false,
-  }));
+  return platforms
+    .map((p) => ({
+      platform: p.platformName.trim().toLowerCase(),
+      date: p.date,
+      time: p.time,
+      isPosted: false,
+    }))
+    .filter((a) => a.platform.toLowerCase() !== "all");
+};
+
+export const buildScheduledPost = (
+  platform: string,
+  datetime: Date,
+  isPosted: boolean = false
+): scheduledPostArray => {
+  const date = datetime.toISOString().split("T")[0];
+
+  const timeObj = datetime.toISOString().split("T")[1].substring(0, 5);
+
+  return {
+    platform,
+    date,
+    time: timeObj,
+    isPosted,
+  };
 };

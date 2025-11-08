@@ -71,6 +71,7 @@ const ViewContent: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
   const [saveDraftPopup, setSaveDraftPopup] = useState(false);
+  const [cancelPlatforms, setCancelPlatforms] = useState<string[]>([]);
   const [show, setShow] = useState({
     success: false,
     remarks: false,
@@ -287,17 +288,9 @@ const ViewContent: React.FC = () => {
       };
       const url = API_LIST.BASE_URL + API_LIST.SCHEDULED_POST;
       if (isEdit) {
-        await PUT(
-          url,
-          payload,
-          { signal: controller.signal }
-        );
+        await PUT(url, payload, { signal: controller.signal });
       } else {
-        await POST(
-          url,
-          payload,
-          { signal: controller.signal }
-        );
+        await POST(url, payload, { signal: controller.signal });
       }
       console.log("Story scheduled successfully!");
     } catch (error: unknown) {
@@ -578,8 +571,14 @@ const ViewContent: React.FC = () => {
                           {contentData?.title || ""}
                         </h1>
                         <div className="flex items-center mb-2 gap-3 ">
-                          <InfoBadge type="date" value={formatToIST(contentData?.updatedAt)} />
-                          <InfoBadge type="user" value={contentData?.reporter.username} />
+                          <InfoBadge
+                            type="date"
+                            value={formatToIST(contentData?.updatedAt)}
+                          />
+                          <InfoBadge
+                            type="user"
+                            value={contentData?.reporter.username}
+                          />
                         </div>
                       </div>
 

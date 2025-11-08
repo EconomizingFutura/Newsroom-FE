@@ -13,7 +13,7 @@ interface StoryCardProps {
   getPriorityColor: (priority: string) => string;
   handlePublishNow: (id: string, platforms: string[]) => void;
   handleSchedulePublish: (story: scheduledPost) => void;
-  handleCancel: (id: string) => void;
+  handleCancel: (id: string, platforms?: string[]) => void;
   handleViewStory: (id: string, text: "TEXT" | "VIDEO" | "AUDIO") => void;
 }
 
@@ -247,8 +247,7 @@ const StoryCard: React.FC<StoryCardProps> = ({
                       isOpen={showScheduleCard}
                       onClose={() => setShowScheduleCard(false)}
                       onPublish={(platforms) => {
-                        handleCancel(story.id);
-                        console.log("Cancelling schedule for:", platforms);
+                        handleCancel(story.id, platforms);
                         setShowScheduleCard(false);
                       }}
                     />

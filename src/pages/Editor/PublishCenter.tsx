@@ -42,6 +42,7 @@ export function PublishCenter() {
     cancelPopup: false,
     type: "" as "PUBLISHED" | "DRAFT" | "SUBMIT" | "SCHEDULE",
     cancelPopId: "",
+    cancelPlatforms: [] as string[],
   });
 
   const [pageMetaData, setPageMetaData] = useState<PaginationTypes>({
@@ -168,29 +169,39 @@ export function PublishCenter() {
   const handlePublishNow = async (storyId: string, platforms: string[]) => {
     const controller = new AbortController();
     const now = new Date();
-    const futureTime = new Date(now.getTime());
+    const formatDate = (d: Date) => d.toISOString().split("T")[0];
 
-    const newPayLoad = platforms.map((a) => ({
-      platform: a.toLowerCase(),
-      date: now,
-      time: futureTime,
-      isPosted: false,
-    }));
+    const formatTime = (d: Date) => {
+      const hours = String(d.getHours()).padStart(2, "0");
+      const minutes = String(d.getMinutes()).padStart(2, "0");
+      return `${hours}:${minutes}`;
+    };
+
+    const newPayload = platforms
+      .map((platform) => ({
+        platform: platform.toLowerCase(),
+        date: formatDate(now),
+        time: formatTime(now),
+        isPosted: false,
+      }))
+      .filter((a) => a.platform.toLowerCase() !== "all");
 
     try {
       setLoading(true);
+
       const url = API_LIST.BASE_URL + API_LIST.SCHEDULED_POST;
+
       await POST(
         url,
         {
           id: storyId,
-          scheduledPosts: newPayLoad,
+          scheduledPosts: newPayload,
         },
         { signal: controller.signal }
       );
-      getDraftArticle();
 
-      console.log("Story scheduled successfully!");
+      getDraftArticle();
+      console.log("Story published successfully!");
     } catch (error: unknown) {
       const err = error as AxiosError;
       if (err.name === "AbortError") {
@@ -258,7 +269,8 @@ export function PublishCenter() {
   };
 
   const handleCancelPopup = async () => {
-    await handleCancelAPI(state.cancelPopId);
+    console.log(state.cancelPlatforms, "asd");
+    await handleCancelAPI(state.cancelPopId, state.cancelPlatforms);
     setState((p) => ({
       ...p,
       cancelPopup: !p.cancelPopup,
@@ -354,11 +366,12 @@ export function PublishCenter() {
                   handleViewStory={handleViewStory}
                   handlePublishNow={handlePublishNow}
                   handleSchedulePublish={handleSchedulePublish}
-                  handleCancel={(id) =>
+                  handleCancel={(id, platforms) =>
                     setState((p) => ({
                       ...p,
                       cancelPopup: !p.cancelPopup,
                       cancelPopId: id,
+                      cancelPlatforms: platforms || [],
                     }))
                   }
                 />

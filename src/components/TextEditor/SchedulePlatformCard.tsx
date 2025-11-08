@@ -1,7 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Globe, Instagram, Facebook, Twitter, Calendar } from "lucide-react";
+import {
+  Globe,
+  Instagram,
+  Facebook,
+  Twitter,
+  Calendar,
+  Minus,
+} from "lucide-react";
 import { Card } from "../ui/card";
 import type { scheduledPostArray } from "@/types/apitypes";
 
@@ -74,6 +81,7 @@ export function SchedulePlatformCard({
     ];
 
     setPlatforms(withAll);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [schedulePost]);
 
   const handlePlatformToggle = (platformId: string) => {
@@ -114,16 +122,19 @@ export function SchedulePlatformCard({
   return (
     <Card
       ref={cardRef}
-      className="bg-white rounded-[12px] shadow-lg border border-gray-200 p-3 max-w-[238px]"
+      className="bg-white rounded-[12px] gap-2 shadow-lg border border-gray-200 p-3 max-w-[238px]"
     >
       <div className="space-y-2">
         {hasNoPlatforms ? (
-          <p className="text-sm text-gray-500 text-center">
+          <p className="text-sm text-[#6A7282] text-center">
             All posts are already published.
           </p>
         ) : (
-          platforms.map((platform) => (
-            <div key={platform.id} className="flex items-center gap-3 py-2">
+          platforms.map((platform, indx) => (
+            <div
+              key={platform.id + indx}
+              className="flex items-center gap-3 py-2"
+            >
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id={platform.id}
@@ -133,7 +144,7 @@ export function SchedulePlatformCard({
                 />
                 <label
                   htmlFor={platform.id}
-                  className="flex items-center space-x-2 text-sm font-semibold text-[#6A7282] cursor-pointer"
+                  className="flex items-center space-x-1 text-sm font-semibold text-[#6A7282] cursor-pointer"
                 >
                   {platform.icon}
                   {platform.id === "all" && <span>{platform.name}</span>}{" "}
@@ -142,10 +153,12 @@ export function SchedulePlatformCard({
               </div>
 
               {platform.id !== "all" && (
-                <div className="text-xs flex gap-1 text-gray-400">
-                  <span>{platform.date}</span>{" "}
-                  <span className="me-1 text-slate-400 h-0.5 text-[12px]"></span>
-                  <span>{platform.time}</span>
+                <div className="text-xs flex text-[#6A7282]">
+                  (<span>{platform.date}</span>{" "}
+                  <span className="text-[#6A7282] p-0  h-0.5 text-[12px]">
+                    <Minus className="rotate-90 h-4 w-4" />
+                  </span>
+                  <span>{platform.time}</span>)
                 </div>
               )}
             </div>
@@ -158,7 +171,7 @@ export function SchedulePlatformCard({
           variant="outline"
           onClick={handlePublish}
           disabled={platforms.every((p) => !p.checked || p.id === "all")}
-          className=" bg-white text-[#FB2C36] border border-[#FB2C36] hover:bg-white hover:text-[#FB2C36]"
+          className=" bg-white text-[#FB2C36] border border-[#FB2C36] hover:bg-white hover:text-[#FB2C36] "
         >
           <Calendar className="w-4 h-4 mr-2" color="#FB2C36" />
           Cancel
