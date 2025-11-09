@@ -55,8 +55,16 @@ const CalendarPage: React.FC = () => {
   const { handleShow, handleDelete } = {
     handleShow: () => setShowSidebar((p) => !p),
     handleDelete: async (id: string) => {
-      console.log("Delete event with id:", id, selectedEvents, selectedEvents[0]?.platform);
-      await handleCancelAPI(id.split('-')[0], selectedEvents[0]?.platform?.split(',') || []);
+      console.log(
+        "Delete event with id:",
+        id,
+        selectedEvents,
+        selectedEvents[0]?.platform
+      );
+      await handleCancelAPI(
+        id.split("-")[0],
+        selectedEvents[0]?.platform?.split(",") || []
+      );
       setShowSidebar((p) => !p);
     },
   };
@@ -81,9 +89,16 @@ const CalendarPage: React.FC = () => {
         setLoading(true);
         const data = await getCalendarEvents();
         if (data) {
-          const transformed = transformScheduleData(data,view === "dayGridMonth" ? "month" : view === "timeGridWeek" ? "week" : "day");
+          const transformed = transformScheduleData(
+            data,
+            view === "dayGridMonth"
+              ? "month"
+              : view === "timeGridWeek"
+              ? "week"
+              : "day"
+          );
           setEvents(transformed);
-          console.log(transformed)
+          console.log(transformed);
         }
       } catch (error: unknown) {
         const err = error as AxiosError;
@@ -123,8 +138,8 @@ const CalendarPage: React.FC = () => {
       v === "month"
         ? "dayGridMonth"
         : v === "week"
-          ? "timeGridWeek"
-          : "timeGridDay";
+        ? "timeGridWeek"
+        : "timeGridDay";
     setView(newView);
     api.changeView(newView);
   };
@@ -148,7 +163,6 @@ const CalendarPage: React.FC = () => {
       setSelectedEvents(dayEvents);
       setShowSidebar(true);
       console.log("dayEvents clicked:", selectInfo);
-
     }
   };
 
@@ -157,6 +171,7 @@ const CalendarPage: React.FC = () => {
     const isDay = view === "timeGridDay";
     const isScheduled = event.status?.toLowerCase() === "scheduled";
     const color = isScheduled ? "#1E3A8A" : "#16A34A";
+    const bgColor = isScheduled ? "#03528F1A" : "#2DA94F1A";
     const timeLabel = arg.event.start
       ? moment(arg.event.start).format("h:mm A")
       : "";
@@ -168,8 +183,8 @@ const CalendarPage: React.FC = () => {
         style={{
           border: `1px solid ${color}`,
           borderLeft: `3px solid ${color}`,
-          backgroundColor: "#ffffff",
-          color: "#0B1220",
+          backgroundColor: view !== "dayGridMonth" ? "white" : bgColor,
+          color: color,
           boxShadow: "0 0 0 1px rgba(0,0,0,0.02) inset",
           maxWidth: `90%`,
         }}
@@ -220,12 +235,15 @@ const CalendarPage: React.FC = () => {
                   {view === "dayGridMonth"
                     ? moment(currentDate).format("MMMM YYYY")
                     : view === "timeGridWeek"
-                      ? `${moment(currentDate).startOf("week").format("MMM D")} – ${moment(currentDate)
+                    ? `${moment(currentDate)
+                        .startOf("week")
+                        .format("MMM D")} – ${moment(currentDate)
                         .endOf("week")
                         .format("MMM D, YYYY")}`
-                      : view === "timeGridDay"
-                        ? moment(currentDate).format("MMMM D, YYYY")
-                        : ""}                </h2>
+                    : view === "timeGridDay"
+                    ? moment(currentDate).format("MMMM D, YYYY")
+                    : ""}{" "}
+                </h2>
               </div>
 
               <div className="flex items-center text-[#333333] space-x-2">
@@ -243,8 +261,8 @@ const CalendarPage: React.FC = () => {
                     view === "dayGridMonth"
                       ? "month"
                       : view === "timeGridWeek"
-                        ? "week"
-                        : "day"
+                      ? "week"
+                      : "day"
                   }
                   onValueChange={handleViewChange}
                 >
@@ -290,10 +308,12 @@ const CalendarPage: React.FC = () => {
                 // }}
                 dayHeaderFormat={{
                   weekday: "short", // 'Sun', 'Mon', 'Tue'
-                  day: "numeric",   // 3, 4, 5
+                  day: "numeric", // 3, 4, 5
                 }}
                 dayHeaderContent={(arg) => {
-                  const weekday = arg.date.toLocaleDateString("en-US", { weekday: "short" });
+                  const weekday = arg.date.toLocaleDateString("en-US", {
+                    weekday: "short",
+                  });
                   const day = arg.date.getDate();
                   return {
                     html: `
@@ -304,9 +324,9 @@ const CalendarPage: React.FC = () => {
     `,
                   };
                 }}
-                 eventOverlap={true}
-  slotEventOverlap={true}
-  eventOrder="title"
+                eventOverlap={true}
+                slotEventOverlap={true}
+                eventOrder="title"
                 dayCellClassNames={() => "px-1 py-2"}
               />
             </div>
