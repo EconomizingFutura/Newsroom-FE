@@ -37,7 +37,6 @@ import {
   transformHistoryStats,
   type HistoryTstatus,
 } from "@/utils/utils";
-import type { AxiosError } from "axios";
 import { useNavigate } from "react-router";
 import { useDebounce } from "@/hooks/useDebounce";
 

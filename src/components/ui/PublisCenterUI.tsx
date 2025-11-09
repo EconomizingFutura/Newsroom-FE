@@ -28,9 +28,7 @@ export const returnPlatformIcon = (platform: string, isPublished: boolean) => {
 };
 
 export const ScheduledPlatformsUI: React.FC<ScheduledPlatformsUIProps> = ({
-  scheduledArr,
-  columns = 1,
-}) => {
+  scheduledArr}) => {
   const published = scheduledArr.filter((a) => a.isPosted);
   const upcoming = scheduledArr.filter((a) => !a.isPosted);
   const path = useLocation();
