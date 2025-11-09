@@ -45,6 +45,7 @@ const ContentUploader = () => {
   });
   const [loading, setLoading] = useState<boolean>(false);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
+  const [isSavingToDraft, setIsSavingToDraft] = useState(false);
 
   const handleSubmitUI = (type: "DRAFT" | "SUBMIT") => {
     setSubmit({
@@ -58,8 +59,9 @@ const ContentUploader = () => {
       type: null,
       isSubmit: false,
     });
-
-    navigate("/history");
+    toast.success("Article Submitted for review!");
+    reset();
+    // navigate("/history");
   };
 
   const path = location.pathname.replace("/", "");
@@ -199,9 +201,8 @@ const ContentUploader = () => {
     }
   };
 
-  const saveDraft = async () => {
-    if (isSavingDraft) return; // prevent duplicate calls
-    setIsSavingDraft(true);
+  const saveDraft = async (createNewDraft: boolean) => {
+    if (isSavingDraft && isSavingToDraft) return; // prevent duplicate calls
 
     const data = getValues(); // get current form values
     try {
@@ -258,18 +259,31 @@ const ContentUploader = () => {
 
       if (response?.id) setValue("reporterId", response.id);
 
-      toast.success("Saved as draft! You can continue editing.");
+      if (createNewDraft) {
+        toast.success("Saved to draft!");
+        reset();
+        setValue("reporterId", null);
+      } else {
+        toast.success("Saved as draft! You can continue editing.");
+      }
     } catch (err) {
       console.error(err);
       toast.error("Error saving draft");
     } finally {
       setIsSavingDraft(false);
+      setIsSavingToDraft(false);
     }
   };
   // wrap inside useMemo to preserve the same throttled function instance
-  const throttledSaveDraft = useMemo(
-    () => throttle(saveDraft, 5000, { trailing: false }),
-    [saveDraft]
+
+  const throttledSaveExisting = useMemo(
+    () => throttle(() => { saveDraft(false); setIsSavingDraft(true) }, 5000, { trailing: false }),
+    []
+  );
+
+  const throttledSaveToDraft = useMemo(
+    () => throttle(() => { saveDraft(true); setIsSavingToDraft(true) }, 5000, { trailing: false }),
+    []
   );
 
   /** Tags */
@@ -286,6 +300,27 @@ const ContentUploader = () => {
       tags.filter((tag) => tag !== tagToRemove)
     );
   };
+  const title = watch("title");
+  const category = watch("category");
+  const content = watch("content");
+  const tagsList = watch("tags");
+
+  const isFormValidForSubmit = useMemo(() => {
+    if (!title?.trim() || !category) return false;
+
+    // Tag validation
+    if (!tagsList || tagsList.length === 0) return false;
+
+    // Type-based validation
+    if (path === "textArticle" && (!content || content.trim() === "<p><br></p>"))
+      return false;
+    if (path === "audio" && !audio)
+      return false;
+    if (path === "video" && !video)
+      return false;
+
+    return true;
+  }, [title, category, tagsList, content, audio, video, path]);
 
   /** Reset form when tab changes */
   useEffect(() => {
@@ -302,7 +337,10 @@ const ContentUploader = () => {
       thumbnail: "",
     });
   }, [path, reset]);
-
+  const isValidForDraft = useMemo(() => {
+    const title = watch("title");
+    return Boolean(title?.trim());
+  }, [watch("title")]);
   if (loading) {
     return <Loading />;
   }
@@ -320,7 +358,7 @@ const ContentUploader = () => {
               type="button"
               variant="ghost"
               size="sm"
-              className="border border-[#E5E7EB] h-10 w-10 rounded-[8.5px]"
+              className="border border-[#E5E7EB] px-4! h-10 w-10 rounded-[8.5px]"
               style={{ backgroundColor: activeConfig.color }}
             >
               <HeaderIcon
@@ -329,15 +367,16 @@ const ContentUploader = () => {
               />
             </Button>
             <p className="font-bold text-2xl">{activeConfig.label}</p>
-            <div className="flex items-center gap-2 px-2 ml-auto">
+            <div className="flex items-center gap-4 px-2 ml-auto">
               <Button
                 form="myForm"
                 type="button"
                 name="draft"
                 variant="outline"
                 size="sm"
-                className="gap-2 border-[#B3E6B3] bg-[#F0F9F0] h-[40px] text-[#008001] hover:bg-[#F0F9F0] hover:text-[#008001]"
-                onClick={throttledSaveDraft}
+                disabled={!isValidForDraft || isSavingDraft || isSavingToDraft}
+                className="gap-2 border-[#B3E6B3] bg-[#F0F9F0] h-10 px-4 text-[14px] text-[#008001] hover:bg-[#F0F9F0] hover:text-[#008001]"
+                onClick={throttledSaveExisting}
               >
                 {isSavingDraft ? (
                   <>
@@ -345,7 +384,27 @@ const ContentUploader = () => {
                   </>
                 ) : (
                   <>
-                    <Save className="w-4 h-4" /> Save Draft
+                    <Save className="w-4 h-4" /> Save
+                  </>
+                )}
+              </Button>
+              <Button
+                form="myForm"
+                type="button"
+                name="draft"
+                variant="outline"
+                disabled={!isValidForDraft || isSavingDraft || isSavingToDraft}
+                size="sm"
+                className="gap-2 border-[#B3E6B3] bg-[#F0F9F0] h-10 px-4 text-[14px] text-[#008001] hover:bg-[#F0F9F0] hover:text-[#008001]"
+                onClick={throttledSaveToDraft}
+              >
+                {isSavingToDraft ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" /> Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4" /> Save to Draft
                   </>
                 )}
               </Button>
@@ -354,8 +413,8 @@ const ContentUploader = () => {
                 type="submit"
                 name="save"
                 size="sm"
-                disabled={isSavingDraft} // disable while saving draft
-                className="bg-green-700 hover:bg-green-700 h-[40px] text-white gap-2"
+                disabled={!isFormValidForSubmit || isSavingDraft || isSavingToDraft}
+                className="bg-green-700 hover:bg-green-700 h-10 text-[14px] text-white gap-2"
               >
                 <Send className="w-4 h-4" />
                 Submit for Review
@@ -373,11 +432,10 @@ const ContentUploader = () => {
                     key={tab.id}
                     type="button"
                     onClick={() => navigate(`/${tab.id}`)}
-                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                      isActive
-                        ? "bg-white font-bold text-gray-900 shadow-sm"
-                        : "text-gray-500 hover:text-gray-700"
-                    }`}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${isActive
+                      ? "bg-white font-bold text-gray-900 shadow-sm"
+                      : "text-gray-500 hover:text-gray-700"
+                      }`}
                   >
                     {tab.name}
                   </button>
@@ -414,11 +472,10 @@ const ContentUploader = () => {
                       }
                       size="sm"
                       onClick={() => setValue("category", category)}
-                      className={`px-[24px] py-[6px] ${
-                        watch("category") === category
-                          ? " bg-[#008001] hover:bg-green-700"
-                          : "bg-[#F8FAF9]"
-                      }`}
+                      className={`px-[24px] py-[6px] ${watch("category") === category
+                        ? " bg-[#008001] hover:bg-green-700"
+                        : "bg-[#F8FAF9]"
+                        }`}
                     >
                       {category}
                     </Button>
@@ -427,22 +484,21 @@ const ContentUploader = () => {
               </div>
 
               {/* Title */}
-              <div className="space-y-3 mt-6">
+              <div className="space-y-2 mt-6">
                 <label className="flex items-center gap-2 font-medium">
                   Title <span className="text-red-500">*</span>
                 </label>
                 <Input
                   placeholder="Title"
                   {...register("title", { required: "Title is required" })}
-                  className={`bg-[#f7fbf8] border-[#ECECEC] h-[40px] ${
-                    errors.title ? "border-red-500" : ""
-                  }`}
+                  className={`bg-[#f7fbf8] border-[#ECECEC] h-[40px] ${errors.title ? "border-red-500" : ""
+                    }`}
                 />
               </div>
 
               {/* Content */}
               {path === "textArticle" && (
-                <div className="space-y-3 mt-6">
+                <div className="space-y-2 mt-6">
                   <label className="flex items-center gap-2 font-medium">
                     Content <span className="text-red-500">*</span>
                   </label>
@@ -485,7 +541,7 @@ const ContentUploader = () => {
               )}
 
               {/* Tags */}
-              <div className="space-y-3 mt-6">
+              <div className="space-y-2 mt-6">
                 <label className="flex items-center gap-2 font-medium">
                   Tags <span className="text-red-500">*</span>
                 </label>
@@ -500,15 +556,14 @@ const ContentUploader = () => {
                         handleAddTag();
                       }
                     }}
-                    className={`py-[19px] border-[#ECECEC] bg-[#f7fbf8] ${
-                      errors.tags ? "border-red-500" : ""
-                    }`}
+                    className={`py-[19px] border-[#ECECEC] bg-[#f7fbf8] ${errors.tags ? "border-red-500" : ""
+                      }`}
                   />
                   <Button
                     type="button"
                     size="sm"
                     onClick={handleAddTag}
-                    className="absolute top-[6px] right-[12px] bg-[#006601] hover:bg-[#006601] px-[16px] py-[6px] gap-1"
+                    className="absolute top-[6px] right-[12px] bg-[#006601] hover:bg-[#006601] px-[16px] py-[6px] !h-8 gap-1"
                   >
                     <Plus className="w-3 h-3" />
                     Add
@@ -529,7 +584,7 @@ const ContentUploader = () => {
                           <Badge
                             key={index}
                             variant="secondary"
-                            className="gap-2 px-3 py-1 text-[#008001] bg-[#f8faf9] border-[#B3E6B3]"
+                            className="gap-2 text-[14px] px-3 py-1 text-[#008001] bg-[#f8faf9] border-[#B3E6B3]"
                           >
                             {tag}
                             <button

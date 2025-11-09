@@ -18,7 +18,7 @@ import { returnType } from "@/utils/utils";
 import { usePagination } from "@/hooks/usePagination";
 import Pagination from "@/components/Pagination";
 import { API_LIST } from "@/api/endpoints";
-import { GET } from "@/api/apiMethods";
+import { GET, POST } from "@/api/apiMethods";
 import moment from "moment";
 import type { RevertedArticleTypes } from "@/types/draftPageTypes";
 import Loading from "./Shared/agency-feeds/loading";
@@ -150,45 +150,51 @@ const HistoryLogPage: React.FC = () => {
     return () => controller.abort();
   }, [currentPage, pageSize, statusFilter, typeFilter, dateRange, searchQuery]);
 
-  const getHistoryList = async () => {
-    try {
-      setLoading(true);
+const getHistoryList = async () => {
+  try {
+    setLoading(true);
 
-      const queryParams = new URLSearchParams({
-        page: currentPage.toString(),
-        pageSize: pageSize.toString(),
-      });
+    // 🧩 Build body payload instead of query string
+    const payload: any = {
+      page: currentPage,
+      pageSize,
+    };
 
-      if (statusFilter !== "All Status") {
-        queryParams.append(
-          "status",
-          statusFilter === "APPROVED" ? "REVIEWED" : statusFilter
-        );
-      }
-      if (typeFilter !== "All Type") {
-        queryParams.append("type", typeFilter);
-      }
-      if (dateRange !== "All") {
-        queryParams.append("range", dateRange); // 7,30,90
-      }
-      if (searchQuery.trim()) {
-        queryParams.append("search", searchQuery.trim());
-      }
-
-      const response: any = await GET(
-        `${API_LIST.BASE_URL}${API_LIST.HISTORY}?${queryParams.toString()}`
-      );
-
-      setHistoryArticles(response.articles ?? []);
-      setPageMetaData(response.pagination);
-      setLoading(false);
-    } catch (error: any) {
-      setLoading(false);
-      if (error.name !== "AbortError") {
-        console.error("Error fetching history:", error);
-      }
+    if (statusFilter !== "All Status") {
+      payload.status =
+        statusFilter === "APPROVED" ? "REVIEWED" : statusFilter;
     }
-  };
+
+    if (typeFilter !== "All Type") {
+      payload.type = typeFilter;
+    }
+
+    if (dateRange !== "All") {
+      payload.dateRange = dateRange; // 'today' | 'week' | 'month' etc.
+    }
+
+    if (searchQuery.trim()) {
+      payload.search = searchQuery.trim();
+    }
+
+    // 🟢 POST request instead of GET
+    const response: any = await POST(
+      `${API_LIST.BASE_URL}${API_LIST.HISTORY}`,
+      payload
+    );
+
+    // 🧭 Update state
+    setHistoryArticles(response.articles ?? []);
+    setPageMetaData(response.pagination);
+  } catch (error: any) {
+    if (error.name !== "AbortError") {
+      console.error("Error fetching history:", error);
+    }
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   function getArticleType(article: any): "text" | "audio" | "video" {
     if (article.content && article.content !== "") {

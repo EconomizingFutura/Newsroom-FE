@@ -136,7 +136,7 @@ export default function VideoArticleEditor() {
             <div className="space-y-3">
               <Card className="p-12 border-2 border-dashed border-gray-300 bg-white">
                 <div className="text-center space-y-4">
-                  <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto">
+                  <div className="w-16 h-16 bg-[linear-gradient(180deg,#FFEDD4_0%,#FEE6C5_100%)] rounded-full flex items-center justify-center mx-auto">
                     <Video className="w-8 h-8 text-orange-600" />
                   </div>
 
@@ -150,7 +150,7 @@ export default function VideoArticleEditor() {
                     </p>
                   </div>
 
-                  <Button className="bg-orange-600 hover:bg-orange-700 text-white gap-2">
+                  <Button className="bg-orange-600 rounded-lg hover:bg-orange-700 text-white gap-2">
                     <Upload className="w-4 h-4" />
                     Choose File
                   </Button>

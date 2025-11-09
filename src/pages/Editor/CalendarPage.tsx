@@ -55,7 +55,16 @@ const CalendarPage: React.FC = () => {
   const { handleShow, handleDelete } = {
     handleShow: () => setShowSidebar((p) => !p),
     handleDelete: async (id: string) => {
-      await handleCancelAPI(id);
+      console.log(
+        "Delete event with id:",
+        id,
+        selectedEvents,
+        selectedEvents[0]?.platform
+      );
+      await handleCancelAPI(
+        id.split("-")[0],
+        selectedEvents[0]?.platform?.split(",") || []
+      );
       setShowSidebar((p) => !p);
     },
   };
@@ -80,8 +89,16 @@ const CalendarPage: React.FC = () => {
         setLoading(true);
         const data = await getCalendarEvents();
         if (data) {
-          const transformed = transformScheduleData(data);
+          const transformed = transformScheduleData(
+            data,
+            view === "dayGridMonth"
+              ? "month"
+              : view === "timeGridWeek"
+              ? "week"
+              : "day"
+          );
           setEvents(transformed);
+          console.log(transformed);
         }
       } catch (error: unknown) {
         const err = error as AxiosError;
@@ -91,7 +108,7 @@ const CalendarPage: React.FC = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [view]);
 
   const fullCalendarEvents: EventInput[] = events.map((e) => ({
     id: e.id.toString(),
@@ -121,8 +138,8 @@ const CalendarPage: React.FC = () => {
       v === "month"
         ? "dayGridMonth"
         : v === "week"
-          ? "timeGridWeek"
-          : "timeGridDay";
+        ? "timeGridWeek"
+        : "timeGridDay";
     setView(newView);
     api.changeView(newView);
   };
@@ -134,6 +151,7 @@ const CalendarPage: React.FC = () => {
     );
     setSelectedEvents(dayEvents);
     setShowSidebar(true);
+    console.log("Event clicked:", dayEvents);
   };
 
   const handleSelect = (selectInfo: DateSelectArg) => {
@@ -144,6 +162,7 @@ const CalendarPage: React.FC = () => {
     if (dayEvents.length > 0) {
       setSelectedEvents(dayEvents);
       setShowSidebar(true);
+      console.log("dayEvents clicked:", selectInfo);
     }
   };
 
@@ -152,6 +171,7 @@ const CalendarPage: React.FC = () => {
     const isDay = view === "timeGridDay";
     const isScheduled = event.status?.toLowerCase() === "scheduled";
     const color = isScheduled ? "#1E3A8A" : "#16A34A";
+    const bgColor = isScheduled ? "#03528F1A" : "#2DA94F1A";
     const timeLabel = arg.event.start
       ? moment(arg.event.start).format("h:mm A")
       : "";
@@ -163,8 +183,8 @@ const CalendarPage: React.FC = () => {
         style={{
           border: `1px solid ${color}`,
           borderLeft: `3px solid ${color}`,
-          backgroundColor: "#ffffff",
-          color: "#0B1220",
+          backgroundColor: view !== "dayGridMonth" ? "white" : bgColor,
+          color: color,
           boxShadow: "0 0 0 1px rgba(0,0,0,0.02) inset",
           maxWidth: `90%`,
         }}
@@ -215,12 +235,15 @@ const CalendarPage: React.FC = () => {
                   {view === "dayGridMonth"
                     ? moment(currentDate).format("MMMM YYYY")
                     : view === "timeGridWeek"
-                      ? `${moment(currentDate).startOf("week").format("MMM D")} – ${moment(currentDate)
+                    ? `${moment(currentDate)
+                        .startOf("week")
+                        .format("MMM D")} – ${moment(currentDate)
                         .endOf("week")
                         .format("MMM D, YYYY")}`
-                      : view === "timeGridDay"
-                        ? moment(currentDate).format("MMMM D, YYYY")
-                        : ""}                </h2>
+                    : view === "timeGridDay"
+                    ? moment(currentDate).format("MMMM D, YYYY")
+                    : ""}{" "}
+                </h2>
               </div>
 
               <div className="flex items-center text-[#333333] space-x-2">
@@ -238,8 +261,8 @@ const CalendarPage: React.FC = () => {
                     view === "dayGridMonth"
                       ? "month"
                       : view === "timeGridWeek"
-                        ? "week"
-                        : "day"
+                      ? "week"
+                      : "day"
                   }
                   onValueChange={handleViewChange}
                 >
@@ -280,15 +303,17 @@ const CalendarPage: React.FC = () => {
                 slotMinTime="00:00:00"
                 slotMaxTime="24:00:00"
                 eventMinHeight={20}
-                eventOverlap={(stillEvent, movingEvent) => {
-                  return stillEvent.startStr === movingEvent?.startStr;
-                }}
+                // eventOverlap={(stillEvent, movingEvent) => {
+                //   return stillEvent.startStr === movingEvent?.startStr;
+                // }}
                 dayHeaderFormat={{
                   weekday: "short", // 'Sun', 'Mon', 'Tue'
-                  day: "numeric",   // 3, 4, 5
+                  day: "numeric", // 3, 4, 5
                 }}
                 dayHeaderContent={(arg) => {
-                  const weekday = arg.date.toLocaleDateString("en-US", { weekday: "short" });
+                  const weekday = arg.date.toLocaleDateString("en-US", {
+                    weekday: "short",
+                  });
                   const day = arg.date.getDate();
                   return {
                     html: `
@@ -299,7 +324,25 @@ const CalendarPage: React.FC = () => {
     `,
                   };
                 }}
+                eventOverlap={true}
+                slotEventOverlap={true}
+                eventOrder="title"
                 dayCellClassNames={() => "px-1 py-2"}
+                moreLinkContent={(arg) => {
+                  return {
+                    html: `
+        <span style="
+          color: #076122;
+          font-weight: 600;
+          text-align: center;
+          display: inline-block;
+          width: 100%;
+        ">
+          +${arg.num} more
+        </span>
+      `,
+                  };
+                }}
               />
             </div>
           </div>

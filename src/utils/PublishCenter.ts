@@ -11,6 +11,13 @@ export const getPriorityColor = (priority: string) => {
   }
 };
 
+export interface ScheduledPost {
+  date: string;
+  time: string;
+  isPosted: boolean;
+  platform: string;
+}
+
 type ScheduledItem = {
   id: number;
   title: string;
@@ -22,48 +29,97 @@ type ScheduledItem = {
   thumbnailUrl: string;
   status: "SCHEDULED" | "POSTED";
   content: string;
+  scheduledPosts: ScheduledPost[];
   type: "TEXT" | "VIDEO" | "AUDIO";
 };
 
-export type TransformedItem = {
-  id: number;
+export interface TransformedItem {
+  id: string;
   title: string;
   start: Date;
   end: Date;
-  scheduledPlatforms: string[];
+  date: string;
+  type: string;
+  status: string;
+  platforms?: string[];
+  platform?: string;
+  originalScheduledTime?: string;
   audioUrl: string;
   videoUrl: string;
   thumbnailUrl: string;
-  scheduledDate: string;
-  status: "SCHEDULED" | "POSTED";
-  type: "TEXT" | "VIDEO" | "AUDIO";
   content: string;
-};
+  scheduledPosts: ScheduledPost[];
+}
 
 export const transformScheduleData = (
-  data: ScheduledItem[]
+  data: ScheduledItem[],
+  viewType: "month" | "week" | "day"
 ): TransformedItem[] => {
-  return data.map((item) => {
-    const start = new Date(item.scheduledDate);
-    const [hours, minutesStr] = item.scheduledTime.split(":");
-    const hoursNum = Number(hours);
-    const minutesNum = Number(minutesStr);
+  console.log("Transforming data for view type:", viewType);
+  const events: TransformedItem[] = [];
 
-    // ⏱ Normalize to nearest half-hour
-    const normalizedMinutes = minutesNum < 30 ? 0 : 30;
+  data.forEach((article) => {
+    if (!article.scheduledPosts?.length) return;
 
-    start.setHours(hoursNum, normalizedMinutes, 0, 0);
+    if (viewType === "day") {
+      // ✅ Show each platform as separate event
+      article.scheduledPosts.forEach((post) => {
+        const start = new Date(`${post.date}T${post.time}`);
+        const end = new Date(start);
+        end.setMinutes(start.getMinutes() + 30);
 
-    const end = new Date(start);
-    end.setMinutes(start.getMinutes() + 30);
+        events.push({
+          id: `${article.id}-${post.platform}`,
+          title: `${article.title} (${post.platform})`,
+          date: post.date,
+          type: article.type,
+          status: article.status,
+          platform: post.platform,
+          originalScheduledTime: post.time,
+          start,
+          end,
+          audioUrl: article.audioUrl,
+          videoUrl: article.videoUrl,
+          thumbnailUrl: article.thumbnailUrl,
+          content: article.content,
+          scheduledPosts: article.scheduledPosts,
+        });
+      });
+    } else {
+      // ✅ For month/week: group all platforms for same article + date
+      const groupedByDate: Record<string, string[]> = {};
 
-    return {
-      ...item,
-      originalScheduledTime: item.scheduledTime,
-      start,
-      end,
-    };
+      article.scheduledPosts.forEach((post) => {
+        if (!groupedByDate[post.date]) groupedByDate[post.date] = [];
+        groupedByDate[post.date].push(post.platform);
+      });
+
+      Object.entries(groupedByDate).forEach(([date, platforms]) => {
+        const start = new Date(`${date}T00:00:00`);
+        const end = new Date(start);
+        end.setMinutes(start.getMinutes() + 30);
+
+        events.push({
+          id: `${article.id}-${date}`, // group by article + date
+          title: `${article.title} (${platforms.length} platforms)`,
+          date,
+          type: article.type,
+          status: article.status,
+          platform: platforms.join(", "),
+          originalScheduledTime: '',
+          start,
+          end,
+          audioUrl: article.audioUrl,
+          videoUrl: article.videoUrl,
+          thumbnailUrl: article.thumbnailUrl,
+          content: article.content,
+          scheduledPosts: article.scheduledPosts,
+        });
+      });
+    }
   });
+
+  return events;
 };
 
 export const stripHTML = (html: string): string => {

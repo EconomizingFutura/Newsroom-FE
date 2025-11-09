@@ -23,7 +23,7 @@ import {
 import Pagination from "@/components/Pagination";
 import { usePagination } from "@/hooks/usePagination";
 import Loading from "../Shared/agency-feeds/loading";
-import { GET } from "@/api/apiMethods";
+import { GET, POST } from "@/api/apiMethods";
 import { API_LIST } from "@/api/endpoints";
 import {
   historyStatus,
@@ -81,7 +81,7 @@ export function HistoryLog() {
   const debouncedSearch = useDebounce(filters.search, 600);
 
   console.log("⌨️ filters.search:", filters.search);
-console.log("🕓 debouncedSearch:", debouncedSearch);
+  console.log("🕓 debouncedSearch:", debouncedSearch);
 
 
   const updateFilter = <K extends keyof typeof filters>(
@@ -142,70 +142,77 @@ console.log("🕓 debouncedSearch:", debouncedSearch);
 
 
   useEffect(() => {
-  const controller = new AbortController();
+    const controller = new AbortController();
 
-  const getHistoryList = async (signal?: AbortSignal) => {
-    try {
-      setLoading(true);
+    const getHistoryList = async (signal?: AbortSignal) => {
+      try {
+        setLoading(true);
 
-      const queryParams = new URLSearchParams({
-        page: currentPage.toString(),
-        pageSize: pageSize.toString(),
-      });
-
-      // ✅ use filters normally, but for search use debouncedSearch
-      if (filters.statuses.length > 0) {
-        queryParams.append("status", filters.statuses.join(","));
-      }
-      if (filters.categories.length > 0) {
-        queryParams.append("category", filters.categories.join(","));
-      }
-      if (filters.authors.length > 0) {
-        queryParams.append("authorId", filters.authors.join(","));
-      }
-      if (filters.dateRange !== "all") {
-        queryParams.append("dateRange", filters.dateRange);
-      }
-      if (debouncedSearch.trim() !== "") {
-        queryParams.append("search", debouncedSearch.trim());
-      }
-
-      const url = `${API_LIST.BASE_URL}${API_LIST.HISTORY}?${queryParams.toString()}`;
-      console.log("📡 API triggered with search:", debouncedSearch);
-      const response: HistoryResponse = await GET(url, { signal });
-
-      setHistoryArticles(response.articles ?? []);
-      setPageMetaData(
-        response.pagination ?? {
-          total: 0,
+        // 🧩 Build POST payload instead of query params
+        const payload: any = {
           page: currentPage,
           pageSize,
-          totalPages: 1,
-          hasNextPage: false,
-          hasPrevPage: false,
+        };
+
+        // ✅ Apply filters
+        if (filters.statuses.length > 0) {
+          payload.status = filters.statuses.join(",");
         }
-      );
-    } catch (err) {
-      if ((err as AxiosError).name !== "AbortError") {
+        if (filters.categories.length > 0) {
+          payload.category = filters.categories.join(",");
+        }
+        if (filters.authors.length > 0) {
+          payload.authorsList = filters.authors; // backend handles array or comma string
+        }
+        if (filters.dateRange !== "all") {
+          payload.dateRange = filters.dateRange;
+        }
+        if (debouncedSearch.trim() !== "") {
+          payload.search = debouncedSearch.trim();
+        }
+
+        console.log("📡 POST API triggered with search:", debouncedSearch, payload);
+
+        // 🟢 Call POST API with AbortSignal
+        const response: HistoryResponse = await POST(
+          `${API_LIST.BASE_URL}${API_LIST.HISTORY}`,
+          payload,
+          { signal } // 👈 forward abort signal if your POST wrapper supports it
+        );
+
+        // 🧭 Update UI state
+        setHistoryArticles(response.articles ?? []);
+        setPageMetaData(
+          response.pagination ?? {
+            total: 0,
+            page: currentPage,
+            pageSize,
+            totalPages: 1,
+            hasNextPage: false,
+            hasPrevPage: false,
+          }
+        );
+      } catch (err) {
+        // ✅ Handle abort safely
+        if ((err as any).name === "AbortError") return;
         console.error("Error fetching history:", err);
+      } finally {
+        setLoading(false);
       }
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  getHistoryList(controller.signal);
+    getHistoryList(controller.signal);
 
-  return () => controller.abort();
-}, [
-  debouncedSearch,            // ✅ only triggers when debounce completes
-  filters.statuses,
-  filters.categories,
-  filters.authors,
-  filters.dateRange,
-  currentPage,
-  pageSize,
-]);
+    return () => controller.abort();
+  }, [
+    debouncedSearch,            // ✅ only triggers when debounce completes
+    filters.statuses,
+    filters.categories,
+    filters.authors,
+    filters.dateRange,
+    currentPage,
+    pageSize,
+  ]);
 
   const handleDropDownToggle = (
     value: string,
@@ -249,37 +256,36 @@ console.log("🕓 debouncedSearch:", debouncedSearch);
 
   const totalPages = pageMetaData?.totalPages >= 1;
 
-  console.log(totalPages);
 
   const isEmpty = !loading && paginatedArticles.length === 0;
 
-const PAGINATION = useMemo(() => {
-  if (!loading && totalPages) {
-    return (
-      <div className="sticky bottom-0 bg-gray-50 border-t py-5 z-20">
-        <Pagination
-          currentPage={currentPage}
-          pageCount={pageMetaData.totalPages}
-          onPageChange={(p) => {
-            handlePageChange(p);
-            setCurrentPage(p.selected);
-          }}
-          setCurrentPage={setCurrentPage}
-          setSortConfig={(val) => {
-            const size = Number(val.split(" ")[0]);
-            setPageSize(size);
-            setCurrentPage(1);
-          }}
-        />
-      </div>
-    );
-  }
-  return null;
-}, [
-  totalPages,
-  currentPage,
-  pageMetaData.totalPages,
-]);
+  const PAGINATION = useMemo(() => {
+    if (!loading && totalPages) {
+      return (
+        <div className="sticky bottom-0 bg-gray-50 border-t py-5 z-20">
+          <Pagination
+            currentPage={currentPage}
+            pageCount={pageMetaData.totalPages}
+            onPageChange={(p) => {
+              handlePageChange(p);
+              setCurrentPage(p.selected);
+            }}
+            setCurrentPage={setCurrentPage}
+            setSortConfig={(val) => {
+              const size = Number(val.split(" ")[0]);
+              setPageSize(size);
+              setCurrentPage(1);
+            }}
+          />
+        </div>
+      );
+    }
+    return null;
+  }, [
+    totalPages,
+    currentPage,
+    pageMetaData.totalPages,
+  ]);
 
 
 
@@ -520,7 +526,7 @@ const PAGINATION = useMemo(() => {
           )}
         </>
       </main>
-      { PAGINATION }
+      {PAGINATION}
 
 
       {/* {!loading && totalPages && (

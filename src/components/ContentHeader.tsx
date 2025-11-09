@@ -1,8 +1,11 @@
 import { Grid3x3, List, MoveLeft, PenLine, Save, Send, X } from "lucide-react";
-import React from "react";
+import React, { useRef, useState } from "react";
 import { Button } from "./ui/button";
 import { HeaderIcon, type HeaderKey } from "@/utils/HeaderIcons";
 import { cn } from "./ui/utils";
+import { createPortal } from "react-dom";
+import { SchedulePlatformCard } from "./TextEditor/SchedulePlatformCard";
+import type { scheduledPost } from "@/types/apitypes";
 
 interface ContentHeaderProps {
   text: string;
@@ -21,6 +24,8 @@ interface ContentHeaderProps {
   handleEdit?: () => void;
   showCancelSchedule?: boolean;
   handleEditPopup?: () => void;
+  handleCancel?: (id: string, platforms?: string[]) => void;
+  story?: any;
 }
 
 const ContentHeader: React.FC<ContentHeaderProps> = ({
@@ -38,7 +43,18 @@ const ContentHeader: React.FC<ContentHeaderProps> = ({
   handleEdit,
   showCancelSchedule,
   handleEditPopup,
+  handleCancel,
+  story
+
 }) => {
+
+  const [showScheduleCard, setShowScheduleCard] = useState(false);
+  const scheduleCardRef = useRef<HTMLDivElement>(null);
+  const scheduleButtonRef = useRef<HTMLButtonElement>(null);
+  const [scheduleButtonRect, setScheduleButtonRect] = useState<DOMRect | null>(
+    null
+  );
+
   return (
     <div className="flex justify-between">
       <div>
@@ -124,14 +140,50 @@ const ContentHeader: React.FC<ContentHeaderProps> = ({
             </Button>
           )}
           {showCancelSchedule && (
-            <Button
-              variant="outline"
-              onClick={handleEditPopup}
-              className="text-[#1E2939] cursor-pointer hover:text-[#1E2939]  border-[#1E2939] hover:bg-[#F8FAF9]"
-            >
-              <X color="#1E2939" className="w-4 h-4 mr-2" />
-              Cancel Schedule
-            </Button>
+            <div className="relative">
+              <Button
+                variant="outline"
+                ref={scheduleButtonRef}
+                onClick={() => {
+                  if (scheduleButtonRef.current) {
+                    setScheduleButtonRect(
+                      scheduleButtonRef.current.getBoundingClientRect()
+                    );
+                  }
+                  setShowScheduleCard(true);
+                }}
+
+                className="text-[#1E2939] cursor-pointer hover:text-[#1E2939]  border-[#1E2939] hover:bg-[#F8FAF9]"
+              >
+                <X color="#1E2939" className="w-4 h-4 mr-2" />
+                Cancel Schedule
+              </Button>
+              {showScheduleCard && story &&
+                createPortal(
+                  <div
+                    ref={scheduleCardRef}
+                    className="fixed z-50 bg-white shadow-lg rounded-lg"
+                    style={{
+                      top: scheduleButtonRect?.top ?? 0,
+                      left: scheduleButtonRect?.left ?? 0,
+                      transform: "translateY(20%) translateX(-10%)",
+                    }}
+                  >
+                    <SchedulePlatformCard
+                      schedulePost={story.scheduledPosts}
+                      isOpen={showScheduleCard}
+                      onClose={() => setShowScheduleCard(false)}
+                      onPublish={(platforms) => {
+                        handleCancel?.(story.id, platforms);
+                        setShowScheduleCard(false);
+                        handleEditPopup?.();
+                      }}
+                    />
+                  </div>,
+                  document.body
+                )}
+            </div>
+
           )}
         </div>
       )}

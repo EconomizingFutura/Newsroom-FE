@@ -1,3 +1,5 @@
+import type { ScheduledPost } from "@/utils/PublishCenter";
+
 export type LoginResponse = {
   accessToken: string;
 };
@@ -7,7 +9,7 @@ export type contentResponse = {
   title: string;
   content: string;
   type: "TEXT" | "VIDEO" | "AUDIO";
-  status: "SUBMITTED" | "POSTED";
+  status: "SUBMITTED" | "POSTED" | "SCHEDULED";
   remarks: string | null;
   audio: string | File | null;
   audioUrl?: string | File | null;
@@ -17,10 +19,7 @@ export type contentResponse = {
   tags: string[];
   createdAt: string;
   updatedAt: string;
-  reporterId: string;
-  scheduledDate: Date | null;
-  scheduledTime: string | null;
-  scheduledPlatforms: string[];
+  scheduledPosts: scheduledPostArray[];
   reporter: {
     id: string;
     username: string;
@@ -64,6 +63,13 @@ export type EditorStatsResponse = {
   data: EditorStatsData;
 };
 
+export type scheduledPostArray = {
+  platform: string;
+  date: Date | string;
+  time: string;
+  isPosted: boolean;
+};
+
 export type scheduledPost = {
   id: string;
   title: string;
@@ -76,6 +82,7 @@ export type scheduledPost = {
   thumbnailurl: string;
   category: string;
   type: "SCHEDULED" | "REVIEWED";
+  scheduledPosts: scheduledPostArray[];
 };
 
 export type scheduledPostsResponse = {
@@ -107,6 +114,7 @@ export interface calendarEvent {
   status: "SCHEDULED" | "POSTED";
   content: string;
   type: "TEXT" | "VIDEO" | "AUDIO";
+  scheduledPosts: ScheduledPost[];
 }
 
 export interface CalendarEventsResponse {

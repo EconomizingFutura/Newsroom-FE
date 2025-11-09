@@ -21,6 +21,7 @@ import type { AxiosError } from "axios";
 import { useCancelEvent } from "@/hooks/useCalendarAPI";
 import { useNavigate } from "react-router";
 import { throttle } from "lodash";
+import { transformPlatformsToScheduledPosts } from "../Reporter/utils";
 
 const FILTER_TABS = [
   "Politics",
@@ -41,6 +42,7 @@ export function PublishCenter() {
     cancelPopup: false,
     type: "" as "PUBLISHED" | "DRAFT" | "SUBMIT" | "SCHEDULE",
     cancelPopId: "",
+    cancelPlatforms: [] as string[],
   });
 
   const [pageMetaData, setPageMetaData] = useState<PaginationTypes>({
@@ -167,24 +169,39 @@ export function PublishCenter() {
   const handlePublishNow = async (storyId: string, platforms: string[]) => {
     const controller = new AbortController();
     const now = new Date();
-    const futureTime = new Date(now.getTime());
+    const formatDate = (d: Date) => d.toISOString().split("T")[0];
+
+    const formatTime = (d: Date) => {
+      const hours = String(d.getHours()).padStart(2, "0");
+      const minutes = String(d.getMinutes()).padStart(2, "0");
+      return `${hours}:${minutes}`;
+    };
+
+    const newPayload = platforms
+      .map((platform) => ({
+        platform: platform.toLowerCase(),
+        date: formatDate(now),
+        time: formatTime(now),
+        isPosted: false,
+      }))
+      .filter((a) => a.platform.toLowerCase() !== "all");
 
     try {
       setLoading(true);
+
       const url = API_LIST.BASE_URL + API_LIST.SCHEDULED_POST;
+
       await POST(
         url,
         {
           id: storyId,
-          date: futureTime,
-          time: futureTime.toLocaleTimeString("en-GB", { hour12: false }),
-          platforms,
+          scheduledPosts: newPayload,
         },
         { signal: controller.signal }
       );
-      getDraftArticle();
 
-      console.log("Story scheduled successfully!");
+      getDraftArticle();
+      console.log("Story published successfully!");
     } catch (error: unknown) {
       const err = error as AxiosError;
       if (err.name === "AbortError") {
@@ -210,54 +227,57 @@ export function PublishCenter() {
       cancelPopId: story.id,
     }));
   };
-const handlePublish = async (
-  platforms: { platformName: string; date: string; time: string }[],
-  isEdit: boolean
-) => {
-  const controller = new AbortController();
+  const handlePublish = async (
+    platforms: { platformName: string; date: string; time: string }[],
+    isEdit: boolean
+  ) => {
+    const newPlatforms = transformPlatformsToScheduledPosts(platforms);
+    const controller = new AbortController();
 
-  try {
-    setLoading(true);
-    const url = API_LIST.BASE_URL + API_LIST.SCHEDULED_POST;
+    try {
+      setLoading(true);
+      const url = API_LIST.BASE_URL + API_LIST.SCHEDULED_POST;
 
-    const payload = {
-      id: state.cancelPopId,
-      platforms, // ✅ full platform list with date & time per platform
-    };
+      const payload = {
+        id: state.cancelPopId,
+        scheduledPosts: newPlatforms,
+      };
+      console.log(payload, "as");
 
-    if (isEdit) {
-      await PUT(url, payload, { signal: controller.signal });
-    } else {
-      await POST(url, payload, { signal: controller.signal });
+      if (isEdit) {
+        await PUT(url, payload, { signal: controller.signal });
+      } else {
+        await POST(url, payload, { signal: controller.signal });
+      }
+
+      getDraftArticle();
+      console.log("✅ Story scheduled successfully!");
+    } catch (error: unknown) {
+      const err = error as AxiosError;
+      if (err.name === "AbortError") {
+        console.warn("⚠️ Request aborted");
+      } else {
+        console.error("❌ Error scheduling story:", error);
+      }
+    } finally {
+      setLoading(false);
+      setState((p) => ({
+        ...p,
+        id: "",
+        scheduleModalOpen: false,
+      }));
     }
-
-    getDraftArticle();
-    console.log("✅ Story scheduled successfully!");
-  } catch (error: unknown) {
-    const err = error as AxiosError;
-    if (err.name === "AbortError") {
-      console.warn("⚠️ Request aborted");
-    } else {
-      console.error("❌ Error scheduling story:", error);
-    }
-  } finally {
-    setLoading(false);
-    setState((p) => ({
-      ...p,
-      id: "",
-    }));
-  }
-};
+  };
 
   const handleCancelPopup = async () => {
-    await handleCancelAPI(state.cancelPopId);
+    console.log(state.cancelPlatforms, "asd");
+    await handleCancelAPI(state.cancelPopId, state.cancelPlatforms);
     setState((p) => ({
       ...p,
       cancelPopup: !p.cancelPopup,
     }));
     getDraftArticle();
   };
-
 
   const showPagination = Number(pageMetaData.totalPages) > 1;
 
@@ -280,10 +300,11 @@ const handlePublish = async (
                     setState((prev) => ({ ...prev, activeTab: tab }));
                     setCurrentPage(1);
                   }}
-                  className={`px-4 py-2 rounded-md text-sm ${state.activeTab === tab
-                    ? "font-bold bg-white"
-                    : "text-gray-500"
-                    }`}
+                  className={`px-4 py-2 rounded-md text-sm ${
+                    state.activeTab === tab
+                      ? "font-bold bg-white"
+                      : "text-gray-500"
+                  }`}
                 >
                   {tab}
                 </button>
@@ -312,7 +333,6 @@ const handlePublish = async (
             </div>
           </div>
 
-
           <div className="my-3 bg-white py-2 px-6 rounded-lg">
             <div className="flex space-x-2.5 bg-[#6A72821A] p-1 rounded-lg w-fit">
               {FILTER_TABS.map((tab) => (
@@ -322,20 +342,21 @@ const handlePublish = async (
                     setState((prev) => ({ ...prev, activeFilterTab: tab }));
                     setCurrentPage(1);
                   }}
-                  className={`px-4 py-2 rounded-md text-sm ${state.activeFilterTab === tab
-                    ? "font-bold bg-white"
-                    : "text-gray-500"
-                    }`}
+                  className={`px-4 py-2 rounded-md text-sm ${
+                    state.activeFilterTab === tab
+                      ? "font-bold bg-white"
+                      : "text-gray-500"
+                  }`}
                 >
                   {tab}
                 </button>
               ))}
             </div>
           </div>
-
         </section>
-        {(loading) ? <Loading /> :
-
+        {loading ? (
+          <Loading />
+        ) : (
           <div className="flex-1 overflow-y-auto space-y-4 pr-2">
             {data.length > 0 ? (
               data.map((story) => (
@@ -346,11 +367,12 @@ const handlePublish = async (
                   handleViewStory={handleViewStory}
                   handlePublishNow={handlePublishNow}
                   handleSchedulePublish={handleSchedulePublish}
-                  handleCancel={(id) =>
+                  handleCancel={(id, platforms) =>
                     setState((p) => ({
                       ...p,
                       cancelPopup: !p.cancelPopup,
                       cancelPopId: id,
+                      cancelPlatforms: platforms || [],
                     }))
                   }
                 />
@@ -365,13 +387,13 @@ const handlePublish = async (
                   {state.activeTab === "Ready to Publish"
                     ? "Articles approved for publication will appear here."
                     : state.activeTab === "Scheduled"
-                      ? "Scheduled articles will appear here."
-                      : "Published articles will appear here."}
+                    ? "Scheduled articles will appear here."
+                    : "Published articles will appear here."}
                 </p>
               </div>
             )}
           </div>
-        }
+        )}
       </main>
 
       {/* === PAGINATION SECTION === */}

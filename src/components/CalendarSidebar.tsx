@@ -5,6 +5,7 @@ import { useState } from "react";
 import { stripHTML, type TransformedItem } from "@/utils/PublishCenter";
 import moment from "moment";
 import { useNavigate } from "react-router";
+import { ScheduledPlatformsUI } from "./ui/PublisCenterUI";
 
 interface CalendarSidebarProps {
   onConfirmdelete: (id: string) => void;
@@ -62,7 +63,7 @@ const Article = ({ event, onConfirmDelete }: ArticleCardProps) => {
   const navigate = useNavigate();
 
   const handleViewStory = () => {
-    navigate(`/editor/viewcontent/${event.id.toString()}?from=calendar`, {
+    navigate(`/editor/viewcontent/${event.id.split('-')[0].toString()}?from=calendar`, {
       state: { articletype: event.type, editable: true },
     });
   };
@@ -70,21 +71,25 @@ const Article = ({ event, onConfirmDelete }: ArticleCardProps) => {
     <div className="bg-[#F3FFF3] flex flex-col p-4 gap-4 rounded-2xl">
       <h1 className="text-[16px] font-semibold line-clamp-1">{event.title}</h1>
       {RETURN_CONTENT(event)}
-      <div className="flex h-[34px] gap-4 text-[14px]">
+      <div className="mb-4">
+        <ScheduledPlatformsUI scheduledArr={event.scheduledPosts} columns={2} />
+      </div>
+
+      <div className="flex h-[34px] gap-4 text-[14px] justify-end">
         <Button
           onClick={handleViewStory}
           className="h-full hover:bg-[#FFFFFF] px-4 py-1.5 border border-[#008001] bg-[#FFFFFF] text-[#008001]"
         >
           View Article
         </Button>
-        {event.status !== "POSTED" && (
+        {/* {event.status !== "POSTED" && (
           <Button
             onClick={onConfirmDelete}
             className="h-full bg-[#FFFFFF] hover:bg-[#FFFFFF] border border-[#1E2939] text-[#1E2939]"
           >
             <X /> <span>Cancel Schedule</span>
           </Button>
-        )}
+        )} */}
       </div>
     </div>
   );

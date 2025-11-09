@@ -105,12 +105,20 @@ export const FILTER_OPTIONS = Object.freeze({
     { value: "guna", label: "Guna" },
     { value: "hari", label: "Hari" },
   ],
+  //   DRAFT
+  // SUBMITTED
+  // REVIEWED
+  // REVERTED
+  // PUBLISHED
+  // SCHEDULED
+  // POSTED
   STATUS: [
     { value: "all", label: "All Status" },
-    { value: "approved", label: "Approved" },
-    { value: "rejected", label: "Rejected" },
-    { value: "in-review", label: "In Review" },
-    { value: "published", label: "Published" },
+    { value: "REVIEWED", label: "Reviewed" },
+    { value: "REVERTED", label: "Reverted" },
+    { value: "SCHEDULED", label: "Scheduled" },
+    { value: "POSTED", label: "Posted" },
+    { value: "SUBMITTED", label: "Submitted" },
   ],
   DATE_RANGE: [
     { value: "all", label: "All Dates" },

@@ -37,6 +37,7 @@ import { toast, Toaster } from "sonner";
 import type { AxiosError } from "axios";
 import EditorRemarks from "@/components/EditorRemarks";
 import { cn } from "@/components/ui/utils";
+import { transformPlatformsToScheduledPosts } from "../Reporter/utils";
 
 interface ContentForm {
   content: string;
@@ -71,6 +72,7 @@ const ViewContent: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
   const [saveDraftPopup, setSaveDraftPopup] = useState(false);
+  const [cancelPlatforms, setCancelPlatforms] = useState<string[]>([]);
   const [show, setShow] = useState({
     success: false,
     remarks: false,
@@ -173,6 +175,10 @@ const ViewContent: React.FC = () => {
     );
   };
 
+  const handleBack = () => {
+    navigate(-1);
+  };
+
   const onSubmit = async (data: ContentForm) => {
     const currentValues = methods.getValues();
     const defaultValues = methods.formState.defaultValues;
@@ -200,14 +206,11 @@ const ViewContent: React.FC = () => {
     await PATCH(URL, data);
     await fetch();
     setShowEnableEdit((p) => !p);
+    handleBack();
     setEnableEdit((p) => !p);
   };
 
   // const handleEdit = async();
-
-  const handleBack = () => {
-    navigate(-1);
-  };
 
   const handleMoveToPublish = async (id: string | number) => {
     console.log("Move to publish content with ID:", id);
@@ -252,13 +255,12 @@ const ViewContent: React.FC = () => {
   // };
 
   const handleAPI = async () => {
-    handleCancelAPI(id as string);
+    handleCancelAPI(id as string, cancelPlatforms);
     setShowEditPopup((prev) => !prev);
     handleBack();
   };
 
   const audioVal = watch("audio");
-  // const videoVal = watch("video");
 
   const handlePublishNowClick = () => {
     setShowPublishCard(!showPublishCard);
@@ -268,36 +270,29 @@ const ViewContent: React.FC = () => {
     setShowPublishCard(false);
   };
 
-  const handlePublishCardPublish = (selectedPlatforms: string[]) => {
-    // handlePublishNow(story.id, selectedPlatforms);
-    console.log("Publishing to platforms:", selectedPlatforms);
-    setShowPublishCard(false);
-  };
-
   const handlePublish = async (
     platforms: { platformName: string; date: string; time: string }[],
     isEdit: boolean
   ) => {
     const controller = new AbortController();
+    const payloadData = transformPlatformsToScheduledPosts(platforms);
     try {
       setLoading(true);
       const payload = {
         id: contentData?.id,
-        platforms, // ✅ full platform list with date & time per platform
+        scheduledPosts: payloadData,
       };
       const url = API_LIST.BASE_URL + API_LIST.SCHEDULED_POST;
       if (isEdit) {
-        await PUT(
-          url,
-          payload,
-          { signal: controller.signal }
-        );
+        const payloadData = payload.scheduledPosts.filter((a) => !a.isPosted);
+        const sppayload = {
+          id: contentData?.id,
+          scheduledPosts: payloadData,
+        };
+        const data = await PUT(url, sppayload, { signal: controller.signal });
+        console.log(data, "put");
       } else {
-        await POST(
-          url,
-          payload,
-          { signal: controller.signal }
-        );
+        await POST(url, payload, { signal: controller.signal });
       }
       console.log("Story scheduled successfully!");
     } catch (error: unknown) {
@@ -309,17 +304,69 @@ const ViewContent: React.FC = () => {
       }
     } finally {
       setLoading(false);
+      handleBack();
     }
+  };
+
+  const handlePublishNow = async (storyId: string, platforms: string[]) => {
+    const controller = new AbortController();
+    const now = new Date();
+    const formatDate = (d: Date) => d.toISOString().split("T")[0];
+
+    const formatTime = (d: Date) => {
+      const hours = String(d.getHours()).padStart(2, "0");
+      const minutes = String(d.getMinutes()).padStart(2, "0");
+      return `${hours}:${minutes}`;
+    };
+
+    const newPayload = platforms
+      .map((platform) => ({
+        platform: platform.toLowerCase(),
+        date: formatDate(now),
+        time: formatTime(now),
+        isPosted: false,
+      }))
+      .filter((a) => a.platform.toLowerCase() !== "all");
+
+    try {
+      setLoading(true);
+
+      const url = API_LIST.BASE_URL + API_LIST.SCHEDULED_POST;
+
+      await POST(
+        url,
+        {
+          id: storyId,
+          scheduledPosts: newPayload,
+        },
+        { signal: controller.signal }
+      );
+
+      console.log("Story published successfully!");
+    } catch (error: unknown) {
+      const err = error as AxiosError;
+      if (err.name === "AbortError") {
+        console.warn("Request aborted");
+      } else {
+        console.error("Error scheduling story:", error);
+      }
+    } finally {
+      setLoading(false);
+      handleBack();
+    }
+  };
+
+  const handlePublishCardPublish = (selectedPlatforms: string[]) => {
+    if (id) {
+      handlePublishNow(id, selectedPlatforms);
+    }
+    console.log("Publishing to platforms:", selectedPlatforms);
+    setShowPublishCard(false);
   };
 
   const handleCancel = () => {
     setShowEnableEdit((p) => !p);
     setEnableEdit((p) => !p);
-    // if (contentData?.type == "AUDIO") {
-    //   reset({
-    //     audio: contentData?.audioUrl,
-    //   });
-    // }
     reset(getValues());
   };
 
@@ -333,8 +380,13 @@ const ViewContent: React.FC = () => {
           text="Content Review"
           onClickBack={handleBack}
           showBackButton
+          story={contentData}
           showEdit={contentData?.status == "POSTED" ? false : showEnableEdit}
           handleEdit={handleEditToggle}
+          handleCancel={(id, platforms) => {
+            console.log(id)
+            setCancelPlatforms(platforms || []);
+          }}
           showCancelSchedule={
             contentData?.status == "POSTED" ? false : showEnableEdit
           }
@@ -436,7 +488,7 @@ const ViewContent: React.FC = () => {
 
                       <label
                         htmlFor="video-upload"
-                        className="inline-flex items-center gap-2 mt-6 bg-green-100 text-green-800 px-4 py-2 rounded-xl cursor-pointer hover:bg-green-200 transition"
+                        className="inline-flex items-center gap-2 mt-6 bg-green-100 text-green-800 px-4 py-2 rounded-lg cursor-pointer hover:bg-green-200 transition"
                       >
                         <Upload className="h-4 w-4" />
                         <span>Choose File</span>
@@ -506,43 +558,6 @@ const ViewContent: React.FC = () => {
                       )}
                     </div>
                   )}
-
-                  {/* {watch("video") && (
-                  <div className="border-2 w-full border-dashed border-[#B2E6B3] rounded-2xl text-end">
-                    {enableEdit && (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setValue("video", null, { shouldDirty: true })
-                        }
-                        className="bg-red-400 flex items-center gap-2 ml-auto mx-8 my-4 w-min text-white text-sm px-3 py-1 rounded-lg shadow hover:bg-red-500 transition"
-                      >
-                        <Trash size={12} /> Remove
-                      </button>
-                    )}
-
-                    {typeof watch("video") === "string" ? (
-                      <div className="py-2 w-full flex flex-col">
-                        <VideoUrlPlayer
-                          videoUrl={videoVal}
-                          thumbnailUrl={
-                            contentData?.thumbnailUrl as string | undefined
-                          }
-                        />
-                      </div>
-                    ) : (
-                      <div className="p-4 flex justify-center">
-                        <video
-                          src={URL.createObjectURL(watch("video") as File)}
-                          controls
-                          className="w-full max-w-3xl rounded-lg shadow"
-                        >
-                          Your browser does not support the video tag.
-                        </video>
-                      </div>
-                    )}
-                  </div>
-                )} */}
                 </>
               )}
 
@@ -578,8 +593,14 @@ const ViewContent: React.FC = () => {
                           {contentData?.title || ""}
                         </h1>
                         <div className="flex items-center mb-2 gap-3 ">
-                          <InfoBadge type="date" value={formatToIST(contentData?.updatedAt)} />
-                          <InfoBadge type="user" value={contentData?.reporter.username} />
+                          <InfoBadge
+                            type="date"
+                            value={formatToIST(contentData?.updatedAt)}
+                          />
+                          <InfoBadge
+                            type="user"
+                            value={contentData?.reporter.username}
+                          />
                         </div>
                       </div>
 
@@ -612,7 +633,7 @@ const ViewContent: React.FC = () => {
 
                       <label
                         htmlFor="audio-upload"
-                        className="inline-flex items-center gap-2 mt-6 bg-green-100 text-green-800 px-4 py-2 rounded-xl cursor-pointer hover:bg-green-200 transition"
+                        className="inline-flex items-center gap-2 mt-6 bg-green-100 text-green-800 px-4 py-2 rounded-lg cursor-pointer hover:bg-green-200 transition"
                       >
                         <Upload className="h-4 w-4" />
                         <span>Choose File</span>
@@ -790,7 +811,9 @@ const ViewContent: React.FC = () => {
                         <Button
                           type="button"
                           onClick={() => {
-                            contentData && handleMoveToPublish(contentData?.id);
+                            if (contentData) {
+                              handleMoveToPublish(contentData.id);
+                            }
                           }}
                           className="bg-[#008001] hover:bg-[#008001] text-white"
                         >
@@ -819,7 +842,7 @@ const ViewContent: React.FC = () => {
                         className="text-[14px] hover:bg-white hover:text-[#006601] w-28  text-[#006601]"
                         onClick={() => setScheduleModalOpen((p) => !p)}
                       >
-                        {contentData?.scheduledTime
+                        {contentData?.status == "SCHEDULED"
                           ? "Re Schedule"
                           : "Schedule"}
                       </Button>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { API_LIST } from "@/api/endpoints";
 import type { AxiosError } from "axios";
-import { GET } from "@/api/apiMethods";
+import { POST } from "@/api/apiMethods";
 
 interface CancelPostResponse {
   message: string;
@@ -13,14 +13,15 @@ export function useCancelEvent() {
   const [error, setError] = useState<string | null>(null);
 
   const handleCancelAPI = async (
-    id: string
+    id: string,
+    platfrom: string[]
   ): Promise<CancelPostResponse | null> => {
     const url = `${API_LIST.BASE_URL}${API_LIST.CANCEL_SCHEDULED_POST}/${id}`;
     setLoading(true);
     setError(null);
 
     try {
-      const response = await GET<CancelPostResponse>(url);
+      const response = await POST<CancelPostResponse>(url, platfrom);
       if (response.status === 200) {
         return response;
       } else {
