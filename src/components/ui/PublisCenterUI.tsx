@@ -76,6 +76,9 @@ export const ScheduledPlatformsUI: React.FC<ScheduledPlatformsUIProps> = ({
               </div>
             ))}
           </div>
+          {published.length > 0 && (
+            <span className="text-slate-400   ms-2">|</span>
+          )}
         </div>
       )}
 

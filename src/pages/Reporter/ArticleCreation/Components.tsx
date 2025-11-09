@@ -40,7 +40,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
         <p className="text-sm text-gray-500">
           Supports MP4, MOV, AVI (Max 1MB)
         </p>
-        <label className="inline-flex items-center gap-2 mt-6 bg-orange-700 text-white px-4 py-2 rounded-xl cursor-pointer">
+        <label className="inline-flex items-center gap-2 mt-6 bg-orange-700 text-white px-4 py-2 rounded-lg cursor-pointer">
           <Upload className="h-4 w-4" />
           <span>Choose File</span>
           <input
@@ -112,14 +112,14 @@ export const AudioContainer: React.FC<AudioContainerProps> = ({
     <div className="mt-6">
       {!audio ? (
         <div className="border-2 border-dashed border-[#B2E6B3] rounded-2xl p-10 text-center">
-          <div className="mx-auto w-16 h-16 rounded-full bg-purple-100 text-[#a32fff] flex items-center justify-center">
+          <div className="mx-auto w-16 h-16 rounded-full bg-purple-100 text-[#a32fff] bg-[linear-gradient(155.43deg,#F2E5FF_14.63%,#E2C7FD_82.69%)] flex items-center justify-center">
             <Mic className="h-6 w-6" />
           </div>
           <p className="mt-6 font-medium">Upload audio file</p>
           <p className="text-sm text-gray-500 mt-1">
             Supports MP3, WAV, M4A (Max 1MB)
           </p>
-          <label className="inline-flex items-center gap-2 mt-6 bg-green-100 text-green-800 px-4 py-2 rounded-xl cursor-pointer">
+          <label className="inline-flex items-center gap-2 mt-6 bg-green-100 text-green-800 px-4 py-2 rounded-lg cursor-pointer">
             <Upload className="h-4 w-4" />
             <span>Choose File</span>
             <input

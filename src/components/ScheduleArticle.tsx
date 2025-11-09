@@ -466,17 +466,17 @@ const ScheduleArticle = ({
 
             {/* Buttons */}
             <div className="flex w-full relative border-t border-white justify-end">
-              <div className="flex gap-6 p-4 bg-[#FFFFFF] shadow-[0px_2px_10px_0px_#0000001A,_0px_0px_2px_0px_#00000033] w-full justify-end rounded-b-2xl">
+              <div className="flex gap-6 p-4 bg-[#FFFFFF] shadow-[0px_2px_10px_0px_#0000001A,0px_0px_2px_0px_#00000033] w-full justify-end rounded-b-2xl">
                 <Button
                   type="button"
-                  className="border rounded-[8px] h-10 w-32 border-[#008001] text-[#008001] bg-[#fff] text-[14px] hover:bg-white"
+                  className="border rounded-[8px] h-10 w-32 border-[#008001] text-[#008001] bg-white text-[14px] hover:bg-white"
                   onClick={onCancel}
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
-                  className="border rounded-[8px] h-10 w-32 border-[#008001] text-[#fff] bg-[#008001] text-[14px] hover:bg-[#008001]"
+                  className="border rounded-[8px] h-10 w-32 border-[#008001] text-white bg-[#008001] text-[14px] hover:bg-[#008001]"
                 >
                   Schedule
                 </Button>

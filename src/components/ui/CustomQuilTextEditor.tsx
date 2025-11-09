@@ -48,9 +48,11 @@ const CustomQuilTextEditor: React.FC<CustomQuilTextEditorProps> = ({
           formats={formats}
           placeholder={placeholder}
           className={cn(
-            "overflow-y-auto",
+            "overflow-y-auto text-[14px]!",
             className,
-            !readOnly ? "h-56 bg-[#F7FBF7]" : "h-56 text-[#4A5565] no-toolbar bg-transparent"
+            !readOnly
+              ? "h-56 bg-[#F7FBF7]"
+              : "h-56 text-[#4A5565] no-toolbar bg-transparent"
           )}
           onChange={(_, __, ___, editor) => {
             const delta = editor.getHTML(); // Delta JSON

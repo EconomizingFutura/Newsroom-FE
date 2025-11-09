@@ -90,67 +90,67 @@ const EditArticle: React.FC = () => {
     content:
       path === "textArticle"
         ? yup.string().test("non-empty", "Content is required", (val) => {
-          // allow empty string early, treat "<p><br></p>" as empty too
-          if (!val) return false;
-          return val.replace(/<p><br><\/p>/g, "").trim().length > 0;
-        })
+            // allow empty string early, treat "<p><br></p>" as empty too
+            if (!val) return false;
+            return val.replace(/<p><br><\/p>/g, "").trim().length > 0;
+          })
         : yup.string().notRequired(),
     tags: yup.array().of(yup.string()).min(1, "At least one tag is required"),
     // audio: if audio page, require audio file or a valid URL string from API
     audio:
       path === "audio"
         ? yup
-          .mixed()
-          .test("present", "Audio is required", (value) => {
-            if (!value) return false;
-            return true;
-          })
-          .test("is-audio", "Unsupported audio type", (value: any) => {
-            if (!value) return false;
-            // if server returned URL string, assume valid
-            if (typeof value === "string") return true;
-            // if it's a File, check MIME
-            if (value instanceof File) {
-              const allowed = [
-                "audio/mpeg",
-                "audio/wav",
-                "audio/ogg",
-                "audio/x-m4a",
-                "audio/mp4",
-              ];
-              return allowed.includes(value.type);
-            }
-            return false;
-          })
-          .test("size", "Audio exceeds max size (100MB)", (value: any) => {
-            if (!value) return false;
-            if (typeof value === "string") return true;
-            if (value instanceof File) return value.size <= 100 * 1024 * 1024;
-            return false;
-          })
+            .mixed()
+            .test("present", "Audio is required", (value) => {
+              if (!value) return false;
+              return true;
+            })
+            .test("is-audio", "Unsupported audio type", (value: any) => {
+              if (!value) return false;
+              // if server returned URL string, assume valid
+              if (typeof value === "string") return true;
+              // if it's a File, check MIME
+              if (value instanceof File) {
+                const allowed = [
+                  "audio/mpeg",
+                  "audio/wav",
+                  "audio/ogg",
+                  "audio/x-m4a",
+                  "audio/mp4",
+                ];
+                return allowed.includes(value.type);
+              }
+              return false;
+            })
+            .test("size", "Audio exceeds max size (100MB)", (value: any) => {
+              if (!value) return false;
+              if (typeof value === "string") return true;
+              if (value instanceof File) return value.size <= 100 * 1024 * 1024;
+              return false;
+            })
         : yup.mixed().notRequired(),
     video:
       path === "video"
         ? yup
-          .mixed()
-          .test("present", "Video is required", (value) => {
-            if (!value) return false;
-            return true;
-          })
-          .test("is-video", "Unsupported video type", (value: any) => {
-            if (!value) return false;
-            if (typeof value === "string") return true;
-            if (value instanceof File) {
-              return value.type.startsWith("video/");
-            }
-            return false;
-          })
-          .test("size", "Video exceeds max size (500MB)", (value: any) => {
-            if (!value) return false;
-            if (typeof value === "string") return true;
-            if (value instanceof File) return value.size <= 500 * 1024 * 1024;
-            return false;
-          })
+            .mixed()
+            .test("present", "Video is required", (value) => {
+              if (!value) return false;
+              return true;
+            })
+            .test("is-video", "Unsupported video type", (value: any) => {
+              if (!value) return false;
+              if (typeof value === "string") return true;
+              if (value instanceof File) {
+                return value.type.startsWith("video/");
+              }
+              return false;
+            })
+            .test("size", "Video exceeds max size (500MB)", (value: any) => {
+              if (!value) return false;
+              if (typeof value === "string") return true;
+              if (value instanceof File) return value.size <= 500 * 1024 * 1024;
+              return false;
+            })
         : yup.mixed().notRequired(),
     status: yup.string().nullable(),
     thumbnail: yup.mixed<File | string>().nullable().notRequired(),
@@ -324,7 +324,6 @@ const EditArticle: React.FC = () => {
 
       // navigate("/drafts");
     } else if (status === "SUBMIT") {
-
       const API_DATA = {
         ...data,
         articleId: id,
@@ -396,7 +395,8 @@ const EditArticle: React.FC = () => {
                   })}
                   size="sm"
                   className={`bg-green-700 hover:bg-green-700 h-[40px] text-white gap-2 ${
-                    (!isValid || isSubmitting) && "opacity-50 cursor-not-allowed"
+                    (!isValid || isSubmitting) &&
+                    "opacity-50 cursor-not-allowed"
                   }`}
                 >
                   {isSubmitting ? (
@@ -418,7 +418,6 @@ const EditArticle: React.FC = () => {
               <div className="flex items-center py-2 justify-between ">
                 <h2 className="text-[20px] font-semibold">Content Editor</h2>
                 <div className="flex gap-2">
-
                   <Badge
                     className={`px-[16px] h-[30px] font-semibold py-[6px] text-[12px] ${HISTORY_STATUS(
                       getValues("status") || ""
@@ -499,7 +498,7 @@ const EditArticle: React.FC = () => {
                         <p className="text-sm text-gray-500 mt-1">
                           Supports MP3, WAV, M4A (Max 100MB)
                         </p>
-                        <label className="inline-flex items-center gap-2 mt-6 bg-green-100 text-green-800 px-4 py-2 rounded-xl cursor-pointer">
+                        <label className="inline-flex items-center gap-2 mt-6 bg-green-100 text-green-800 px-4 py-2 rounded-lg cursor-pointer">
                           <Upload className="h-4 w-4" />
                           <span>Choose File</span>
                           <input

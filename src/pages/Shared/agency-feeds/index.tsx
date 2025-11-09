@@ -19,7 +19,7 @@ const AgencyFeedsPage: React.FC = () => {
   }, [query]);
 
   return (
-    <main className="mx-auto w-full max-w-7xl px-4 py-6 md:py-10">
+    <main className="mx-auto w-full bg-[#F6FAF6] min-h-full  px-6 py-6 md:py-10">
       {/* Header */}
       <header className="mb-6 md:mb-10">
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
@@ -40,8 +40,7 @@ const AgencyFeedsPage: React.FC = () => {
             </Button>
           </div>
         </div>
-
-        <Card className="mt-4 border-border bg-secondary p-3 md:p-4">
+        <Card className="mt-4 border-border bg-[#ffffff] shadow-[0px_2px_10px_0px_#959DA533] p-3 md:p-4">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <p className="text-sm text-primary">
               Due to security policies, embedded sites may be blocked. Use the

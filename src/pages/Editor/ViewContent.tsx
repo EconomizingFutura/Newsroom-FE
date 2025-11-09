@@ -487,7 +487,7 @@ const ViewContent: React.FC = () => {
 
                       <label
                         htmlFor="video-upload"
-                        className="inline-flex items-center gap-2 mt-6 bg-green-100 text-green-800 px-4 py-2 rounded-xl cursor-pointer hover:bg-green-200 transition"
+                        className="inline-flex items-center gap-2 mt-6 bg-green-100 text-green-800 px-4 py-2 rounded-lg cursor-pointer hover:bg-green-200 transition"
                       >
                         <Upload className="h-4 w-4" />
                         <span>Choose File</span>
@@ -632,7 +632,7 @@ const ViewContent: React.FC = () => {
 
                       <label
                         htmlFor="audio-upload"
-                        className="inline-flex items-center gap-2 mt-6 bg-green-100 text-green-800 px-4 py-2 rounded-xl cursor-pointer hover:bg-green-200 transition"
+                        className="inline-flex items-center gap-2 mt-6 bg-green-100 text-green-800 px-4 py-2 rounded-lg cursor-pointer hover:bg-green-200 transition"
                       >
                         <Upload className="h-4 w-4" />
                         <span>Choose File</span>
