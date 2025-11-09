@@ -384,7 +384,8 @@ const ViewContent: React.FC = () => {
           showEdit={contentData?.status == "POSTED" ? false : showEnableEdit}
           handleEdit={handleEditToggle}
           handleCancel={(id, platforms) => {
-            setCancelPlatforms({ id, platforms });
+            console.log(id)
+            setCancelPlatforms(platforms || []);
           }}
           showCancelSchedule={
             contentData?.status == "POSTED" ? false : showEnableEdit
