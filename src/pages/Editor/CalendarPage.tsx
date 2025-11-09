@@ -328,6 +328,21 @@ const CalendarPage: React.FC = () => {
                 slotEventOverlap={true}
                 eventOrder="title"
                 dayCellClassNames={() => "px-1 py-2"}
+                moreLinkContent={(arg) => {
+                  return {
+                    html: `
+        <span style="
+          color: #076122;
+          font-weight: 600;
+          text-align: center;
+          display: inline-block;
+          width: 100%;
+        ">
+          +${arg.num} more
+        </span>
+      `,
+                  };
+                }}
               />
             </div>
           </div>
