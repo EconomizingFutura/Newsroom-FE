@@ -264,6 +264,7 @@ export function PublishCenter() {
       setState((p) => ({
         ...p,
         id: "",
+        scheduleModalOpen: false,
       }));
     }
   };

@@ -94,7 +94,7 @@ const CustomQuilTextEditor: React.FC<CustomQuilTextEditorProps> = ({
           formats={formats}
           placeholder={placeholder}
           className={cn(
-            "h-full",
+            "h-full !text-[14px]",
             className,
             !readOnly
               ? "bg-[#F7FBF7]"

@@ -43,7 +43,7 @@ export const AgencyCard: React.FC<AgencyCardProps> = ({
           "relative overflow-hidden rounded-xl p-3 transition-all",
           "border-muted/60 bg-background",
           // hover/active
-          "hover:shadow-md hover:shadow-emerald-100/60 hover:-translate-y-0.5",
+          "hover:shadow-md  hover:shadow-emerald-100/60 hover:-translate-y-0.5",
           "active:scale-[0.99]",
           // focus ring
           "focus-visible:ring-2 focus-visible:ring-emerald-500"
@@ -73,10 +73,10 @@ export const AgencyCard: React.FC<AgencyCardProps> = ({
           </div>
 
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium leading-6">
+            <p className="truncate !hover:text-black text-sm font-medium leading-6">
               {agency.name}
             </p>
-            <p className="truncate text-[11px]">
+            <p className="truncate !hover:text-black text-[11px]">
               {agency.domain}
             </p>
           </div>

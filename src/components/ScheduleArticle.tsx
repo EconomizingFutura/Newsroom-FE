@@ -1,6 +1,6 @@
 import { Clock, X } from "lucide-react";
 import { useForm, Controller } from "react-hook-form";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useMemo } from "react";
 import { Button } from "./ui/button";
 import { cn } from "./ui/utils";
 import { DatePickerComponent, PlatformIcon } from "@/utils/calendarUtils";
@@ -57,9 +57,8 @@ const ScheduleArticle = ({
   });
   const [hovered, setHovered] = useState(false);
 
-
   const [platformSchedules, setPlatformSchedules] = useState<
-    Record<string, { date?: Date; time?: string } | null>
+    Record<string, { date?: Date; time?: string; isPosted?: boolean } | null>
   >({
     "All Platform": null,
     Web: null,
@@ -68,35 +67,88 @@ const ScheduleArticle = ({
     Facebook: null,
   });
 
+  console.log(contentData, "cddata");
+
   useEffect(() => {
-    if (contentData) {
-      const initialDate = contentData.scheduledDate
-        ? new Date(contentData.scheduledDate)
-        : undefined;
-      const initialTime = contentData.scheduledTime || "";
+    if (!contentData?.scheduledPosts) return;
 
-      const updatedSchedules: Record<string, any> = {};
-      CONTENT_TABS.forEach((tab) => {
-        updatedSchedules[tab.name] = {
-          date: initialDate,
-          time: initialTime,
+    const posts = contentData.scheduledPosts;
+
+    // ✅ Convert date/time into Date objects where needed
+    const scheduleMap: Record<
+      string,
+      { date?: Date; time?: string; isPosted: boolean } | null
+    > = {
+      "All Platform": null,
+      Web: { date: undefined, time: "", isPosted: false },
+      Instagram: { date: undefined, time: "", isPosted: false },
+      Twitter: { date: undefined, time: "", isPosted: false },
+      Facebook: { date: undefined, time: "", isPosted: false },
+    };
+
+    posts.forEach((sp) => {
+      const platform = sp.platform.toLowerCase();
+
+      const mappedName =
+        platform === "instagram"
+          ? "Instagram"
+          : platform === "facebook"
+          ? "Facebook"
+          : platform === "twitter"
+          ? "Twitter"
+          : platform === "web"
+          ? "Web"
+          : null;
+
+      if (mappedName) {
+        scheduleMap[mappedName] = {
+          date: new Date(sp.date),
+          time: sp.time,
+          isPosted: sp.isPosted,
         };
-      });
+      }
+    });
 
-      reset({
-        time: initialTime,
-        date: initialDate,
-        primaryPlatform:
-          contentData.scheduledPlatforms.length === 1
-            ? contentData.scheduledPlatforms[0]
-            : "All Platform",
-        additionalPlatforms: contentData.scheduledPlatforms || [],
-        type: [],
-      });
+    // ✅ Detect if all 4 platforms exist & have the same schedule
+    const platforms = ["Web", "Instagram", "Twitter", "Facebook"];
 
-      setPlatformSchedules(updatedSchedules);
+    const allPlatformsPresent = platforms.every((p) => scheduleMap[p] !== null);
+
+    let sameDateTime = false;
+
+    if (allPlatformsPresent) {
+      const first = scheduleMap["Web"];
+      sameDateTime = platforms.every(
+        (p) =>
+          scheduleMap[p]?.date?.getTime() === first?.date?.getTime() &&
+          scheduleMap[p]?.time === first?.time
+      );
     }
-  }, []);
+
+    const primaryPlatform = sameDateTime
+      ? "All Platform"
+      : (() => {
+          const active =
+            posts.length === 1 ? posts[0].platform : posts[0].platform;
+          return active.charAt(0).toUpperCase() + active.slice(1);
+        })();
+
+    // ✅ Extract a default date/time (from Web OR the first one)
+    const fallback = posts[0];
+    const initialDate = fallback?.date ? new Date(fallback.date) : undefined;
+    const initialTime = fallback?.time ?? "";
+
+    // ✅ Pre-fill the form
+    reset({
+      date: initialDate,
+      time: initialTime,
+      primaryPlatform,
+      additionalPlatforms: posts.map((p) => p.platform),
+      type: [],
+    });
+
+    setPlatformSchedules(scheduleMap);
+  }, [contentData, reset]);
 
   const handlePrimaryPlatform = (newPlatform: string) => {
     const currentPlatform = getValues("primaryPlatform");
@@ -121,24 +173,23 @@ const ScheduleArticle = ({
       setValue("additionalPlatforms", []);
     }
 
-    // ✅ Load that platform’s previous schedule (if any)
     const current = platformSchedules[newPlatform];
     setValue("date", current?.date || undefined);
     setValue("time", current?.time || "");
   };
 
-const handleAllPlatformSchedule = (date: Date, time: string) => {
-  const updated = Object.fromEntries(
-    Object.keys(platformSchedules).map((p) => [
-      p,
-      p === "All Platform" ? { date, time } : { date, time },
-    ])
-  );
+  const handleAllPlatformSchedule = (date: Date, time: string) => {
+    const updated = Object.fromEntries(
+      Object.keys(platformSchedules).map((p) => [
+        p,
+        p === "All Platform" ? { date, time } : { date, time },
+      ])
+    );
 
-  setPlatformSchedules(updated);
-  setValue("date", date);
-  setValue("time", time);
-};
+    setPlatformSchedules(updated);
+    setValue("date", date);
+    setValue("time", time);
+  };
 
   const handleIndividualPlatformSchedule = (
     platform: string,
@@ -166,8 +217,6 @@ const handleAllPlatformSchedule = (date: Date, time: string) => {
     setValue("time", source.time);
   };
 
-
-
   const validateFutureDateTime = () => {
     const { date, time } = getValues();
     if (!date || !time) return "Date and time are required.";
@@ -180,52 +229,50 @@ const handleAllPlatformSchedule = (date: Date, time: string) => {
     if (selectedDateTime < now) return "Selected time cannot be in the past.";
     return true;
   };
-const onSubmit = async (data: PublishForm) => {
-  console.log(data)
-  const validationResult = validateFutureDateTime();
-  if (validationResult !== true) {
-    toast.error(validationResult);
-    return;
-  }
+  const onSubmit = async (data: PublishForm) => {
+    console.log(data);
+    const validationResult = validateFutureDateTime();
+    if (validationResult !== true) {
+      toast.error(validationResult);
+      return;
+    }
 
-  const currentPlatform = getValues("primaryPlatform");
-  const currentDate = getValues("date");
-  const currentTime = getValues("time");
+    const currentPlatform = getValues("primaryPlatform");
+    const currentDate = getValues("date");
+    const currentTime = getValues("time");
 
-  // ✅ Persist the current tab’s changes before submission
-  setPlatformSchedules((prev) => ({
-    ...prev,
-    [currentPlatform]: { date: currentDate, time: currentTime },
-  }));
-
-  // ✅ Build final payload using stored platformSchedules
-  const finalSchedules = Object.entries(platformSchedules)
-    .filter(([name, value]) => name !== "All Platform" && value?.date && value?.time)
-    .map(([platformName, value]) => ({
-      platformName,
-      date: value!.date!.toISOString().split("T")[0],
-      time: value!.time!,
+    setPlatformSchedules((prev) => ({
+      ...prev,
+      [currentPlatform]: { date: currentDate, time: currentTime },
     }));
 
-  // ✅ If “All Platform” is selected, override everything
-  if (currentPlatform === "All Platform" && currentDate && currentTime) {
-    const allPayload = CONTENT_TABS.slice(1).map((tab) => ({
-      platformName: tab.name,
-      date: currentDate.toISOString().split("T")[0],
-      time: currentTime,
-    }));
-    console.log("📦 Final Payload (All Platforms):", allPayload);
-    handlePublish(allPayload, Boolean(contentData?.scheduledTime));
-    toast.success("Scheduled for all platforms!");
-    onCancel();
-    return;
-  }
+    const finalSchedules = Object.entries(platformSchedules)
+      .filter(
+        ([name, value]) => name !== "All Platform" && value?.date && value?.time
+      )
+      .map(([platformName, value]) => ({
+        platformName,
+        date: value!.date!.toISOString().split("T")[0],
+        time: value!.time!,
+      }));
 
-  console.log("📦 Final Payload:", finalSchedules);
-  handlePublish(finalSchedules, Boolean(contentData?.scheduledTime));
-  toast.success("Schedule updated successfully!");
- // onCancel();
-};
+    if (currentPlatform === "All Platform" && currentDate && currentTime) {
+      const allPayload = CONTENT_TABS.slice(1).map((tab) => ({
+        platformName: tab.name,
+        date: currentDate.toISOString().split("T")[0],
+        time: currentTime,
+      }));
+      handlePublish(allPayload, contentData?.status == "SCHEDULED");
+      toast.success("Scheduled for all platforms!");
+      onCancel();
+      return;
+    }
+
+    console.log("📦 Final Payload:", finalSchedules);
+    handlePublish(finalSchedules, contentData?.status == "SCHEDULED");
+    toast.success("Schedule updated successfully!");
+    // onCancel();
+  };
 
   const primaryPlatform = watch("primaryPlatform");
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -251,8 +298,12 @@ const onSubmit = async (data: PublishForm) => {
   };
 
   const hasAnyPlatformScheduled = Object.entries(platformSchedules).some(
-    ([name, val]) =>
-      name !== primaryPlatform && val?.date && val?.time
+    ([name, val]) => name !== primaryPlatform && val?.date && val?.time
+  );
+
+  const currentIsPosted = useMemo(
+    () => platformSchedules[primaryPlatform]?.isPosted === true,
+    [platformSchedules, primaryPlatform]
   );
 
   return (
@@ -277,11 +328,17 @@ const onSubmit = async (data: PublishForm) => {
                     <button
                       type="button"
                       key={tab.name}
-                      onClick={() => handlePrimaryPlatform(tab.name)}
-                      className={`px-4 py-2 rounded-md text-sm text-[14px]  transition-all flex items-center space-x-2 ${primaryPlatform === tab.name
-                        ? "bg-white text-[#1E2939] font-bold"
-                        : "text-gray-500 hover:text-gray-700 font-medium"
-                        }`}
+                      onClick={() => {
+                        const p = platformSchedules[tab.name];
+                        if (!p?.isPosted) handlePrimaryPlatform(tab.name);
+                      }}
+                      className={cn(
+                        `px-4 py-2 rounded-md text-sm text-[14px]  transition-all flex items-center space-x-2 ${
+                          primaryPlatform === tab.name
+                            ? "bg-white text-[#1E2939] font-bold"
+                            : "text-gray-500 hover:text-gray-700 font-medium"
+                        }`
+                      )}
                     >
                       <span>{tab.name}</span>
                     </button>
@@ -348,7 +405,11 @@ const onSubmit = async (data: PublishForm) => {
                       onChange={(e) => handleTimeChange(e.target.value)}
                       value={getValues("time")}
                       placeholder="00:00"
-                      className="bg-transparent outline-none w-full [&::-webkit-calendar-picker-indicator]:opacity-0"
+                      disabled={currentIsPosted}
+                      className={cn(
+                        "bg-transparent outline-none w-full [&::-webkit-calendar-picker-indicator]:opacity-0",
+                        currentIsPosted && "cursor-not-allowed "
+                      )}
                     />
                     <Clock className="h-5" />
                   </div>
@@ -361,54 +422,61 @@ const onSubmit = async (data: PublishForm) => {
               </div>
               <div className="min-h-24">
                 {/* Same As Section */}
-                {primaryPlatform !== "All Platform" && hasAnyPlatformScheduled && (
-                  <>
-                    <p className="text-[12px] pb-2 font-semibold text-[#6A7282]">
-                      Same as:
-                    </p>
-                    <div className="flex gap-4 flex-wrap">
-                      {Object.entries(platformSchedules)
-                        .filter(
-                          ([name, val]) =>
-                            name !== primaryPlatform &&
-                            name !== "All Platform" &&
-                            val?.date &&
-                            val?.time
-                        )
-                        .map(([name]) => (
-                          <div
-                            key={name}
-                            onMouseEnter={() => setHovered(true)}
-                            onMouseLeave={() => setHovered(false)}
-                            onClick={() => handleSameAs(primaryPlatform, name)}
-                            className="flex items-center bg-[#F0F1F2] text-[#6A7282] w-max py-2 px-3 rounded-[8px] space-x-2 cursor-pointer hover:bg-[#008001] hover:text-white"
-                          >
-                            <PlatformIcon name={name} color={!hovered ? "#2C3E50" : "#ffffff"} />
+                {primaryPlatform !== "All Platform" &&
+                  hasAnyPlatformScheduled && (
+                    <>
+                      <p className="text-[12px] pb-2 font-semibold text-[#6A7282]">
+                        Same as:
+                      </p>
+                      <div className="flex gap-4 flex-wrap">
+                        {Object.entries(platformSchedules)
+                          .filter(
+                            ([name, val]) =>
+                              name !== primaryPlatform &&
+                              name !== "All Platform" &&
+                              val?.date &&
+                              val?.time &&
+                              !val.isPosted
+                          )
+                          .map(([name]) => (
+                            <div
+                              key={name}
+                              onMouseEnter={() => setHovered(true)}
+                              onMouseLeave={() => setHovered(false)}
+                              onClick={() =>
+                                handleSameAs(primaryPlatform, name)
+                              }
+                              className="flex items-center bg-[#F0F1F2] text-[#6A7282] w-max py-2 px-3 rounded-[8px] space-x-2 cursor-pointer hover:bg-[#008001] hover:text-white"
+                            >
+                              <PlatformIcon
+                                name={name}
+                                color={!hovered ? "#2C3E50" : "#ffffff"}
+                              />
 
-                            <p className="font-semibold  text-[14px]">{name}</p>
-                          </div>
-                        ))}
-                    </div>
-                  </>
-                )}
-
+                              <p className="font-semibold  text-[14px]">
+                                {name}
+                              </p>
+                            </div>
+                          ))}
+                      </div>
+                    </>
+                  )}
               </div>
-
             </div>
 
             {/* Buttons */}
             <div className="flex w-full relative border-t border-white justify-end">
-              <div className="flex gap-6 p-4 bg-[#FFFFFF] shadow-[0px_2px_10px_0px_#0000001A,_0px_0px_2px_0px_#00000033] w-full justify-end rounded-b-2xl">
+              <div className="flex gap-6 p-4 bg-[#FFFFFF] shadow-[0px_2px_10px_0px_#0000001A,0px_0px_2px_0px_#00000033] w-full justify-end rounded-b-2xl">
                 <Button
                   type="button"
-                  className="border rounded-[8px] h-10 w-32 border-[#008001] text-[#008001] bg-[#fff] text-[14px] hover:bg-white"
+                  className="border rounded-[8px] h-10 w-32 border-[#008001] text-[#008001] bg-white text-[14px] hover:bg-white"
                   onClick={onCancel}
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
-                  className="border rounded-[8px] h-10 w-32 border-[#008001] text-[#fff] bg-[#008001] text-[14px] hover:bg-[#008001]"
+                  className="border rounded-[8px] h-10 w-32 border-[#008001] text-white bg-[#008001] text-[14px] hover:bg-[#008001]"
                 >
                   Schedule
                 </Button>

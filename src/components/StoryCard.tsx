@@ -57,20 +57,20 @@ const StoryCard: React.FC<StoryCardProps> = ({
   const handlePublishCardClose = () => setShowPublishCard(false);
 
   // ------------------ Schedule Card ------------------
-  const handleScheduleClick = () => {
-    if (scheduleButtonRef.current) {
-      setScheduleButtonRect(scheduleButtonRef.current.getBoundingClientRect());
-    }
-    setShowScheduleCard((prev) => !prev);
-    setShowPublishCard(false); // close publish if open
-  };
+  // const handleScheduleClick = () => {
+  //   if (scheduleButtonRef.current) {
+  //     setScheduleButtonRect(scheduleButtonRef.current.getBoundingClientRect());
+  //   }
+  //   setShowScheduleCard((prev) => !prev);
+  //   setShowPublishCard(false); // close publish if open
+  // };
 
-  const handleScheduleCardPublish = (selectedPlatforms: string[]) => {
-    handleSchedulePublish(story);
-    setShowScheduleCard(false);
-  };
+  // const handleScheduleCardPublish = (selectedPlatforms: string[]) => {
+  //   handleSchedulePublish(story);
+  //   setShowScheduleCard(false);
+  // };
 
-  const handleScheduleCardClose = () => setShowScheduleCard(false);
+  // const handleScheduleCardClose = () => setShowScheduleCard(false);
 
   // ------------------ Common Position Updates ------------------
   const updatePosition = () => {
@@ -120,6 +120,23 @@ const StoryCard: React.FC<StoryCardProps> = ({
     };
   }, [showPublishCard, showScheduleCard]);
 
+  useEffect(() => {
+    if (!showPublishCard) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        publishCardRef.current &&
+        !publishCardRef.current.contains(event.target as Node)
+      ) {
+        handlePublishCardClose();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showPublishCard]);
+
   // ------------------ Render ------------------
   return (
     <div
@@ -148,7 +165,6 @@ const StoryCard: React.FC<StoryCardProps> = ({
 
       <div className="mb-4">
         <ScheduledPlatformsUI scheduledArr={story.scheduledPosts} columns={4} />
-
       </div>
 
       {/* Actions */}
