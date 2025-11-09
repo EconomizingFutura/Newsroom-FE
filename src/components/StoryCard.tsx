@@ -148,7 +148,6 @@ const StoryCard: React.FC<StoryCardProps> = ({
 
       <div className="mb-4">
         <ScheduledPlatformsUI scheduledArr={story.scheduledPosts} columns={4} />
-
       </div>
 
       {/* Actions */}

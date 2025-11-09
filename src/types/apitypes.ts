@@ -9,7 +9,7 @@ export type contentResponse = {
   title: string;
   content: string;
   type: "TEXT" | "VIDEO" | "AUDIO";
-  status: "SUBMITTED" | "POSTED";
+  status: "SUBMITTED" | "POSTED" | "SCHEDULED";
   remarks: string | null;
   audio: string | File | null;
   audioUrl?: string | File | null;
@@ -19,10 +19,7 @@ export type contentResponse = {
   tags: string[];
   createdAt: string;
   updatedAt: string;
-  reporterId: string;
-  scheduledDate: Date | null;
-  scheduledTime: string | null;
-  scheduledPlatforms: string[];
+  scheduledPosts: scheduledPostArray[];
   reporter: {
     id: string;
     username: string;
