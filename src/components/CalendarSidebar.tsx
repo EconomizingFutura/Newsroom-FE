@@ -59,7 +59,7 @@ const RETURN_CONTENT = (event: TransformedItem) => {
   }
 };
 
-const Article = ({ event, onConfirmDelete }: ArticleCardProps) => {
+const Article = ({ event }: ArticleCardProps) => {
   const navigate = useNavigate();
 
   const handleViewStory = () => {

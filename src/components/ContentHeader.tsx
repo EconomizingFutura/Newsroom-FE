@@ -5,7 +5,6 @@ import { HeaderIcon, type HeaderKey } from "@/utils/HeaderIcons";
 import { cn } from "./ui/utils";
 import { createPortal } from "react-dom";
 import { SchedulePlatformCard } from "./TextEditor/SchedulePlatformCard";
-import type { scheduledPost } from "@/types/apitypes";
 
 interface ContentHeaderProps {
   text: string;
