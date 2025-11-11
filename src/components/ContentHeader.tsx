@@ -43,10 +43,8 @@ const ContentHeader: React.FC<ContentHeaderProps> = ({
   showCancelSchedule,
   handleEditPopup,
   handleCancel,
-  story
-
+  story,
 }) => {
-
   const [showScheduleCard, setShowScheduleCard] = useState(false);
   const scheduleCardRef = useRef<HTMLDivElement>(null);
   const scheduleButtonRef = useRef<HTMLButtonElement>(null);
@@ -151,13 +149,13 @@ const ContentHeader: React.FC<ContentHeaderProps> = ({
                   }
                   setShowScheduleCard(true);
                 }}
-
                 className="text-[#1E2939] cursor-pointer hover:text-[#1E2939]  border-[#1E2939] hover:bg-[#F8FAF9]"
               >
                 <X color="#1E2939" className="w-4 h-4 mr-2" />
                 Cancel Schedule
               </Button>
-              {showScheduleCard && story &&
+              {showScheduleCard &&
+                story &&
                 createPortal(
                   <div
                     ref={scheduleCardRef}
@@ -182,7 +180,6 @@ const ContentHeader: React.FC<ContentHeaderProps> = ({
                   document.body
                 )}
             </div>
-
           )}
         </div>
       )}

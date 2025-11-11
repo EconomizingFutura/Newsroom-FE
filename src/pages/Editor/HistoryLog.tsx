@@ -82,7 +82,6 @@ export function HistoryLog() {
   console.log("⌨️ filters.search:", filters.search);
   console.log("🕓 debouncedSearch:", debouncedSearch);
 
-
   const updateFilter = <K extends keyof typeof filters>(
     key: K,
     value: (typeof filters)[K]
@@ -138,8 +137,6 @@ export function HistoryLog() {
     });
   };
 
-
-
   useEffect(() => {
     const controller = new AbortController();
 
@@ -170,7 +167,11 @@ export function HistoryLog() {
           payload.search = debouncedSearch.trim();
         }
 
-        console.log("📡 POST API triggered with search:", debouncedSearch, payload);
+        console.log(
+          "📡 POST API triggered with search:",
+          debouncedSearch,
+          payload
+        );
 
         // 🟢 Call POST API with AbortSignal
         const response: HistoryResponse = await POST(
@@ -204,7 +205,7 @@ export function HistoryLog() {
 
     return () => controller.abort();
   }, [
-    debouncedSearch,            // ✅ only triggers when debounce completes
+    debouncedSearch, // ✅ only triggers when debounce completes
     filters.statuses,
     filters.categories,
     filters.authors,
@@ -255,7 +256,6 @@ export function HistoryLog() {
 
   const totalPages = pageMetaData?.totalPages >= 1;
 
-
   const isEmpty = !loading && paginatedArticles.length === 0;
 
   const PAGINATION = useMemo(() => {
@@ -280,13 +280,7 @@ export function HistoryLog() {
       );
     }
     return null;
-  }, [
-    totalPages,
-    currentPage,
-    pageMetaData.totalPages,
-  ]);
-
-
+  }, [totalPages, currentPage, pageMetaData.totalPages]);
 
   return (
     <div className="min-h-screen flex flex-col pt-16 bg-[#F6FAF6]">
@@ -339,7 +333,9 @@ export function HistoryLog() {
                           }
                         >
                           <Checkbox
-                            className="data-[state=checked]:!bg-green-500 data-[state=checked]:!border-green-500"
+                            className="data-[state=checked]:!bg-[#008001]
+    data-[state=checked]:!border-[#008001]
+    data-[state=checked]:!text-white"
                             checked={filters.categories.includes(option.value)}
                           />
                           {option.label}
@@ -364,7 +360,9 @@ export function HistoryLog() {
                           }
                         >
                           <Checkbox
-                            className="data-[state=checked]:!bg-green-500 data-[state=checked]:!border-green-500"
+                            className="   data-[state=checked]:!bg-[#008001]
+    data-[state=checked]:!border-[#008001]
+    data-[state=checked]:!text-white"
                             checked={filters.authors.includes(option.id)}
                           />
                           {option.username}
@@ -389,7 +387,9 @@ export function HistoryLog() {
                           }
                         >
                           <Checkbox
-                            className="data-[state=checked]:!bg-green-500 data-[state=checked]:!border-green-500"
+                            className="   data-[state=checked]:!bg-[#008001]
+    data-[state=checked]:!border-[#008001]
+    data-[state=checked]:!text-white"
                             checked={filters.statuses.includes(option.value)}
                           />
                           {option.label}
@@ -441,7 +441,11 @@ export function HistoryLog() {
                     </thead>
                     <tbody className="divide-y divide-gray-200 mx-2">
                       {paginatedArticles.map((article) => (
-                        <tr key={article.id} className="hover:bg-gray-50 mx-2">
+                        <tr
+                          onClick={() => handleViewStory(article.id.toString())}
+                          key={article.id}
+                          className="hover:bg-gray-50 mx-2"
+                        >
                           <td className="py-4 px-4 max-w-[250px]">
                             {" "}
                             <div
@@ -466,8 +470,8 @@ export function HistoryLog() {
                                 article.status
                               )}`}
                             >
-                              <span className=" font-semibold text-[14px]">
-                                {article.status}
+                              <span className=" font-semibold first-letter:uppercase text-[14px]">
+                                {article.status.toLowerCase()}
                               </span>
                             </Badge>
                           </td>
@@ -499,7 +503,9 @@ export function HistoryLog() {
                               variant="ghost"
                               size="sm"
                               className="text-gray-600 border border-[#4F668133] h-8 w-8 hover:text-gray-900"
-                              onClick={() => handleViewStory(article.id.toString())}
+                              onClick={() =>
+                                handleViewStory(article.id.toString())
+                              }
                             >
                               <Eye className="w-4 h-4" />
                             </Button>
@@ -526,7 +532,6 @@ export function HistoryLog() {
         </>
       </main>
       {PAGINATION}
-
 
       {/* {!loading && totalPages && (
         <div className="sticky bottom-0 bg-gray-50 border-t py-5 z-20">

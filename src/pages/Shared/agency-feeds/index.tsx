@@ -33,7 +33,7 @@ const AgencyFeedsPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center hidden gap-2">
             <Button variant="outline" className="gap-2 bg-transparent">
               <Sparkles className="h-4 w-4 text-primary" />
               Suggested

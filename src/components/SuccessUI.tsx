@@ -24,11 +24,15 @@ const SuccessUI: React.FC<SuccessUIProps> = ({ onCancel, label }) => {
         <button className=" bg-white rounded-full p-1" onClick={onCancel}>
           <X size={20} />
         </button>
-        <div className="bg-white rounded-2xl flex flex-col items-center shadow-lg p-6  max-h-80 h-full w-96 text-center">
-          <div className='w-40 pb-[10px]'>
-            <Lottie animationData={Success} loop={true} />
+        <div className="bg-white rounded-2xl flex flex-col items-center shadow-lg py-6 px-12 gap-8 min-h-80 h-full w-96 text-center">
+          <div className="max-h-40 max-w-40 h-full w-full">
+            <Lottie
+              className="max-h-40 max-w-40"
+              animationData={Success}
+              loop={true}
+            />
           </div>
-          <div className="flex w-full text-[#03101F] justify-center gap-4 text-[18px]">
+          <div className="flex w-full text-[#03101F] justify-center font-semibolds gap-4 text-[18px]">
             {wordings}
           </div>
         </div>

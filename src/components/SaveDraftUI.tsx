@@ -10,13 +10,13 @@ interface SaveDraftUIProps {
 const SaveDraftsUI: React.FC<SaveDraftUIProps> = ({ onCancel, saveType }) => {
   const wordings =
     saveType == "DRAFT"
-      ? "Successfully Article Stored in the Draft  !"
-      : "Successfully Article Submit for the review  !";
+      ? "The article has been successfully saved as a draft."
+      : "The article has been successfully submitted for review.";
   const SCHEDULEDTYPE =
     saveType == "SCHEDULE"
-      ? "Successfully Article Scheduled!"
+      ? "The article has been successfully scheduled."
       : saveType
-      ? "Successfully Article Scheduled!"
+      ? "The article has been successfully saved."
       : wordings;
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -32,14 +32,14 @@ const SaveDraftsUI: React.FC<SaveDraftUIProps> = ({ onCancel, saveType }) => {
         <button className=" bg-white rounded-full p-1" onClick={onCancel}>
           <X size={20} />
         </button>
-        <div className="bg-white rounded-2xl flex flex-col items-center shadow-lg p-6 max-h-80 h-full w-96 text-center">
+        <div className="bg-white rounded-2xl flex gap-8 flex-col items-center shadow-lg py-8 px-12 min-h-80 h-full w-96 text-center">
           <img
             src={Success}
             alt="delete"
-            className="max-h-48 max-w-48 h-full w-full"
+            className="max-h-40 max-w-40 h-full w-full"
           />
 
-          <div className="flex w-full text-[#03101F] font-semibold justify-center gap-4 text-xl">
+          <div className="flex w-full text-[#03101F] font-semibold justify-center text-[18px]">
             {SCHEDULEDTYPE}
           </div>
         </div>

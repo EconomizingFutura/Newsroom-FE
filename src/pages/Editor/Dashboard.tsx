@@ -1,5 +1,5 @@
 import StoryCard, { StatCard } from "@/components/ui/card";
-import {  SquareChartGantt } from "lucide-react";
+import { SquareChartGantt } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import { useEditorReviewArticle } from "@/hooks/useEditorReviewArticle";
@@ -61,8 +61,12 @@ export function Dashboard() {
         className="flex flex-col gap-[24px] px-[24px] bg-[#F6FAF6]"
       >
         <div className="flex flex-col gap-3">
-          <h1 className="text-[#101828] font-bold text-[24px]">{`Welcome back, ${USERNAME ?? "Editor"}!`}</h1>
-          <p className="text-[#4A5565] leading-5 tracking-wide font-medium text-[14px]">Here's what's happening in your newsroom today.</p>
+          <h1 className="text-[#101828] font-bold text-[24px]">{`Welcome back, ${
+            USERNAME ?? "Editor"
+          }!`}</h1>
+          <p className="text-[#4A5565] leading-5 tracking-wide font-medium text-[14px]">
+            Here's what's happening in your newsroom today.
+          </p>
         </div>
         <div className="flex flex-col sm:flex-row flex-1 w-full sm:flex-wrap gap-6 mb-1">
           {stats.map((stat, index) => (
@@ -102,7 +106,8 @@ export function Dashboard() {
                   {pendingStories.map((story) => (
                     <div
                       key={story.id}
-                      className=" w-full hover:bg-gray-50 transition-colors"
+                      onClick={() => handleNavigate(story.id.toString())}
+                      className=" w-full bg-[#F3FFF3] hover:bg-[#F3FFF3] "
                     >
                       <StoryCard
                         title={story.title}

@@ -154,9 +154,9 @@ function HistoryCard({
   return (
     <div className="bg-white rounded-2xl shadow-md p-6 flex flex-col items-center justify-center">
       <div
-        className={`text-[14px] font-[600] px-6 py-2 rounded-full ${pillBg} ${pillText}`}
+        className={`text-[14px] font-semibold first-letter:uppercase px-6 py-2 rounded-full ${pillBg} ${pillText}`}
       >
-        {title}
+        {title.toLowerCase()}
       </div>
       <div className="text-3xl font-bold mt-4">{value}</div>
     </div>
@@ -179,10 +179,10 @@ export default function StoryCard({
   return (
     <div className="flex items-center justify-between rounded-md bg-green-50 px-4 gap-2 py-3">
       <div className="flex flex-col gap-2">
-        <h4 className="text-sm text-[#1E2939]">
+        <h1 className="text-sm font-semibold text-[#1E2939]">
           Article For Review
-        </h4>
-        <p className="text-sm text-[#6A7282]">
+        </h1>
+        <p className="text-sm font-normal text-[#6A7282] line-clamp-2 max-w-11/12">
           Your article "{title}: {description}"
         </p>
       </div>
@@ -190,7 +190,7 @@ export default function StoryCard({
       <Button
         size="sm"
         onClick={onView}
-        className="rounded-md bg-[#008001] hover:bg-[#008001] cursor-pointer px-4 py-1 text-sm font-medium text-white "
+        className="rounded-[8.5px] bg-[#008001] hover:bg-[#008001] cursor-pointer px-4 py-2 text-sm font-medium text-white text-center"
       >
         View Story
       </Button>

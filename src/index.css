@@ -2,7 +2,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-   --font-weight-normal: 400;
+  --font-weight-normal: 400;
   --font-weight-medium: 400;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
@@ -131,8 +131,8 @@
   --color-sidebar-ring: var(--sidebar-ring);
   /* --shadow-history-search: var(--history-search-shadow); */
   --shadow-history-search: var(--history-search-shadow);
-    --font-weight-normal: 400;
-  --font-weight-medium: 400;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
 }
@@ -229,7 +229,7 @@ body {
 }
 
 :not(.no-toolbar) .ql-editor {
-  height: calc(100% - 53px) !important;
+  min-height: calc(100% - 20rem) !important;
 }
 
 .no-toolbar .ql-editor {
@@ -364,6 +364,13 @@ body {
 
 @font-face {
   font-family: "Open Sans";
+  src: url("@/assets/font/OpenSans-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Open Sans";
   src: url("@/assets/font/OpenSans-SemiBold.ttf") format("truetype");
   font-weight: 600;
   font-style: normal;
@@ -374,4 +381,67 @@ body {
   src: url("@/assets/font/OpenSans-Bold.ttf") format("truetype");
   font-weight: 700;
   font-style: normal;
+}
+
+/* Remove Edge/Chrome internal input controls */
+
+/* Removes password reveal and clear icons */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none !important;
+}
+
+/* Removes Chromium autofill and credential icons (including tab icon) */
+input::-webkit-textfield-decoration-container {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* Removes autofill credential key/icon in password fields */
+input::-webkit-credentials-auto-fill-button {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+input::-webkit-inner-spin-button,
+input::-webkit-outer-spin-button,
+input::-webkit-calendar-picker-indicator,
+input::-webkit-input-decoration-container {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #f7fbf7 inset !important;
+  box-shadow: 0 0 0 1000px #f7fbf7 inset !important;
+}
+
+/* WEEK VIEW ONLY — remove scrollbars/icons from the header scroller */
+.fc-scroller-harness > .fc-scroller {
+  overflow: none !important;
+  scrollbar-width: none !important; /* Firefox */
+}
+
+.fc-scroller-harness > .fc-scroller::-webkit-scrollbar {
+  display: none !important; /* Chrome, Edge, Safari */
+}
+
+/* WEEK VIEW — remove scroller behavior completely in the header */
+.fc-timegrid-header .fc-scroller-harness {
+  overflow: visible !important;
+  height: auto !important;
+  max-height: none !important;
+}
+
+.fc-timegrid-header .fc-scroller-harness > .fc-scroller {
+  overflow: visible !important;
+  height: auto !important;
+  max-height: none !important;
+  scrollbar-width: none !important; /* Firefox */
+}
+
+.fc-timegrid-header .fc-scroller-harness > .fc-scroller::-webkit-scrollbar {
+  display: none !important; /* Chrome, Edge, Safari */
 }
