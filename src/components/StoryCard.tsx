@@ -7,6 +7,7 @@ import { SchedulePlatformCard } from "./TextEditor/SchedulePlatformCard";
 import type { scheduledPost } from "@/types/apitypes";
 import { createPortal } from "react-dom";
 import { ScheduledPlatformsUI } from "./ui/PublisCenterUI";
+import { extractTextSummary } from "@/pages/Reporter/utils";
 
 interface StoryCardProps {
   story: scheduledPost;
@@ -162,6 +163,11 @@ const StoryCard: React.FC<StoryCardProps> = ({
           </div>
         </div>
       </div>
+      {story?.content && (
+        <p className="text-[#4A5565] mb-4 text-sm leading-relaxed ">
+          {extractTextSummary(story?.content ?? "", 75).text}
+        </p>
+      )}
 
       <div className="mb-4">
         <ScheduledPlatformsUI scheduledArr={story.scheduledPosts} columns={4} />

@@ -77,14 +77,14 @@ export const RenderListView: React.FC<ListViewProps> = ({
                     <span>Updated {formatDate(article.updatedAt)}</span>
                     {extractTextSummary(article.content ?? "", 30).wordCount >
                       0 && (
-                        <p>
-                          {
-                            extractTextSummary(article.content ?? "", 30)
-                              .wordCount
-                          }{" "}
-                          words
-                        </p>
-                      )}
+                      <p>
+                        {
+                          extractTextSummary(article.content ?? "", 30)
+                            .wordCount
+                        }{" "}
+                        words
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -126,15 +126,15 @@ export const RenderListViewDraft: React.FC<ListViewProps> = ({
         <Card
           key={article.id}
           onClick={() => handleEdit?.(article.id)}
-          className="p-4 bg-white hover:shadow-sm  !cursor-pointer transition-shadow"
+          className="p-4 bg-white hover:shadow-sm rounded-xl !cursor-pointer transition-shadow"
         >
           <div className="flex !cursor-pointer items-center   justify-between">
-            <div className="flex-1 !cursor-pointer  min-w-0">
-              <div className="flex items-center !cursor-pointer gap-3 mb-2">
-                <h3 className="text-[16px] font-medium text-[#101828] truncate">
+            <div className="flex-1 !cursor-pointer flex flex-col gap-3  min-w-0">
+              <div className="flex items-center !cursor-pointer gap-3 ">
+                <h3 className="text-[16px] font-semibold text-[#101828] max-w-6/12 truncate">
                   {article.title}
                 </h3>
-                <div className="flex gap-2 flex-shrink-0">
+                <div className="flex gap-3 flex-shrink-0">
                   <Badge
                     className={`text-xs ${getTypeColor(
                       article.type.toLowerCase()
@@ -149,15 +149,15 @@ export const RenderListViewDraft: React.FC<ListViewProps> = ({
                   </Badge>
                 </div>
               </div>
-              <div className="flex items-center gap-4 text-xs font-normal text-gray-500">
+              <div className="flex items-center gap-[30px] text-sm font-normal text-gray-500">
                 <span>Updated {formatDate(article.updatedAt)}</span>
                 {extractTextSummary(article.content ?? "", 30).wordCount >
                   0 && (
-                    <p>
-                      {extractTextSummary(article.content ?? "", 30).wordCount}{" "}
-                      words
-                    </p>
-                  )}
+                  <p>
+                    {extractTextSummary(article.content ?? "", 30).wordCount}{" "}
+                    words
+                  </p>
+                )}
               </div>
             </div>
 

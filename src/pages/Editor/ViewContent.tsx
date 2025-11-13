@@ -57,7 +57,8 @@ const ViewContent: React.FC = () => {
   const from = searchParams.get("from") as
     | CurrentPageType
     | null
-    | "publishCenter";
+    | "publishCenter"
+    | "reviewQueue";
   const state = location.state as {
     articletype?: string;
     editable?: boolean;
@@ -378,9 +379,9 @@ const ViewContent: React.FC = () => {
   const ISPOSTED = contentData?.status !== "POSTED";
 
   return (
-    <div className="flex-1 font-openSans py-8 min-h-screen bg-[#f2f6f2] overflow-auto">
+    <div className="flex-1 font-openSans py-8 h-screen bg-[#f2f6f2] overflow-hidden">
       <Toaster position="top-center" richColors />
-      <div className="flex flex-col flex-1 min-h-96 px-6   pt-16 overflow-y-auto">
+      <div className="flex flex-col h-[calc(100vh-3rem)]  px-6 pt-16">
         <ContentHeader
           text="Content Review"
           onClickBack={handleBack}
@@ -402,9 +403,12 @@ const ViewContent: React.FC = () => {
           <form
             ref={formRef}
             onSubmit={methods.handleSubmit(onSubmit)}
-            className="flex flex-col bg-white mt-2 shadow-[0px_2px_10px_0px_#959DA533] space-y-6"
+            className={cn(
+              "flex flex-col overflow-y-auto mt-2 shadow-[0px_2px_10px_0px_#959DA533] space-y-6",
+              from === "reviewQueue" && "bg-white min-h-[calc(100dvh-10rem)] "
+            )}
           >
-            <div className="flex flex-col px-6 space-y-6 p-4 sm:p-6 mb-2">
+            <div className="flex-1 overflow-y-auto px-6 space-y-6 p-4 sm:p-6 pb-40">
               {contentData?.type === "TEXT" && (
                 <Text
                   content={contentData}
@@ -773,9 +777,9 @@ const ViewContent: React.FC = () => {
                 from !== "editor-history") ||
               isEDit) &&
               ISPOSTED && (
-                <div className="shadow-[0px_2px_10px_0px_#0000001A,0px_0px_2px_0px_#00000033] border border-b-[#0000001A] bg-[#FFFFFF] h-min py-6 px-4">
+                <div className="sticky bottom-0 left-0 w-full bg-white shadow-[0px_-2px_10px_0px_#0000001A] border-t border-[#0000001A] py-6 px-4 z-50">
                   {!isEDit && enableEdit ? (
-                    <div className="flex flex-wrap justify-end gap-3">
+                    <div className="flex flex-wrap bottom-0 justify-end gap-3">
                       <Button
                         type="button"
                         variant="outline"

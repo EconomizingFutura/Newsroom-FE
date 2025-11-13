@@ -79,8 +79,8 @@ export default function DraftsPage() {
       activeFilter === "AUDIO"
         ? "audio"
         : activeFilter === "VIDEO"
-          ? "video"
-          : "textArticle";
+        ? "video"
+        : "textArticle";
     const handleNav = () => {
       navigate(`/${isAudio}`);
     };
@@ -145,7 +145,6 @@ export default function DraftsPage() {
     return () => controller.abort();
   }, [currentPage, pageSize]);
 
-
   return (
     <div className="min-h-screen flex flex-col pt-16 bg-[#F6FAF6]">
       {/* Main Wrapper */}
@@ -180,32 +179,30 @@ export default function DraftsPage() {
             }
           />
         </div>
-        {
-          loading ? (
-            <Loading />
-          ) : (
-            <div className="flex-1 overflow-y-auto rounded-md bg-transparent ">
-              {filteredArticles?.length === 0 ? (
-                renderEmptyState()
-              ) : viewMode === "grid" ? (
-                <RenderGridView
-                  filteredArticles={filteredArticles}
-                  handleDeletePost={(id) => setDeletePost({ id, isOpen: true })}
-                  handleEdit={handleEdit}
-                  status="DRAFT"
-                />
-              ) : (
-                <RenderListViewDraft
-                  handleDeletePost={(id) => setDeletePost({ id, isOpen: true })}
-                  handleEdit={handleEdit}
-                  filteredArticles={filteredArticles}
-                />
-              )}
-            </div>)
-        }
+        {loading ? (
+          <Loading />
+        ) : (
+          <div className="flex-1 overflow-y-auto rounded-md bg-transparent ">
+            {filteredArticles?.length === 0 ? (
+              renderEmptyState()
+            ) : viewMode === "grid" ? (
+              <RenderGridView
+                filteredArticles={filteredArticles}
+                handleDeletePost={(id) => setDeletePost({ id, isOpen: true })}
+                handleEdit={handleEdit}
+                status="DRAFT"
+              />
+            ) : (
+              <RenderListViewDraft
+                handleDeletePost={(id) => setDeletePost({ id, isOpen: true })}
+                handleEdit={handleEdit}
+                filteredArticles={filteredArticles}
+              />
+            )}
+          </div>
+        )}
 
         {/* Scrollable Content */}
-
       </div>
 
       {/* Sticky Pagination */}
@@ -235,5 +232,4 @@ export default function DraftsPage() {
       )}
     </div>
   );
-
 }

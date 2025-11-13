@@ -609,14 +609,14 @@ const EditArticle: React.FC = () => {
                             handleAddTag();
                           }
                         }}
-                        className="py-[19px] border-[#ECECEC] border bg-[#f7fbf8]"
+                        className="h-10 py-[19px] border-[#ECECEC] border bg-[#F7FBF7]"
                       />
                       {!isPreviewMode && (
                         <Button
                           type="button"
                           size="sm"
                           onClick={handleAddTag}
-                          className="absolute top-[6px] right-[12px] bg-[#006601] hover:bg-[#006601] font-semibold text-[14px] px-[16px] py-[6px] gap-1"
+                          className="absolute top-[6px] right-[12px] bg-[#006601] hover:bg-[#006601] font-semibold text-[14px] px-[16px] h-8 py-[6px] gap-1"
                         >
                           <Plus className="w-3 h-3" />
                           Add

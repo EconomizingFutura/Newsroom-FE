@@ -109,9 +109,13 @@ export default function Dashboard() {
         style={{ paddingTop: "32px" }}
         className="flex flex-col gap-[24px] px-[24px] bg-[#F6FAF6]"
       >
-          <div className="flex flex-col gap-3">
-          <h1 className="text-[#101828] font-bold text-[24px]">{`Welcome back, ${username ?? "Editor"}!`}</h1>
-          <p className="text-[#4A5565] leading-5 tracking-wide font-medium text-[14px]">Here's what's happening in your newsroom today.</p>
+        <div className="flex flex-col gap-3">
+          <h1 className="text-[#101828] font-bold text-[24px]">{`Welcome back, ${
+            username ?? "Editor"
+          }!`}</h1>
+          <p className="text-[#4A5565] h-10 items-center leading-5 tracking-wide font-normal text-[14px]">
+            Here's what's happening in your newsroom today.
+          </p>
         </div>
 
         {/* Stats Section */}
@@ -134,9 +138,7 @@ export default function Dashboard() {
             <div className="mb-4 p-4  rounded-full">
               <CheckCircle className="w-12 h-12 text-green-500" />
             </div>
-            <h3 className="text-4xl text-gray-900 mb-2">
-              All caught up!
-            </h3>
+            <h3 className="text-4xl text-gray-900 mb-2">All caught up!</h3>
             <p className="text-gray-500 text-lg max-w-md">
               Great news! You don't have any articles that need revision right
               now. Keep up the excellent work!
@@ -152,10 +154,7 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 warning-color text-[16px]">
                     <RotateCcw className="w-5 h-5 warning-color" />
-                    <span className="">
-                      {" "}
-                      Urgent Actions Required
-                    </span>
+                    <span className=""> Urgent Actions Required</span>
                     <span className="ml-2 bg-red-100 warning-color text-sm px-2 py-0.5 rounded-full">
                       {revertedPost.length}
                     </span>

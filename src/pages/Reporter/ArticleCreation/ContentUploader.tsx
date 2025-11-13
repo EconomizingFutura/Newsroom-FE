@@ -277,12 +277,28 @@ const ContentUploader = () => {
   // wrap inside useMemo to preserve the same throttled function instance
 
   const throttledSaveExisting = useMemo(
-    () => throttle(() => { saveDraft(false); setIsSavingDraft(true) }, 5000, { trailing: false }),
+    () =>
+      throttle(
+        () => {
+          saveDraft(false);
+          setIsSavingDraft(true);
+        },
+        5000,
+        { trailing: false }
+      ),
     []
   );
 
   const throttledSaveToDraft = useMemo(
-    () => throttle(() => { saveDraft(true); setIsSavingToDraft(true) }, 5000, { trailing: false }),
+    () =>
+      throttle(
+        () => {
+          saveDraft(true);
+          setIsSavingToDraft(true);
+        },
+        5000,
+        { trailing: false }
+      ),
     []
   );
 
@@ -312,12 +328,13 @@ const ContentUploader = () => {
     if (!tagsList || tagsList.length === 0) return false;
 
     // Type-based validation
-    if (path === "textArticle" && (!content || content.trim() === "<p><br></p>"))
+    if (
+      path === "textArticle" &&
+      (!content || content.trim() === "<p><br></p>")
+    )
       return false;
-    if (path === "audio" && !audio)
-      return false;
-    if (path === "video" && !video)
-      return false;
+    if (path === "audio" && !audio) return false;
+    if (path === "video" && !video) return false;
 
     return true;
   }, [title, category, tagsList, content, audio, video, path]);
@@ -416,7 +433,9 @@ const ContentUploader = () => {
               type="submit"
               name="save"
               size="sm"
-              disabled={!isFormValidForSubmit || isSavingDraft || isSavingToDraft}
+              disabled={
+                !isFormValidForSubmit || isSavingDraft || isSavingToDraft
+              }
               className="bg-green-700 hover:bg-green-700 h-10 text-[14px] text-white gap-2"
             >
               <Send className="w-4 h-4" />
@@ -438,10 +457,11 @@ const ContentUploader = () => {
                   key={tab.id}
                   type="button"
                   onClick={() => navigate(`/${tab.id}`)}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${isActive
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                    isActive
                       ? "bg-white font-bold text-gray-900 shadow-sm"
                       : "text-gray-500 hover:text-gray-700"
-                    }`}
+                  }`}
                 >
                   {tab.name}
                 </button>
@@ -478,10 +498,11 @@ const ContentUploader = () => {
                     }
                     size="sm"
                     onClick={() => setValue("category", category)}
-                    className={`px-[24px] py-[6px] ${watch("category") === category
+                    className={`px-[24px] py-[6px] ${
+                      watch("category") === category
                         ? " bg-[#008001] hover:bg-green-700"
                         : "bg-[#F8FAF9]"
-                      }`}
+                    }`}
                   >
                     {category}
                   </Button>
@@ -497,8 +518,9 @@ const ContentUploader = () => {
               <Input
                 placeholder="Title"
                 {...register("title", { required: "Title is required" })}
-                className={`bg-[#f7fbf8] border-[#ECECEC] h-[40px] ${errors.title ? "border-red-500" : ""
-                  }`}
+                className={`bg-[#f7fbf8] border-[#ECECEC] h-[40px] ${
+                  errors.title ? "border-red-500" : ""
+                }`}
               />
             </div>
 
@@ -560,14 +582,15 @@ const ContentUploader = () => {
                       handleAddTag();
                     }
                   }}
-                  className={`py-[19px] border-[#ECECEC] bg-[#f7fbf8] ${errors.tags ? "border-red-500" : ""
-                    }`}
+                  className={`py-[19px] border-[#ECECEC] bg-[#f7fbf8] ${
+                    errors.tags ? "border-red-500" : ""
+                  }`}
                 />
                 <Button
                   type="button"
                   size="sm"
                   onClick={handleAddTag}
-                  className="absolute top-[6px] right-[12px] bg-[#006601] hover:bg-[#006601] px-[16px] py-[6px] !h-8 gap-1"
+                  className="absolute top-[6px] right-[12px] bg-[#006601] hover:bg-[#006601] px-4 py-4 !h-8 gap-1 text-[14px]"
                 >
                   <Plus className="w-3 h-3" />
                   Add
@@ -614,7 +637,6 @@ const ContentUploader = () => {
       </div>
     </div>
   );
-
 };
 
 export default ContentUploader;

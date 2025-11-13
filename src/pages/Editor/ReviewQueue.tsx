@@ -151,7 +151,7 @@ export function ReviewQueue() {
         ) : (
           <div className="flex-1 overflow-y-auto mb-3 space-y-4 pr-2">
             {pendingStories.length === 0 ? (
-              <div className="flex justify-center  items-center h-full !w-full">
+              <div className="flex justify-center  items-center h-full w-full!">
                 <PendingReviewEmptyState />
               </div>
             ) : (

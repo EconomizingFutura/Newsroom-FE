@@ -64,7 +64,7 @@ export function Dashboard() {
           <h1 className="text-[#101828] font-bold text-[24px]">{`Welcome back, ${
             USERNAME ?? "Editor"
           }!`}</h1>
-          <p className="text-[#4A5565] leading-5 tracking-wide font-medium text-[14px]">
+          <p className="text-[#4A5565] h-10 flex items-center leading-5 tracking-wide font-medium text-[14px]">
             Here's what's happening in your newsroom today.
           </p>
         </div>
