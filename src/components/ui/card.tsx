@@ -130,14 +130,14 @@ function DashboardListCard({
     <div className="flex items-center justify-between bg-red-50 rounded-xl p-4 shadow-sm">
       {/* Left Section */}
       <div>
-        <p className=" warning-color mb-[8px]">{title}</p>
-        <p className="text-[#E7000B]">{message}</p>
+        <p className=" warning-color mb-[8px] truncate max-w-[750px]">{title}</p>
+        <p className="text-[#E7000B] truncate max-w-[250px]">{message}</p>
       </div>
 
       {/* Right Button */}
       <button
         onClick={() => onClick(id)}
-        className="px-4 py-2 cursor-pointer rounded-lg bg-[linear-gradient(90deg,#FB2C36_0%,#E7000B_100%)] text-white  w-max text-[14px] transition"
+        className="px-4 py-2 cursor-pointer rounded-lg bg-gradient-to-r from-[#FB2C36] to-[#E7000B] text-white w-max text-[14px] transition"
       >
         {buttonText}
       </button>

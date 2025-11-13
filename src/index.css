@@ -203,6 +203,11 @@
   }
 }
 
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
 html {
   font-size: var(--font-size);
 }

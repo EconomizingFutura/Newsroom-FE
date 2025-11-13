@@ -27,7 +27,7 @@ export const RenderGridView: React.FC<GridViewProps> = ({
   handleEdit,
   status,
 }) => (
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
     {filteredArticles?.map((article) => (
       <SharedCard
         id={article.id}
@@ -62,7 +62,7 @@ export const RenderListView: React.FC<ListViewProps> = ({
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between mb-3">
               <div className="flex-1">
-                <h3 className="text-sm font-semibold text-[16px] text-[#101828] mb-2">
+                <h3 className="text-base font-semibold text-gray-900 line-clamp-1 break-words text-balance">
                   {article.title}
                 </h3>
                 <div className="flex items-center gap-3 mb-2">
@@ -77,14 +77,14 @@ export const RenderListView: React.FC<ListViewProps> = ({
                     <span>Updated {formatDate(article.updatedAt)}</span>
                     {extractTextSummary(article.content ?? "", 30).wordCount >
                       0 && (
-                      <p>
-                        {
-                          extractTextSummary(article.content ?? "", 30)
-                            .wordCount
-                        }{" "}
-                        words
-                      </p>
-                    )}
+                        <p>
+                          {
+                            extractTextSummary(article.content ?? "", 30)
+                              .wordCount
+                          }{" "}
+                          words
+                        </p>
+                      )}
                   </div>
                 </div>
               </div>
@@ -153,11 +153,11 @@ export const RenderListViewDraft: React.FC<ListViewProps> = ({
                 <span>Updated {formatDate(article.updatedAt)}</span>
                 {extractTextSummary(article.content ?? "", 30).wordCount >
                   0 && (
-                  <p>
-                    {extractTextSummary(article.content ?? "", 30).wordCount}{" "}
-                    words
-                  </p>
-                )}
+                    <p>
+                      {extractTextSummary(article.content ?? "", 30).wordCount}{" "}
+                      words
+                    </p>
+                  )}
               </div>
             </div>
 
