@@ -413,7 +413,7 @@ const HistoryLogPage: React.FC = () => {
                                 variant="ghost"
                                 size="sm"
                                 className="text-gray-600 border border-[#4F668133] h-8 w-8 hover:text-gray-900"
-                                onClick={() => handleEdit(article.id)}
+                                onClick={() => handleEdit(article.id,article.status)}
                               >
                                 <Eye className="w-4 h-4" />
                               </Button>
@@ -422,7 +422,7 @@ const HistoryLogPage: React.FC = () => {
                                   variant="ghost"
                                   size="sm"
                                   className="text-gray-600 border border-[#4F668133] h-8 w-8 hover:text-gray-900"
-                                  onClick={() => handleEdit(article.id)}
+                                onClick={() => handleEdit(article.id,article.status)}
                                 >
                                   <PencilLine className="w-4 h-4" />
                                 </Button>
