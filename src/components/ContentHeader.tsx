@@ -43,10 +43,8 @@ const ContentHeader: React.FC<ContentHeaderProps> = ({
   showCancelSchedule,
   handleEditPopup,
   handleCancel,
-  story
-
+  story,
 }) => {
-
   const [showScheduleCard, setShowScheduleCard] = useState(false);
   const scheduleCardRef = useRef<HTMLDivElement>(null);
   const scheduleButtonRef = useRef<HTMLButtonElement>(null);
@@ -58,7 +56,7 @@ const ContentHeader: React.FC<ContentHeaderProps> = ({
     <div className="flex justify-between">
       <div>
         <h1 className=" font-bold text-2xl flex items-center gap-2 text-[#101828]">
-          <div className="flex flex-col gap-[12px]">
+          <div className="flex flex-col gap-3">
             <div className="relative items-center flex gap-2">
               {showBackButton && (
                 <Button
@@ -79,20 +77,26 @@ const ContentHeader: React.FC<ContentHeaderProps> = ({
                   <HeaderIcon className=" text-white" name="Text Article" />
                 </Button>
               )}
-              {iconName && (
-                <HeaderIcon className=" text-[#008001]" name={iconName} />
-              )}
-              <p className="text-[#101828] ">{text}</p>
-              {number !== undefined && number > 0 && (
-                <p className=" border border-[#B3E6B3] p-0.5 px-2.5 text-[#006601] rounded-full font-font1 font-medium text-[10.5px] leading-[14px] tracking-normal text-center align-middle text-[#006601 border border-[#B3E6B3] h-min w-min font-medium text-[10.5px] leading-3.5 bg-[#D9F2D9]  top-0 left-">
-                  {number}
-                </p>
-              )}
-            </div>
 
-            <p className="font-openSans font-normal text-base leading-[100%] tracking-normal align-middle text-[#4A5565]">
-              {description}
-            </p>
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-2">
+                  {iconName && (
+                    <HeaderIcon className=" text-[#008001]" name={iconName} />
+                  )}
+                  <h1 className="text-[#101828] text-2xl">{text}</h1>
+                  {number !== undefined && number > 0 && (
+                    <p className=" border border-[#B3E6B3] p-0.5 px-2.5 text-[#006601] rounded-full font-font1 font-medium text-[10.5px] leading-3.5 tracking-normal text-center align-middle text-[#006601 border border-[#B3E6B3] h-min w-min font-medium text-[10.5px] leading-3.5 bg-[#D9F2D9]  top-0 left-">
+                      {number}
+                    </p>
+                  )}
+                </div>
+                {description && (
+                  <p className="font-openSans flex items-center h-10 font-normal text-base leading-[100%] tracking-normal align-middle text-[#4A5565]">
+                    {description}
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
         </h1>
       </div>
@@ -151,13 +155,13 @@ const ContentHeader: React.FC<ContentHeaderProps> = ({
                   }
                   setShowScheduleCard(true);
                 }}
-
                 className="text-[#1E2939] cursor-pointer hover:text-[#1E2939]  border-[#1E2939] hover:bg-[#F8FAF9]"
               >
                 <X color="#1E2939" className="w-4 h-4 mr-2" />
                 Cancel Schedule
               </Button>
-              {showScheduleCard && story &&
+              {showScheduleCard &&
+                story &&
                 createPortal(
                   <div
                     ref={scheduleCardRef}
@@ -182,7 +186,6 @@ const ContentHeader: React.FC<ContentHeaderProps> = ({
                   document.body
                 )}
             </div>
-
           )}
         </div>
       )}

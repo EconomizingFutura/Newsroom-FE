@@ -10,7 +10,7 @@ interface RemarksModalProps {
 const RemarksModal: React.FC<RemarksModalProps> = ({ onCancel, onConfirm }) => {
   const [remark, setRemark] = useState("");
   const handleConfirm = () => {
-    if (onConfirm && remark !== '') {
+    if (onConfirm && remark !== "") {
       onConfirm(remark);
     }
   };
@@ -27,13 +27,13 @@ const RemarksModal: React.FC<RemarksModalProps> = ({ onCancel, onConfirm }) => {
         <div className="bg-white flex flex-col rounded-3xl w-full max-w-4xl">
           {/* Header + Textarea */}
           <div className="flex flex-col justify-center w-full items-center p-6">
-            <div className="w-full flex flex-col gap-3">
-              <p className="font-bold text-[#03101F] text-lg leading-6">
+            <div className="w-full flex flex-col gap-5">
+              <p className="font-bold text-[#03101F] text-xl  leading-6">
                 Write a Comment
               </p>
 
               <textarea
-                className="min-h-[180px] min-w-[680px] max-h-[400px] w-full text-sm border border-[#ECECEC] bg-[#F7FBF7] rounded-lg px-2 py-1 outline-none resize-none"
+                className="min-h-[180px] min-w-[680px] max-h-[400px] w-full text-sm border border-[#ECECEC] bg-[#F7FBF7] rounded-lg p-4 outline-none resize-none"
                 placeholder="comment"
                 value={remark}
                 onChange={(e) => {
@@ -49,10 +49,10 @@ const RemarksModal: React.FC<RemarksModalProps> = ({ onCancel, onConfirm }) => {
           </div>
 
           {/* Footer Buttons */}
-          <div className="flex rounded-b-xl px-6 items-center bg-white shadow-[0px_2px_10px_0px_#0000001A,0px_0px_2px_0px_#00000033] w-full justify-end gap-4 py-4">
+          <div className="flex rounded-b-xl px-6 h-[72px] items-center bg-white shadow-[0px_2px_10px_0px_#0000001A,0px_0px_2px_0px_#00000033] w-full justify-end gap-4 py-4">
             <button
               onClick={onCancel}
-              className="px-6 py-2 w-28 rounded-lg border border-[#008001] text-[#008001]"
+              className=" h-10 w-30 text-[14px] py-2 font-semibold rounded-lg border border-[#008001] text-[#008001]"
             >
               Cancel
             </button>
@@ -69,9 +69,9 @@ const RemarksModal: React.FC<RemarksModalProps> = ({ onCancel, onConfirm }) => {
               type="button"
               name="Revert"
               size="sm"
-              disabled={remark === ''}
+              disabled={remark === ""}
               onClick={handleConfirm}
-              className="bg-[#008001] border font-circular-500 font-medium rounded-lg h-10 w-28 text-white"
+              className="bg-[#008001] hover:bg-[#008001] border text-[14px] font-semibold rounded-lg h-10 w-30 py-2 text-white"
             >
               Revert
             </Button>

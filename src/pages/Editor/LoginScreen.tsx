@@ -82,6 +82,9 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••"
                     value={password}
+                    autoComplete="new-password"
+                    autoCorrect="off"
+                    autoCapitalize="off"
                     onChange={(e) => setPassword(e.target.value)}
                     className="pl-4 pr-10 py-3 border-gray-300 rounded-lg"
                     required

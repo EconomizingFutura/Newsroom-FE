@@ -84,7 +84,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
     {video && (
       <div className="mt-4">
         <label className="block text-sm font-medium">Thumbnail Preview</label>
-        <div className="mt-2 h-28 w-full bg-gray-100 rounded-xl">
+        <div className="mt-2 h-28 w-[132px] bg-gray-100 rounded-xl">
           {thumbnail && (
             <ImageWithFallback
               src={thumbnail}

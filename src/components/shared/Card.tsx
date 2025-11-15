@@ -15,7 +15,7 @@ type CardProps = {
   type?: "TEXT" | "All Type" | "AUDIO" | "VIDEO";
   status?: "Auto-saved" | "REVERTED" | "DRAFT";
   remarkMessage?: string;
-  thumbnailUrl?: string; // 👈 supports both AUDIO + VIDEO
+  thumbnailUrl?: string;
   handleDelete: (id: string) => void;
   handleEdit: (id: string) => void;
 };
@@ -35,116 +35,123 @@ const Card: React.FC<CardProps> = ({
   handleEdit,
 }) => {
   return (
-    <div className="w-full max-w-md bg-white rounded-2xl shadow-md border border-gray-200 max-h-[300px] p-[20px] flex flex-col justify-between">
+    <div
+      className="
+        w-full
+    max-w-[358px]
+    h-[294px]
+    bg-white
+    rounded-xl
+    border
+    border-gray-200
+    shadow-sm
+    p-6
+    flex
+    flex-col
+    justify-between
+    overflow-hidden
+      "
+    >
       {/* Title */}
-      <h2 className="text-base  font-semibold text-gray-900">{title}</h2>
+      <h2
+        className="text-base font-semibold text-gray-900 line-clamp-2 break-words text-balance"
+        title={title}
+      >
+        {title}
+      </h2>
 
       {/* Tags */}
       <div className="flex items-center gap-2 mt-1">
         <span
-          className={`px-2 py-0.5 text-xs font-medium rounded-md ${
-            type === "TEXT"
-              ? "bg-[#DBEAFE] border border-[#BEDBFF] text-[#193CB8]"
-              : type === "AUDIO"
+          className={`px-2 py-0.5 text-xs font-medium rounded-md ${type === "TEXT"
+            ? "bg-[#DBEAFE] border border-[#BEDBFF] text-[#193CB8]"
+            : type === "AUDIO"
               ? "bg-[#F3E8FF] border border-[#EAD4FF] text-[#6D11B0]"
               : type === "VIDEO"
-              ? "bg-[#FFEDD4] border border-[#FFD6A7] text-[#9F2E00]"
-              : "bg-gray-200 border border-gray-300 text-gray-700"
-          }`}
+                ? "bg-[#FFEDD4] border border-[#FFD6A7] text-[#9F2E00]"
+                : "bg-gray-200 border border-gray-300 text-gray-700"
+            }`}
         >
           {type}
         </span>
+
         <span className="px-2 py-0.5 text-xs font-medium rounded-md border border-[#B3E6B3] text-[#006601] bg-[#f0f9f0]">
           {status}
         </span>
       </div>
 
       {/* Dynamic Preview Section */}
-      <div className="mt-2">
-        {/* TEXT */}
+      <div className="mt-2 flex-1">
         {type === "TEXT" && (
-          <p className="text-sm text-gray-600  min-h-20 line-clamp-2">
+          <p className="text-sm text-gray-600 line-clamp-2 sm:line-clamp-3 break-words min-h-[40px]">
             {contentPreview}
           </p>
         )}
 
-        {/* AUDIO */}
         {type === "AUDIO" && (
           <div className="flex justify-center items-center">
             <ImageWithFallback
               mediaType="audio"
               src={thumbnailUrl || "/images/audio-placeholder.png"}
               alt="Audio Thumbnail"
-              className="w-full h-32 object-cover rounded-lg"
+              className="w-full h-[100px] object-cover rounded-lg"
             />
           </div>
         )}
 
-        {/* VIDEO */}
         {type === "VIDEO" && (
-          <div className="flex justify-center  items-center relative">
+          <div className="flex justify-center items-center relative">
             <ImageWithFallback
               mediaType="video"
               src={thumbnailUrl}
               alt="Video Thumbnail"
-              className="w-full h-32 object-cover rounded-lg"
+              className="w-full h-[100px] object-cover rounded-lg"
             />
-            {/* Play overlay */}
-            {/* <div className="absolute inset-0 flex items-center justify-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-10 h-10 text-white bg-black bg-opacity-50 rounded-full p-2"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path d="M8 5v14l11-7z" />
-              </svg>
-            </div> */}
           </div>
         )}
       </div>
 
-      {/* Remark Block */}
-      {status === "REVERTED" && remarkMessage && remarkMessage?.length > 0 && (
-        <div className="mt-2 p-2 border border-red-300 bg-red-50 rounded-lg text-sm text-red-700">
-          <div className="flex gap-[8px]">
-            <MessageSquare size={18} />
+      {/* Remarks Section (for REVERTED) */}
+      {status === "REVERTED" && remarkMessage && (
+        <div className="mt-2 p-2 border border-red-300 bg-red-50 rounded-lg text-xs text-red-700 break-words">
+          <div className="flex gap-1 items-start">
+            <MessageSquare size={14} />
             <div>
-              <div className="flex items-center text-sm font-semibold">
-                Editor Remarks
-              </div>
-              <p className="text-xs leading-snug">{remarkMessage}</p>
+              <div className="font-semibold text-sm">Editor Remarks</div>
+              <p className="line-clamp-2">{remarkMessage}</p>
             </div>
           </div>
         </div>
       )}
 
-      {/* Footer */}
+      {/* Footer Info (for DRAFT) */}
       {savedTime && status === "DRAFT" && (
         <div
           className={cn(
-            "grid items-center justify-between mt-3 text-[14px] text-gray-500",
+            "grid items-center justify-between mt-2 text-[13px] text-gray-500",
             wordCount > 0 ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-2"
           )}
         >
-          <div className="flex items-center  gap-2">
-            <Clock className="w-5 h-5" />
-            <p>Updated {formatDate(updatedDate)} </p>
+          <div className="flex items-center gap-2 truncate">
+            <Clock className="w-4 h-4" />
+            <p className="truncate">Updated {formatDate(updatedDate)}</p>
           </div>
+
           {wordCount > 0 && (
-            <div className="text-center ">
-              {wordCount && <p>{wordCount} words</p>}
+            <div className="text-center truncate">
+              <p>{wordCount} words</p>
             </div>
           )}
-          <p className="text-[#008001]">{savedTime}</p>
+
+          <p className="text-[#008001] text-right">{savedTime}</p>
         </div>
       )}
 
-      {/* Actions */}
+      {/* Action Buttons */}
       <div className="flex items-center gap-3 mt-3">
         <button
           onClick={() => handleEdit(id)}
-          className="flex-1 bg-[#008001] hover:bg-[#008001] text-white py-2 rounded-lg font-medium flex items-center justify-center gap-2 transition"
+          className="flex-1 bg-[#008001] text-white py-2 rounded-lg font-medium flex items-center justify-center gap-2 transition hover:bg-[#009901]"
         >
           <PenLine className="w-5 h-5" />
           Edit

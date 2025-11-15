@@ -8,6 +8,7 @@ interface ScheduledPlatformsUIProps {
   columns?: number; // 👈 control how many columns in grid (default 4)
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const returnPlatformIcon = (platform: string, isPublished: boolean) => {
   const colorClass = isPublished
     ? "text-[#00B401] h-5 w-5"
@@ -28,7 +29,8 @@ export const returnPlatformIcon = (platform: string, isPublished: boolean) => {
 };
 
 export const ScheduledPlatformsUI: React.FC<ScheduledPlatformsUIProps> = ({
-  scheduledArr}) => {
+  scheduledArr,
+}) => {
   const published = scheduledArr.filter((a) => a.isPosted);
   const upcoming = scheduledArr.filter((a) => !a.isPosted);
   const path = useLocation();
@@ -142,7 +144,7 @@ export const ScheduledPlatformsUI: React.FC<ScheduledPlatformsUIProps> = ({
               className="flex flex-wrap items-center gap-1 text-[12px] text-slate-700"
             >
               {returnPlatformIcon(a.platform, false)}
-              <span className="whitespace-normal break-words leading-tight">
+              <span className="whitespace-normal wrap-break-word leading-tight">
                 {a.date.toString()} {a.time}
               </span>
               {idx !== upcoming.length - 1 && path.pathname == pname && (

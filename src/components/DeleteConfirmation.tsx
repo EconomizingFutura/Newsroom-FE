@@ -28,13 +28,17 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
             alt="delete"
             className="max-h-24 max-w-24 h-full w-full"
           />
-          {wordings !== null || wordings !== undefined ? (
+          {wordings ? (
             <p className="text-lg text-center py-4 font-semibold">
-              Are you sure want to cancel <br /> the scheduled post ?
+              Are you sure you want to cancel
+              <br />
+              the scheduled post?
             </p>
           ) : (
             <p className="text-lg text-center py-4 font-semibold">
-              Are you sure want to Delete <br /> the Article ?
+              Are you sure you want to delete
+              <br />
+              this article?
             </p>
           )}
 

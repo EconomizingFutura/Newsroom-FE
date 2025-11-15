@@ -83,6 +83,7 @@ export type scheduledPost = {
   category: string;
   type: "SCHEDULED" | "REVIEWED";
   scheduledPosts: scheduledPostArray[];
+  content?: string;
 };
 
 export type scheduledPostsResponse = {

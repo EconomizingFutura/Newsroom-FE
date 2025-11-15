@@ -280,11 +280,89 @@ const CalendarPage: React.FC = () => {
 
             <div className="bg-white rounded-lg shadow-sm p-4">
               <style>{`
-              .fc .fc-day-today ,.fc-v-event{
-                background-color: transparent !important;
-                border:transparent !important
+  /* Remove your previous today cell override */
+  .fc .fc-day-today {
+    background-color: transparent !important;
+    border: none !important;
   }
+
+  /* MONTH VIEW — highlight only date number */
+  .fc .fc-day-today .fc-daygrid-day-number {
+    background-color: #008001 !important;
+    color: white !important;
+    padding: 2px 6px;
+    border-radius: 50%;
+    font-weight: 600;
+  }
+
+  .fc .fc-col-header-cell.fc-day-today .fc-col-header-cell-cushion {
+    background-color: #008001 !important;
+    color: white !important;
+    padding: 2px 8px;
+    border-radius: 50%;
+    font-weight: 600;
+    display: inline-block; /* ensures the circle wraps the text */
+  }
+
+  /* WEEK/DAY VIEW - Today's header styling */
+  .fc .fc-timeGridWeek .fc-col-header-cell.fc-day-today,
+  .fc .fc-timeGridDay .fc-col-header-cell.fc-day-today {
+    background-color: #008001 !important;
+  }
+
+  /* Override Tailwind text colors for today's header */
+  .fc .fc-timeGridWeek .fc-col-header-cell.fc-day-today .fc-col-header-cell-cushion,
+  .fc .fc-timeGridDay .fc-col-header-cell.fc-day-today .fc-col-header-cell-cushion {
+    background-color: #008001 !important;
+  }
+
+  .fc .fc-timeGridWeek .fc-col-header-cell.fc-day-today .text-gray-500,
+  .fc .fc-timeGridDay .fc-col-header-cell.fc-day-today .text-gray-500,
+  .fc .fc-timeGridWeek .fc-col-header-cell.fc-day-today .text-gray-900,
+  .fc .fc-timeGridDay .fc-col-header-cell.fc-day-today .text-gray-900 {
+    color: white !important;
+  }
+
+  /* WEEK/DAY VIEW - Today's time slot styling */
+  .fc .fc-timegrid-axis-frame.fc-timegrid-axis-frame-liquid {
+    background-color: transparent !important;
+  }
+
+  .fc .fc-timeGridWeek .fc-day-today,
+  .fc .fc-timeGridDay .fc-day-today {
+    background-color: #008001 !important;
+  }
+
+  .fc .fc-timeGridWeek .fc-day-today .fc-timegrid-col-frame,
+  .fc .fc-timeGridDay .fc-day-today .fc-timegrid-col-frame {
+    background-color: #008001 !important;
+  }
+
+  /* White text for today's date in week/day view time slots */
+  .fc .fc-timeGridWeek .fc-day-today .fc-timegrid-col-frame *,
+  .fc .fc-timeGridDay .fc-day-today .fc-timegrid-col-frame * {
+    color: white !important;
+  }
+
+  /* Today's date number in week view header */
+  .fc .fc-timeGridWeek .fc-day-today .fc-timegrid-axis-frame,
+  .fc .fc-timeGridDay .fc-day-today .fc-timegrid-axis-frame {
+    color: white !important;
+  }
+/* WEEK VIEW — make the weekday white */
+.fc-col-header-cell.fc-day-today .fc-col-header-cell-cushion span:nth-child(1) {
+  color: white !important;
+}
+
+/* WEEK VIEW — make the date number white */
+.fc-col-header-cell.fc-day-today .fc-col-header-cell-cushion span:nth-child(2) {
+  color: white !important;
+}
+
+
+
 `}</style>
+
               <FullCalendar
                 ref={calendarRef}
                 plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}

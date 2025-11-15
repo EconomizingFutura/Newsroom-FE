@@ -1,8 +1,24 @@
 import React, { useEffect, useState, useRef } from "react";
-import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 import { cn } from "./utils";
 import "./quillTextEditor.css";
+
+// ✅ Import Quill before ReactQuill
+import ReactQuill, { Quill } from "react-quill-new";
+import QuillResizeImage from "quill-resize-image";
+
+/** ✅ Register safely (once, HMR-safe) */
+try {
+  const QuillAny = Quill as any;
+  if (typeof window !== "undefined" && QuillAny) {
+    if (!QuillAny.imports?.["modules/resizeImage"]) {
+      QuillAny.register("modules/resizeImage", QuillResizeImage);
+      console.log("✅ QuillResizeImage module registered");
+    }
+  }
+} catch (err) {
+  console.warn("⚠️ QuillResizeImage registration skipped:", err);
+}
 
 type CustomQuilTextEditorProps = {
   placeholder?: string;
@@ -35,6 +51,7 @@ const CustomQuilTextEditor: React.FC<CustomQuilTextEditorProps> = ({
     setContent(selectedValue || "");
   }, [selectedValue]);
 
+  /** Resizable editor drag */
   const handleMouseDown = (e: React.MouseEvent) => {
     isResizing.current = true;
     startY.current = e.clientY;
@@ -65,8 +82,27 @@ const CustomQuilTextEditor: React.FC<CustomQuilTextEditorProps> = ({
     };
   }, []);
 
+  /** ✅ Quill config */
   const modules = {
-    toolbar: [["bold", "italic", "underline", "strike"], ["image"]],
+    toolbar: {
+      container: [
+        ["bold", "italic", "underline", "strike"],
+        ["image"],
+      ],
+    },
+    resizeImage: {
+      locale: {},
+      displaySize: true,
+      modules: ["Resize", "DisplaySize"],
+      handleStyles: {
+        backgroundColor: "rgba(0, 0, 0, 0.3)",
+        border: "1px solid white",
+      },
+      handleSingleImage: true,
+      keepAspectRatio: true,
+      minWidth: 100,
+      maxWidth: 400,       // ✅ required for quill-resize-image
+    },
   };
 
   const formats = ["bold", "italic", "underline", "strike", "image"];
@@ -101,14 +137,14 @@ const CustomQuilTextEditor: React.FC<CustomQuilTextEditorProps> = ({
               : "text-[#4A5565] no-toolbar bg-transparent"
           )}
           onChange={(_, __, ___, editor) => {
-            const delta = editor.getHTML(); // Delta JSON
+            const delta = editor.getHTML();
             setContent(delta);
-            onChange?.(delta); // ✅ emit JSON to parent
+            onChange?.(delta);
           }}
         />
       </div>
 
-      {/* ✅ SVG Grip Handle - always visible */}
+      {/* ✅ Resize grip */}
       {!readOnly && (
         <div
           onMouseDown={handleMouseDown}

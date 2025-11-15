@@ -7,6 +7,7 @@ import { SchedulePlatformCard } from "./TextEditor/SchedulePlatformCard";
 import type { scheduledPost } from "@/types/apitypes";
 import { createPortal } from "react-dom";
 import { ScheduledPlatformsUI } from "./ui/PublisCenterUI";
+import { extractTextSummary } from "@/pages/Reporter/utils";
 
 interface StoryCardProps {
   story: scheduledPost;
@@ -146,9 +147,9 @@ const StoryCard: React.FC<StoryCardProps> = ({
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center space-x-3 mb-2">
-            <h3 className="text-lg font-semibold text-[#101828]">
+            <h1 className="text-lg line-clamp-2 font-semibold text-[#101828]">
               {story.title}
-            </h3>
+            </h1>
           </div>
           <div className="flex items-center space-x-4 text-sm text-gray-500 mb-3">
             <div className="flex items-center space-x-1">
@@ -162,6 +163,11 @@ const StoryCard: React.FC<StoryCardProps> = ({
           </div>
         </div>
       </div>
+      {story?.content && (
+        <p className="text-[#4A5565] mb-4 text-sm leading-relaxed ">
+          {extractTextSummary(story?.content ?? "", 75).text}
+        </p>
+      )}
 
       <div className="mb-4">
         <ScheduledPlatformsUI scheduledArr={story.scheduledPosts} columns={4} />
@@ -176,15 +182,17 @@ const StoryCard: React.FC<StoryCardProps> = ({
           {story.category}
         </Badge>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center gap-3">
           {/* Final Edit */}
           <Button
             variant="outline"
             onClick={() => handleViewStory(story.id, story.articleType)}
-            className="text-gray-700 cursor-pointer border-gray-300 hover:bg-gray-50"
+            className="text-[#6A7282] bg-[#F8FAF9] flex gap-2 h-[34px] py-1.5 px-4 cursor-pointer border-gray-300 hover:text-[#6A7282] hover:bg-[#F8FAF9]"
           >
-            <PenLine className="w-4 h-4 mr-2" />
-            Final Edit
+            <PenLine color="#6A7282" className="w-4 h-4 " />
+            <span className="text-sm font-medium cursor-pointer">
+              Final Edit
+            </span>
           </Button>
 
           {/* Publish Now */}
@@ -192,10 +200,13 @@ const StoryCard: React.FC<StoryCardProps> = ({
             <Button
               ref={publishButtonRef}
               onClick={handlePublishNowClick}
-              className="bg-[#008001] cursor-pointer hover:bg-green-700 text-white"
+              className="bg-[#008001] cursor-pointer h-[34px] py-1.5 px-4  hover:bg-green-700 text-white"
             >
-              <Send className="w-4 h-4 mr-2" />
-              Publish Now
+              <Send className="w-4 h-4 " />
+              <span className="text-sm font-medium cursor-pointer">
+                {" "}
+                Publish Now
+              </span>
             </Button>
 
             {showPublishCard &&
@@ -222,10 +233,13 @@ const StoryCard: React.FC<StoryCardProps> = ({
             <Button
               variant="outline"
               onClick={() => handleSchedulePublish(story)}
-              className="bg-[#f0f9f0] text-[#006601] border hover:bg-[#f0f9f0] hover:text-[#006601] cursor-pointer border-[#B3E6B3]"
+              className="bg-[#f0f9f0] text-[#006601] border hover:bg-[#f0f9f0] hover:text-[#006601] cursor-pointer border-[#B3E6B3]  h-[34px] py-1.5 px-4 "
             >
-              <Calendar className="w-4 h-4 mr-2" />
-              Schedule
+              <Calendar className="w-4 h-4 " />
+              <span className="text-sm font-medium cursor-pointer ">
+                {" "}
+                Schedule
+              </span>
             </Button>
           )}
 
@@ -243,10 +257,13 @@ const StoryCard: React.FC<StoryCardProps> = ({
                   }
                   setShowScheduleCard(true);
                 }}
-                className="bg-[#ffffff] text-[#FB2C36] border hover:bg-[#ffffff] hover:text-[#FB2C36] cursor-pointer border-[#FB2C36]"
+                className="bg-[#ffffff] text-[#FB2C36] border hover:bg-[#ffffff] hover:text-[#FB2C36] cursor-pointer border-[#FB2C36] h-[34px] py-1.5 px-4 "
               >
-                <Calendar className="w-4 h-4 mr-2" color="#FB2C36" />
-                Cancel
+                <Calendar className="w-4 h-4 " color="#FB2C36" />
+                <span className="text-sm font-medium cursor-pointer">
+                  {" "}
+                  Cancel
+                </span>
               </Button>
 
               {/* Show popup when clicking Cancel */}

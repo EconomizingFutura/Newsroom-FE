@@ -130,14 +130,14 @@ function DashboardListCard({
     <div className="flex items-center justify-between bg-red-50 rounded-xl p-4 shadow-sm">
       {/* Left Section */}
       <div>
-        <p className=" warning-color mb-[8px]">{title}</p>
-        <p className="text-[#E7000B]">{message}</p>
+        <p className=" warning-color mb-[8px] truncate max-w-[750px]">{title}</p>
+        <p className="text-[#E7000B] truncate max-w-[250px]">{message}</p>
       </div>
 
       {/* Right Button */}
       <button
         onClick={() => onClick(id)}
-        className="px-4 py-2 cursor-pointer rounded-lg bg-[linear-gradient(90deg,#FB2C36_0%,#E7000B_100%)] text-white  w-max text-[14px] transition"
+        className="px-4 py-2 cursor-pointer rounded-lg bg-gradient-to-r from-[#FB2C36] to-[#E7000B] text-white w-max text-[14px] transition"
       >
         {buttonText}
       </button>
@@ -154,9 +154,9 @@ function HistoryCard({
   return (
     <div className="bg-white rounded-2xl shadow-md p-6 flex flex-col items-center justify-center">
       <div
-        className={`text-[14px] font-[600] px-6 py-2 rounded-full ${pillBg} ${pillText}`}
+        className={`text-[14px] font-semibold first-letter:uppercase px-6 py-2 rounded-full ${pillBg} ${pillText}`}
       >
-        {title}
+        {title.toLowerCase()}
       </div>
       <div className="text-3xl font-bold mt-4">{value}</div>
     </div>
@@ -179,10 +179,10 @@ export default function StoryCard({
   return (
     <div className="flex items-center justify-between rounded-md bg-green-50 px-4 gap-2 py-3">
       <div className="flex flex-col gap-2">
-        <h4 className="text-sm text-[#1E2939]">
+        <h1 className="text-sm font-semibold text-[#1E2939]">
           Article For Review
-        </h4>
-        <p className="text-sm text-[#6A7282]">
+        </h1>
+        <p className="text-sm font-normal text-[#6A7282] line-clamp-2 max-w-11/12">
           Your article "{title}: {description}"
         </p>
       </div>
@@ -190,7 +190,7 @@ export default function StoryCard({
       <Button
         size="sm"
         onClick={onView}
-        className="rounded-md bg-[#008001] hover:bg-[#008001] cursor-pointer px-4 py-1 text-sm font-medium text-white "
+        className="rounded-[8.5px] bg-[#008001] hover:bg-[#008001] cursor-pointer px-4 py-2 text-sm font-medium text-white text-center"
       >
         View Story
       </Button>

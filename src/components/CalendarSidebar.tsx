@@ -26,7 +26,7 @@ const RETURN_CONTENT = (event: TransformedItem) => {
 
   if (isText) {
     return (
-      <p className="text-[14px] text-[#4A5565] line-clamp-2">
+      <p className="text-[14px] font-normal text-[#4A5565] line-clamp-2">
         {stripHTML(event.content)}
       </p>
     );
@@ -63,24 +63,27 @@ const Article = ({ event }: ArticleCardProps) => {
   const navigate = useNavigate();
 
   const handleViewStory = () => {
-    navigate(`/editor/viewcontent/${event.id.split('-')[0].toString()}?from=calendar`, {
-      state: { articletype: event.type, editable: true },
-    });
+    navigate(
+      `/editor/viewcontent/${event.id.split("-")[0].toString()}?from=calendar`,
+      {
+        state: { articletype: event.type, editable: true },
+      }
+    );
   };
   return (
     <div className="bg-[#F3FFF3] flex flex-col p-4 gap-4 rounded-2xl">
-      <h1 className="text-[16px] font-semibold line-clamp-1">{event.title}</h1>
+      <h1 className="text-[16px] font-bold line-clamp-1">{event.title}</h1>
       {RETURN_CONTENT(event)}
-      <div className="mb-4">
+      <div className="">
         <ScheduledPlatformsUI scheduledArr={event.scheduledPosts} columns={2} />
       </div>
 
-      <div className="flex h-[34px] gap-4 text-[14px] justify-end">
+      <div className="flex h-[34px] gap-4 text-[14px] justify-start">
         <Button
           onClick={handleViewStory}
           className="h-full hover:bg-[#FFFFFF] px-4 py-1.5 border border-[#008001] bg-[#FFFFFF] text-[#008001]"
         >
-          View Article
+          View {event.type.toUpperCase() == "TEXT" ? "Article" : event.type}
         </Button>
         {/* {event.status !== "POSTED" && (
           <Button

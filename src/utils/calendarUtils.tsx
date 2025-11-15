@@ -1,7 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/components/ui/utils";
-import { Popover, PopoverContent } from "@radix-ui/react-popover";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
 import {
   CalendarIcon,
   Facebook,
@@ -74,7 +77,13 @@ export function DatePickerComponent({
           <CalendarIcon className="ml-2 h-4 w-4 shrink-0 " />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0 z-50" align="start">
+      <PopoverContent
+        className="w-auto p-0 "
+        align="start"
+        side="bottom"
+        sideOffset={4}
+        collisionPadding={16}
+      >
         <Calendar
           mode="single"
           selected={dateValue}

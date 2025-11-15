@@ -23,17 +23,17 @@ const AgencyFeedsPage: React.FC = () => {
       {/* Header */}
       <header className="mb-6 md:mb-10">
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-          <div className="space-y-1">
-            <h1 className="text-pretty text-2xl font-semibold tracking-tight md:text-3xl">
+          <div className="flex flex-col gap-3">
+            <h1 className="text-[#101828] font-bold text-[24px]">
               Agency Feeds
             </h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-[#4A5565] h-10 items-center leading-5 tracking-wide font-normal text-[14px]">
               Launch trusted newsrooms in a new tab. No iframes, no blockers—
-              just one-click access.
+              just one-click access.{" "}
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center hidden gap-2">
             <Button variant="outline" className="gap-2 bg-transparent">
               <Sparkles className="h-4 w-4 text-primary" />
               Suggested

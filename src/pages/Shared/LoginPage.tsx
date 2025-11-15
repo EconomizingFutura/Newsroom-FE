@@ -157,7 +157,7 @@ export default function LoginPage() {
                 <div>
                   <label
                     htmlFor="password"
-                    className="block text-sm font-medium mb-[8px] text-[#1E2939]"
+                    className="block text-sm font-medium mb-2 text-[#1E2939]"
                   >
                     Password
                   </label>
@@ -165,6 +165,9 @@ export default function LoginPage() {
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
+                      autoComplete="new-password"
+                      autoCorrect="off"
+                      autoCapitalize="off"
                       placeholder="******"
                       {...register("password", {
                         required: "Password is required",

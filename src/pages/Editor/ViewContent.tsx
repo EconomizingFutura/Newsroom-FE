@@ -57,7 +57,8 @@ const ViewContent: React.FC = () => {
   const from = searchParams.get("from") as
     | CurrentPageType
     | null
-    | "publishCenter";
+    | "publishCenter"
+    | "reviewQueue";
   const state = location.state as {
     articletype?: string;
     editable?: boolean;
@@ -201,13 +202,18 @@ const ViewContent: React.FC = () => {
       });
       return;
     }
-
+    setLoading(true);
     const URL = API_LIST.BASE_URL + API_LIST.EDITOR_EDIT_ARTICLE + id;
     await PATCH(URL, data);
     await fetch();
-    setShowEnableEdit((p) => !p);
-    handleBack();
-    setEnableEdit((p) => !p);
+
+    setLoading(false);
+
+    if (!isEDit) {
+      handleBack();
+      setShowEnableEdit((p) => !p);
+      setEnableEdit((p) => !p);
+    }
   };
 
   // const handleEdit = async();
@@ -373,9 +379,9 @@ const ViewContent: React.FC = () => {
   const ISPOSTED = contentData?.status !== "POSTED";
 
   return (
-    <div className="flex-1 font-openSans py-8 min-h-screen bg-[#f2f6f2] overflow-auto">
+    <div className="flex-1 font-openSans py-8 h-screen bg-[#f2f6f2] overflow-hidden">
       <Toaster position="top-center" richColors />
-      <div className="flex flex-col flex-1 min-h-96 px-6   pt-16 overflow-y-auto">
+      <div className="flex flex-col h-[calc(100vh-3rem)]  px-6 pt-16">
         <ContentHeader
           text="Content Review"
           onClickBack={handleBack}
@@ -384,7 +390,7 @@ const ViewContent: React.FC = () => {
           showEdit={contentData?.status == "POSTED" ? false : showEnableEdit}
           handleEdit={handleEditToggle}
           handleCancel={(id, platforms) => {
-            console.log(id)
+            console.log(id);
             setCancelPlatforms(platforms || []);
           }}
           showCancelSchedule={
@@ -397,9 +403,12 @@ const ViewContent: React.FC = () => {
           <form
             ref={formRef}
             onSubmit={methods.handleSubmit(onSubmit)}
-            className="flex flex-col bg-white shadow-[0px_2px_10px_0px_#959DA533] space-y-6"
+            className={cn(
+              "flex flex-col overflow-y-auto mt-2 shadow-[0px_2px_10px_0px_#959DA533] space-y-6",
+              from === "reviewQueue" && "bg-white min-h-[calc(100dvh-10rem)] "
+            )}
           >
-            <div className="flex flex-col px-6 space-y-6 p-4 sm:p-6 mb-2">
+            <div className="flex-1 overflow-y-auto px-6 space-y-6 p-4 sm:p-6 pb-40">
               {contentData?.type === "TEXT" && (
                 <Text
                   content={contentData}
@@ -702,7 +711,7 @@ const ViewContent: React.FC = () => {
                       Tags <span className="text-red-500">*</span>
                     </label>
 
-                    <div className="relative w-full flex flex-col sm:flex-row gap-2">
+                    <div className="relative  w-full flex flex-col items-center rounded-[8px] h-10 sm:flex-row gap-2">
                       <Input
                         {...register("newTag")}
                         placeholder="Add tag"
@@ -712,16 +721,16 @@ const ViewContent: React.FC = () => {
                             handleAddTag();
                           }
                         }}
-                        className="py-[19px] border-[#ECECEC] bg-[#f7fbf8]"
+                        className=" rounded-[8px] border-[#ECECEC] bg-[#f7fbf8] border h-10! py-1.5"
                       />
                       <Button
                         type="button"
                         size="sm"
                         onClick={handleAddTag}
-                        className="absolute top-1.5 right-3 bg-[#006601] hover:bg-[#006601] px-4 py-1.5 gap-1"
+                        className="absolute top-1 right-3 bg-[#006601] hover:bg-[#006601] font-semibold rounded-[8px] flex max-h-[28px]  text-[14px] px-4 py-1.5 gap-1"
                       >
                         <Plus className="w-3 h-3" />
-                        Add
+                        <span>Add</span>
                       </Button>
                     </div>
                   </>
@@ -768,9 +777,9 @@ const ViewContent: React.FC = () => {
                 from !== "editor-history") ||
               isEDit) &&
               ISPOSTED && (
-                <div className="shadow-[0px_2px_10px_0px_#0000001A,0px_0px_2px_0px_#00000033] border border-b-[#0000001A] bg-[#FFFFFF] h-min py-6 px-4">
+                <div className="sticky bottom-0 left-0 w-full bg-white shadow-[0px_-2px_10px_0px_#0000001A] border-t border-[#0000001A] py-6 px-4 z-50">
                   {!isEDit && enableEdit ? (
-                    <div className="flex flex-wrap justify-end gap-3">
+                    <div className="flex flex-wrap bottom-0 justify-end gap-3">
                       <Button
                         type="button"
                         variant="outline"
@@ -824,22 +833,21 @@ const ViewContent: React.FC = () => {
                   )}
 
                   {isEDit && (
-                    <div className="flex flex-wrap justify-end gap-3">
+                    <div className="flex flex-wrap justify-end gap-6">
                       <Button
                         type="submit"
                         onClick={() => {
                           formRef.current?.requestSubmit();
-                          if (from === "publishCenter") navigate(-1);
                         }}
                         variant="outline"
-                        className="text-[14px] hover:bg-white hover:text-[#006601] w-28 text-[#006601]"
+                        className="text-[14px] font-semibold py-1.5 px-4 h-10 hover:bg-white hover:text-[#006601] w-30 text-[#006601]"
                       >
                         Update
                       </Button>
                       <Button
                         type="button"
                         variant="outline"
-                        className="text-[14px] hover:bg-white hover:text-[#006601] w-28  text-[#006601]"
+                        className="text-[14px] hover:bg-white py-1.5 px-4 hover:text-[#006601] w-30 h-10  text-[#006601] font-semibold"
                         onClick={() => setScheduleModalOpen((p) => !p)}
                       >
                         {contentData?.status == "SCHEDULED"
@@ -849,7 +857,7 @@ const ViewContent: React.FC = () => {
                       <Button
                         type="button"
                         onClick={handlePublishNowClick}
-                        className="bg-[#006601] text-[14px] w-28  hover:bg-[#005001]"
+                        className="bg-[#006601] text-[14px] py-1.5 px-[18px] w-30 h-10 font-semibold  hover:bg-[#005001]"
                       >
                         Publish Now
                       </Button>
