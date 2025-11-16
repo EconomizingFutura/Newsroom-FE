@@ -262,20 +262,22 @@ export function HistoryLog() {
     if (!loading && totalPages) {
       return (
         <div className="sticky bottom-0 bg-gray-50 border-t py-5 z-20">
-          <Pagination
-            currentPage={currentPage}
-            pageCount={pageMetaData.totalPages}
-            onPageChange={(p) => {
-              handlePageChange(p);
-              setCurrentPage(p.selected);
-            }}
-            setCurrentPage={setCurrentPage}
-            setSortConfig={(val) => {
-              const size = Number(val.split(" ")[0]);
-              setPageSize(size);
-              setCurrentPage(1);
-            }}
-          />
+          <div className="ms-10">
+            <Pagination
+              currentPage={currentPage}
+              pageCount={pageMetaData.totalPages}
+              onPageChange={(p) => {
+                handlePageChange(p);
+                setCurrentPage(p.selected);
+              }}
+              setCurrentPage={setCurrentPage}
+              setSortConfig={(val) => {
+                const size = Number(val.split(" ")[0]);
+                setPageSize(size);
+                setCurrentPage(1);
+              }}
+            />
+          </div>
         </div>
       );
     }
@@ -471,7 +473,9 @@ export function HistoryLog() {
                               )}`}
                             >
                               <span className=" font-semibold first-letter:uppercase text-[14px]">
-                                {article.status.toLowerCase()}
+                                {article.status === "REVIEWED"
+                                  ? "Approved"
+                                  : article.status.toLowerCase()}
                               </span>
                             </Badge>
                           </td>

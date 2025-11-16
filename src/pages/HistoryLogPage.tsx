@@ -65,9 +65,9 @@ const HistoryLogPage: React.FC = () => {
   const statusOptions = [
     "All Status",
     "APPROVED",
-    "SUBMITTED",
-    "REVERTED",
     "DRAFT",
+    "REVERTED",
+    "SUBMITTED",
   ];
   const typeOptions = ["All Type", "TEXT", "AUDIO", "VIDEO"];
 

@@ -114,10 +114,10 @@ export const FILTER_OPTIONS = Object.freeze({
   // POSTED
   STATUS: [
     { value: "all", label: "All Status" },
-    { value: "REVIEWED", label: "Reviewed" },
+    { value: "REVIEWED", label: "Approved" },
+    { value: "POSTED", label: "Posted" },
     { value: "REVERTED", label: "Reverted" },
     { value: "SCHEDULED", label: "Scheduled" },
-    { value: "POSTED", label: "Posted" },
     { value: "SUBMITTED", label: "Submitted" },
   ],
   DATE_RANGE: [
