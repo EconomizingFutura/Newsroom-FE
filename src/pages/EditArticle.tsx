@@ -72,6 +72,12 @@ const EditArticle: React.FC = () => {
   const [remarks, setRemarks] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
   const { triggerRefresh } = useSidebarRefresh();
+  const [initialState, setInitialState] = useState<ArticleFormValues | null>(
+    null
+  );
+  const isSame = (a: any, b: any) => {
+    return JSON.stringify(a) === JSON.stringify(b);
+  };
 
   const headerConfig: Record<
     string,
@@ -236,6 +242,7 @@ const EditArticle: React.FC = () => {
               shouldDirty: false,
             });
           });
+          setInitialState(mapped);
 
           setRemarks(response.remarks);
         }
@@ -344,6 +351,78 @@ const EditArticle: React.FC = () => {
     }
   };
 
+  const handleSave = async (data: ArticleFormValues) => {
+    if (!initialState) {
+      console.warn("No initial state yet");
+      return;
+    }
+
+    const changes: Partial<ArticleFormValues> = {};
+
+    // compare every field
+    (Object.keys(initialState) as (keyof ArticleFormValues)[]).forEach(
+      (key) => {
+        const oldVal = initialState[key];
+        const newVal = data[key];
+
+        if (!isSame(oldVal, newVal)) {
+          changes[key] = newVal as any;
+        }
+      }
+    );
+
+    // if no changes found
+    if (Object.keys(changes).length === 0) {
+      toast.info("No changes to save");
+      return;
+    }
+
+    try {
+      // upload only edited audio
+      if (
+        !isSame(initialState.audio, data.audio) &&
+        data.audio instanceof File
+      ) {
+        changes.audio = await uploadToS3(data.audio, "audio", "draft");
+      }
+
+      // upload only edited video
+      if (
+        !isSame(initialState.video, data.video) &&
+        data.video instanceof File
+      ) {
+        changes.video = await uploadToS3(data.video, "video", "draft");
+      }
+
+      // upload only edited thumbnail
+      if (
+        !isSame(initialState.thumbnail, data.thumbnail) &&
+        typeof data.thumbnail === "string"
+      ) {
+        changes.thumbnail = await uploadToS3(
+          base64ToFile(data.thumbnail, `${uuidv4()}.png`),
+          "thumbnail",
+          "draft"
+        );
+      }
+
+      changes.status = "DRAFT";
+
+      await PATCH(
+        `${API_LIST.BASE_URL}${API_LIST.DRAFT_BY_ARTICLE}${id}`,
+        changes
+      );
+
+      toast.success("Draft saved");
+
+      // set new initial state so next save works correctly
+      setInitialState(data);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to save");
+    }
+  };
+
   if (loading) {
     return <Loading />;
   }
@@ -378,6 +457,17 @@ const EditArticle: React.FC = () => {
             {!isPreviewMode && (
               <div className="flex items-center gap-2 px-2 ml-auto">
                 <Button
+                  type="button"
+                  disabled={!isValid || loading}
+                  onClick={() => handleSave(getValues())}
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 border-[#B3E6B3] bg-[#F0F9F0] text-[#008001] hover:bg-[#F0F9F0] hover:text-[#008001] h-[40px] rounded-md"
+                >
+                  <Save className="w-4 h-4" />
+                  Save
+                </Button>
+                <Button
                   form="myForm"
                   type="button"
                   disabled={!isValid || isSubmitting || loading}
@@ -394,7 +484,6 @@ const EditArticle: React.FC = () => {
                   <Save className="w-4 h-4" />
                   Save Draft
                 </Button>
-                {console.log(isSubmitting, "isSubmitting")}
                 <Button
                   form="myForm"
                   type="button"
