@@ -52,6 +52,20 @@ const CalendarPage: React.FC = () => {
 
   const { handleCancelAPI } = useCancelEvent();
 
+  const getCalendarEvents = async () => {
+    try {
+      setLoading(true);
+      const url = API_LIST.BASE_URL + API_LIST.CALENDAR_EVENTS;
+      const response = await GET<CalendarEventsResponse>(url);
+      return response.data;
+    } catch (err: unknown) {
+      const error = err as AxiosError;
+      console.log("Error fetching calendar events:", error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const { handleShow, handleDelete } = {
     handleShow: () => setShowSidebar((p) => !p),
     handleDelete: async (id: string) => {
@@ -66,21 +80,8 @@ const CalendarPage: React.FC = () => {
         selectedEvents[0]?.platform?.split(",") || []
       );
       setShowSidebar((p) => !p);
+      getCalendarEvents();
     },
-  };
-
-  const getCalendarEvents = async () => {
-    try {
-      setLoading(true);
-      const url = API_LIST.BASE_URL + API_LIST.CALENDAR_EVENTS;
-      const response = await GET<CalendarEventsResponse>(url);
-      return response.data;
-    } catch (err: unknown) {
-      const error = err as AxiosError;
-      console.log("Error fetching calendar events:", error.message);
-    } finally {
-      setLoading(false);
-    }
   };
 
   useEffect(() => {
@@ -280,7 +281,6 @@ const CalendarPage: React.FC = () => {
 
             <div className="bg-white rounded-lg shadow-sm p-4">
               <style>{`
-  /* Remove your previous today cell override */
   .fc .fc-day-today {
     background-color: transparent !important;
     border: none !important;
@@ -294,7 +294,13 @@ const CalendarPage: React.FC = () => {
     border-radius: 50%;
     font-weight: 600;
   }
+.fc .fc-more-popover .fc-popover-body{
+    background-color: #ffffff !important;
+}
+    .fc-theme-standard .fc-popover-header{
+        background-color: #ffffff !important;
 
+    }
   .fc .fc-col-header-cell.fc-day-today .fc-col-header-cell-cushion {
     background-color: #008001 !important;
     color: white !important;

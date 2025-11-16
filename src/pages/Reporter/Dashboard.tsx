@@ -119,7 +119,7 @@ export default function Dashboard() {
         </div>
 
         {/* Stats Section */}
-        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-6 mb-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-1">
           {stats.map((stat) => (
             <StatCard
               key={stat.title}

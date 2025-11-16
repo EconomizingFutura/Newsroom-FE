@@ -38,6 +38,7 @@ import type { AxiosError } from "axios";
 import EditorRemarks from "@/components/EditorRemarks";
 import { cn } from "@/components/ui/utils";
 import { transformPlatformsToScheduledPosts } from "../Reporter/utils";
+import { useSidebarRefresh } from "@/store/useSidebarRefresh";
 
 interface ContentForm {
   content: string;
@@ -87,6 +88,7 @@ const ViewContent: React.FC = () => {
   const publishCardRef = useRef<HTMLDivElement>(null);
   const publishButtonRef = useRef<HTMLButtonElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const { triggerRefresh } = useSidebarRefresh();
 
   const methods = useForm<ContentForm>({
     mode: "onChange",
@@ -209,6 +211,8 @@ const ViewContent: React.FC = () => {
 
     setLoading(false);
 
+    triggerRefresh();
+
     if (!isEDit) {
       handleBack();
       setShowEnableEdit((p) => !p);
@@ -224,9 +228,10 @@ const ViewContent: React.FC = () => {
     if (contentData?.id) {
       await revertArticle(contentData.id.toString(), "REVIEWED", " ");
     }
+    triggerRefresh();
     setTimeout(() => {
       handleBack();
-    }, 3000);
+    }, 1600);
   };
 
   const toggleSuccess = () => {
@@ -242,6 +247,7 @@ const ViewContent: React.FC = () => {
     setShow((prev) => ({ ...prev, remarks: !prev.remarks }));
     if (contentData?.id) {
       await revertArticle(contentData.id.toString(), "REVERTED", remarks);
+      triggerRefresh();
     }
     handleBack();
   };
@@ -263,6 +269,7 @@ const ViewContent: React.FC = () => {
   const handleAPI = async () => {
     handleCancelAPI(id as string, cancelPlatforms);
     setShowEditPopup((prev) => !prev);
+    triggerRefresh();
     handleBack();
   };
 
@@ -358,6 +365,7 @@ const ViewContent: React.FC = () => {
       }
     } finally {
       setLoading(false);
+      triggerRefresh();
       handleBack();
     }
   };
@@ -405,7 +413,9 @@ const ViewContent: React.FC = () => {
             onSubmit={methods.handleSubmit(onSubmit)}
             className={cn(
               "flex flex-col overflow-y-auto mt-2 shadow-[0px_2px_10px_0px_#959DA533] space-y-6",
-              from === "reviewQueue" && "bg-white min-h-[calc(100dvh-10rem)] "
+              from &&
+                ["reviewQueue", "dashboard"].includes(from) &&
+                "bg-white min-h-[calc(100dvh-10rem)] "
             )}
           >
             <div className="flex-1 overflow-y-auto px-6 space-y-6 p-4 sm:p-6 pb-40">

@@ -40,6 +40,8 @@ import { v4 as uuidv4 } from "uuid";
 import { HISTORY_STATUS } from "@/utils/draftUtils";
 import Loading from "./Shared/agency-feeds/loading";
 import { toast, Toaster } from "sonner";
+import UnsavedChangesDialog from "@/components/UnsavedDraftsModal";
+import { useSidebarRefresh } from "@/store/useSidebarRefresh";
 
 type ArticleFormValues = {
   category: string;
@@ -60,7 +62,7 @@ const EditArticle: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const from = searchParams.get("from");
-
+  const [showDrafts, setShowDrafts] = useState<boolean>(false);
   const [submit, setSubmit] = useState<{
     type: "DRAFT" | "SUBMIT" | null;
     isSubmit: boolean;
@@ -69,6 +71,7 @@ const EditArticle: React.FC = () => {
   const [newTag, setNewTag] = useState("");
   const [remarks, setRemarks] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
+  const { triggerRefresh } = useSidebarRefresh();
 
   const headerConfig: Record<
     string,
@@ -190,6 +193,10 @@ const EditArticle: React.FC = () => {
     setSubmit({ type: null, isSubmit: false });
   };
   const handleBack = () => {
+    if (from == "drafts") {
+      setShowDrafts((p) => !p);
+      return;
+    }
     if (from) {
       navigate(`/${from}`);
     }
@@ -321,6 +328,7 @@ const EditArticle: React.FC = () => {
         changes
       );
       toast.success("Saved as draft please keep editing");
+      triggerRefresh();
 
       // navigate("/drafts");
     } else if (status === "SUBMIT") {
@@ -331,6 +339,7 @@ const EditArticle: React.FC = () => {
       };
 
       await POST(API_LIST.SUBMIT_ARTICLE, API_DATA);
+      triggerRefresh();
       navigate("/history");
     }
   };
@@ -340,11 +349,11 @@ const EditArticle: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#f6faf6]">
+    <div className="min-h-screen flex flex-col pt-16 bg-[#F6FAF6]">
       {/* Header */}
       <Toaster position="top-center" richColors />
 
-      <header className="sticky top-0 z-10 bg-[#f6faf6] pt-[70px]">
+      <header className="sticky top-0 z-10 bg-[#f6faf6] ">
         <div className="px-4 py-3 flex flex-col gap-[24px]">
           <div className="flex flex-row items-center gap-4">
             <Button
@@ -376,6 +385,7 @@ const EditArticle: React.FC = () => {
                     // save draft -> update status and show UI
                     // setValue("status", "DRAFT");
                     onSubmit(data, getValues("status"));
+                    triggerRefresh();
                   })}
                   variant="outline"
                   size="sm"
@@ -392,6 +402,7 @@ const EditArticle: React.FC = () => {
                   onClick={handleSubmit((data) => {
                     // setValue("status", "SUBMIT");
                     onSubmit(data, "SUBMIT");
+                    triggerRefresh();
                   })}
                   size="sm"
                   className={`bg-green-700 hover:bg-green-700 h-[40px] text-white gap-2 ${
@@ -419,7 +430,7 @@ const EditArticle: React.FC = () => {
                 <h2 className="text-[20px] font-semibold">Content Editor</h2>
                 <div className="flex gap-2">
                   <Badge
-                    className={`px-[16px] h-[30px] font-semibold py-[6px] text-[12px] ${HISTORY_STATUS(
+                    className={`px-4  font-semibold py-1.5 text-[12px] ${HISTORY_STATUS(
                       getValues("status") || ""
                     )}`}
                   >
@@ -656,11 +667,18 @@ const EditArticle: React.FC = () => {
             </div>
           </form>
         </div>
-
-        {submit.isSubmit && submit.type && (
-          <SaveDraftsUI saveType={submit.type} onCancel={handleCloseUI} />
-        )}
       </header>
+      {submit.isSubmit && submit.type && (
+        <SaveDraftsUI saveType={submit.type} onCancel={handleCloseUI} />
+      )}
+      {from == "drafts" && showDrafts && (
+        <UnsavedChangesDialog
+          isOpen={showDrafts}
+          onClose={() => setShowDrafts(false)}
+          onSave={handleSubmit((data) => onSubmit(data, "DRAFT"))}
+          onDiscard={() => navigate(-1)}
+        />
+      )}
     </div>
   );
 };
