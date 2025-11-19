@@ -1,6 +1,7 @@
 import React from "react";
 import { X } from "lucide-react";
 import Delete from "@/assets/Delete.png";
+import { useSidebarRefresh } from "@/store/useSidebarRefresh";
 
 interface DeleteConfirmationProps {
   onConfirm: () => void;
@@ -13,8 +14,11 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
   onCancel,
   wordings,
 }) => {
+  const { triggerRefresh } = useSidebarRefresh();
+
   const handleConfirm = () => {
     onConfirm();
+    triggerRefresh();
   };
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">

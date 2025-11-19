@@ -12,24 +12,38 @@ function base64ToFile(base64: string, filename: string): File {
   }
   return new File([u8arr], filename, { type: mime });
 }
-async function processAndUploadImages(html: string): Promise<string> {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, "text/html");
-  const images = doc.querySelectorAll("img");
+export default async function processAndUploadImages(html: string) {
+  if (!html) return html;
 
-  for (const img of images) {
-    if (img.src.startsWith("data:")) {
-      // Convert base64 to file
-      const file = base64ToFile(img.src, "upload.jpg");
-      // Upload to S3
-      const imageUrl = await uploadToS3(file, "TEXT", "draft");
-      // Replace src with S3 URL
-      img.setAttribute("src", imageUrl);
-    }
+  const imgRegex = /<img[^>]+src="([^">]+)"/g;
+  const matches = [...html.matchAll(imgRegex)];
+
+  if (matches.length === 0) return html;
+
+  let updatedHTML = html;
+
+  for (const match of matches) {
+    const src = match[1];
+
+    // --- 1️⃣ Base64 Detection ---
+    const isBase64Image = /^data:image\/(png|jpe?g|webp|gif);base64,/i.test(src);
+    if (!isBase64Image) continue; // Skip S3, Blob, File, External URLs
+
+    // --- 2️⃣ Convert base64 -> File ---
+    const ext = src.substring(11, src.indexOf(";")).split("/")[1] || "png";
+    const filename = crypto.randomUUID() + "." + ext;
+    const file = base64ToFile(src, filename);
+
+    // --- 3️⃣ Upload ---
+    const s3url = await uploadToS3(file, "TEXT", "draft");
+
+    // --- 4️⃣ Replace this base64 image with S3 URL ---
+    updatedHTML = updatedHTML.replace(src, s3url);
   }
 
-  return doc.body.innerHTML; // cleaned HTML with S3 URLs
+  return updatedHTML;
 }
+
 
 export function extractTextSummary(
   html: unknown,
@@ -61,8 +75,6 @@ export function extractTextSummary(
     wordCount,
   };
 }
-
-export default processAndUploadImages;
 
 export const transformPlatformsToScheduledPosts = (
   platforms: { platformName: string; date: string; time: string }[]

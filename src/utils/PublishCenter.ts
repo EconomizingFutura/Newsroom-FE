@@ -51,6 +51,18 @@ export interface TransformedItem {
   scheduledPosts: ScheduledPost[];
 }
 
+const normalizeTo30MinBlock = (date: Date): Date => {
+  const normalized = new Date(date);
+  const minutes = normalized.getMinutes();
+
+  normalized.setMinutes(minutes < 30 ? 0 : 30);
+  normalized.setSeconds(0);
+  normalized.setMilliseconds(0);
+
+  return normalized;
+};
+
+
 export const transformScheduleData = (
   data: ScheduledItem[],
   viewType: "month" | "week" | "day"
@@ -61,10 +73,12 @@ export const transformScheduleData = (
   data.forEach((article) => {
     if (!article.scheduledPosts?.length) return;
 
-    if (viewType === "day") {
+    if (viewType === "day" || viewType === 'week') {
       // ✅ Show each platform as separate event
       article.scheduledPosts.forEach((post) => {
-        const start = new Date(`${post.date}T${post.time}`);
+        let start = new Date(`${post.date}T${post.time}`);
+        start = normalizeTo30MinBlock(start);
+
         const end = new Date(start);
         end.setMinutes(start.getMinutes() + 30);
 

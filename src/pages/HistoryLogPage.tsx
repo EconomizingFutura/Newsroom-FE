@@ -65,9 +65,9 @@ const HistoryLogPage: React.FC = () => {
   const statusOptions = [
     "All Status",
     "APPROVED",
-    "SUBMITTED",
-    "REVERTED",
     "DRAFT",
+    "REVERTED",
+    "SUBMITTED",
   ];
   const typeOptions = ["All Type", "TEXT", "AUDIO", "VIDEO"];
 
@@ -324,10 +324,10 @@ const HistoryLogPage: React.FC = () => {
             <div className="flex-1 overflow-y-auto mt-4 space-y-4 pr-2">
               <div
                 style={{ boxShadow: "0px 2px 10px 0px #959DA533" }}
-                className="bg-white rounded-lg border px-3 border-gray-200 overflow-hidden"
+                className="bg-white rounded-lg border w-full px-3 border-gray-200 overflow-hidden"
               >
                 <div className="overflow-x-auto px-3">
-                  <table className="w-full p-2">
+                  <table className="w-full py-2 px-1">
                     <thead className="border-b border-gray-200">
                       <tr>
                         <th className="text-left py-3 px-4 font-bold text-[14px] text-[#999999] whitespace-nowrap">
@@ -360,7 +360,7 @@ const HistoryLogPage: React.FC = () => {
                             }
                             className="hover:bg-gray-50 cursor-pointer"
                           >
-                            <td className="py-4 px-4 max-w-[250px] whitespace-nowrap">
+                            <td className="py-4 px-8 max-w-[280px] whitespace-nowrap">
                               <div
                                 className="font-medium text-[#1E2939] truncate"
                                 title={article.title}
@@ -413,7 +413,9 @@ const HistoryLogPage: React.FC = () => {
                                 variant="ghost"
                                 size="sm"
                                 className="text-gray-600 border border-[#4F668133] h-8 w-8 hover:text-gray-900"
-                                onClick={() => handleEdit(article.id,article.status)}
+                                onClick={() =>
+                                  handleEdit(article.id, article.status)
+                                }
                               >
                                 <Eye className="w-4 h-4" />
                               </Button>
@@ -422,7 +424,9 @@ const HistoryLogPage: React.FC = () => {
                                   variant="ghost"
                                   size="sm"
                                   className="text-gray-600 border border-[#4F668133] h-8 w-8 hover:text-gray-900"
-                                onClick={() => handleEdit(article.id,article.status)}
+                                  onClick={() =>
+                                    handleEdit(article.id, article.status)
+                                  }
                                 >
                                   <PencilLine className="w-4 h-4" />
                                 </Button>
@@ -452,13 +456,15 @@ const HistoryLogPage: React.FC = () => {
       {/* Sticky Pagination */}
       {pageMetaData.totalPages >= 1 && (
         <div className="sticky bottom-0 bg-gray-50 border-t py-5 z-20">
-          <Pagination
-            currentPage={pageMetaData.page}
-            pageCount={pageMetaData.totalPages}
-            onPageChange={handlePageChange}
-            setCurrentPage={setCurrentPage}
-            setSortConfig={handlePageSize}
-          />
+          <div className="ms-16">
+            <Pagination
+              currentPage={pageMetaData.page}
+              pageCount={pageMetaData.totalPages}
+              onPageChange={handlePageChange}
+              setCurrentPage={setCurrentPage}
+              setSortConfig={handlePageSize}
+            />
+          </div>
         </div>
       )}
     </div>

@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Card } from "../ui/card";
 import type { scheduledPostArray } from "@/types/apitypes";
+import { useSidebarRefresh } from "@/store/useSidebarRefresh";
 
 interface PublishPlatform {
   id: string;
@@ -43,6 +44,7 @@ export function SchedulePlatformCard({
 
   const [platforms, setPlatforms] = useState<PublishPlatform[]>([]);
   const cardRef = useRef<HTMLDivElement>(null);
+  const { triggerRefresh } = useSidebarRefresh();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -111,6 +113,7 @@ export function SchedulePlatformCard({
       .map((p) => p.id);
     if (selectedPlatforms.length === 0) return;
     onPublish(selectedPlatforms);
+    triggerRefresh();
     onClose();
   };
 

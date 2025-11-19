@@ -104,7 +104,7 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
 
 function StatCard({ title, count, icon: Icon, color }: StatCardProps) {
   return (
-    <div className="flex items-center justify-between rounded-2xl shadow-md bg-white px-5 py-4 max-w-[225px] w-full">
+    <div className="flex items-center justify-between rounded-2xl shadow-md bg-white px-5 py-4 max-w-[234px] w-full">
       {/* Left Section */}
       <div>
         <p className="text-gray-500 text-sm max-w-28 font-medium">{title}</p>
@@ -127,10 +127,15 @@ function DashboardListCard({
   onClick,
 }: NotificationCardProps) {
   return (
-    <div className="flex items-center justify-between bg-red-50 rounded-xl p-4 shadow-sm">
+    <div
+      onClick={() => onClick(id)}
+      className="flex items-center justify-between bg-red-50 rounded-xl p-4 shadow-sm"
+    >
       {/* Left Section */}
-      <div>
-        <p className=" warning-color mb-[8px] truncate max-w-[750px]">{title}</p>
+      <div className="max-w-[70%]">
+        <p className=" warning-color mb-[8px] truncate max-w-[750px]">
+          {title}
+        </p>
         <p className="text-[#E7000B] truncate max-w-[250px]">{message}</p>
       </div>
 

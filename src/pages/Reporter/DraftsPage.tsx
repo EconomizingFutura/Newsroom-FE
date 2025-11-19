@@ -15,6 +15,7 @@ import { RenderGridView, RenderListViewDraft } from "./RevertedPost/Components";
 import Pagination from "@/components/Pagination";
 import { usePagination } from "@/hooks/usePagination";
 import Loading from "../Shared/agency-feeds/loading";
+import { useSidebarRefresh } from "@/store/useSidebarRefresh";
 
 export default function DraftsPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -23,6 +24,8 @@ export default function DraftsPage() {
   >("All Type");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [data, setData] = useState<RevertedArticleTypes[]>([]);
+  const { triggerRefresh } = useSidebarRefresh();
+
   const [pageMetaData, setPageMetaData] = useState<{
     total: number;
     page: number;
@@ -97,22 +100,27 @@ export default function DraftsPage() {
     if (!deletePost.id) {
       return;
     }
-    DELETE_DRAFT_MODAL_ID(
-      deletePost.id,
-      (filteredArticles) => {
-        const revertedArticles = filteredArticles.map((draft) => ({
-          ...draft,
-          remarks: "",
-          editor: "",
-        }));
-        setData(revertedArticles);
-      },
-      data
-    );
-    setDeletePost((pre) => ({
-      id: null,
-      isOpen: !pre.isOpen,
-    }));
+    try {
+      DELETE_DRAFT_MODAL_ID(
+        deletePost.id,
+        (filteredArticles) => {
+          const revertedArticles = filteredArticles.map((draft) => ({
+            ...draft,
+            remarks: "",
+            editor: "",
+          }));
+          setData(revertedArticles);
+          triggerRefresh();
+        },
+        data
+      );
+      setDeletePost((pre) => ({
+        id: null,
+        isOpen: !pre.isOpen,
+      }));
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleEdit = (id: string) => {
@@ -182,7 +190,7 @@ export default function DraftsPage() {
         {loading ? (
           <Loading />
         ) : (
-          <div className="flex-1 overflow-y-auto rounded-md bg-transparent ">
+          <div className="flex-1 overflow-y-auto w-full rounded-md bg-transparent ">
             {filteredArticles?.length === 0 ? (
               renderEmptyState()
             ) : viewMode === "grid" ? (
@@ -207,14 +215,16 @@ export default function DraftsPage() {
 
       {/* Sticky Pagination */}
       {pageMetaData.totalPages >= 1 && (
-        <div className="sticky bottom-0 bg-gray-50 border-t py-5 z-20">
-          <Pagination
-            currentPage={pageMetaData.page}
-            pageCount={pageMetaData.totalPages}
-            onPageChange={handlePageChange}
-            setCurrentPage={setCurrentPage}
-            setSortConfig={handlePageSize}
-          />
+        <div className="sticky bottom-0  bg-gray-50 border-t py-5 z-20">
+          <div className="ms-16">
+            <Pagination
+              currentPage={pageMetaData.page}
+              pageCount={pageMetaData.totalPages}
+              onPageChange={handlePageChange}
+              setCurrentPage={setCurrentPage}
+              setSortConfig={handlePageSize}
+            />
+          </div>
         </div>
       )}
 

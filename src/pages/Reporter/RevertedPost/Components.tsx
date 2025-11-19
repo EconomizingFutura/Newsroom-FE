@@ -27,7 +27,7 @@ export const RenderGridView: React.FC<GridViewProps> = ({
   handleEdit,
   status,
 }) => (
-  <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+  <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-3">
     {filteredArticles?.map((article) => (
       <SharedCard
         id={article.id}
@@ -131,7 +131,7 @@ export const RenderListViewDraft: React.FC<ListViewProps> = ({
           <div className="flex !cursor-pointer items-center   justify-between">
             <div className="flex-1 !cursor-pointer flex flex-col gap-3  min-w-0">
               <div className="flex items-center !cursor-pointer gap-3 ">
-                <h3 className="text-[16px] font-semibold text-[#101828] max-w-6/12 truncate">
+                <h3 className="text-[16px] font-semibold text-[#101828] max-w-10/12 truncate">
                   {article.title}
                 </h3>
                 <div className="flex gap-3 flex-shrink-0">

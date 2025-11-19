@@ -38,7 +38,7 @@ const Card: React.FC<CardProps> = ({
     <div
       className="
         w-full
-    max-w-[358px]
+    max-w-[390px]
     h-[294px]
     bg-white
     rounded-xl
@@ -61,16 +61,17 @@ const Card: React.FC<CardProps> = ({
       </h2>
 
       {/* Tags */}
-      <div className="flex items-center gap-2 mt-1">
+      <div className="flex items-center gap-2 my-2.5">
         <span
-          className={`px-2 py-0.5 text-xs font-medium rounded-md ${type === "TEXT"
-            ? "bg-[#DBEAFE] border border-[#BEDBFF] text-[#193CB8]"
-            : type === "AUDIO"
+          className={`px-2 py-0.5 text-xs font-medium rounded-md ${
+            type === "TEXT"
+              ? "bg-[#DBEAFE] border border-[#BEDBFF] text-[#193CB8]"
+              : type === "AUDIO"
               ? "bg-[#F3E8FF] border border-[#EAD4FF] text-[#6D11B0]"
               : type === "VIDEO"
-                ? "bg-[#FFEDD4] border border-[#FFD6A7] text-[#9F2E00]"
-                : "bg-gray-200 border border-gray-300 text-gray-700"
-            }`}
+              ? "bg-[#FFEDD4] border border-[#FFD6A7] text-[#9F2E00]"
+              : "bg-gray-200 border border-gray-300 text-gray-700"
+          }`}
         >
           {type}
         </span>
@@ -94,7 +95,7 @@ const Card: React.FC<CardProps> = ({
               mediaType="audio"
               src={thumbnailUrl || "/images/audio-placeholder.png"}
               alt="Audio Thumbnail"
-              className="w-full h-[100px] object-cover rounded-lg"
+              className="w-full h-[90px] object-cover rounded-lg"
             />
           </div>
         )}
@@ -105,7 +106,7 @@ const Card: React.FC<CardProps> = ({
               mediaType="video"
               src={thumbnailUrl}
               alt="Video Thumbnail"
-              className="w-full h-[100px] object-cover rounded-lg"
+              className="w-full h-[90px] object-cover rounded-lg"
             />
           </div>
         )}
@@ -128,18 +129,39 @@ const Card: React.FC<CardProps> = ({
       {savedTime && status === "DRAFT" && (
         <div
           className={cn(
-            "grid items-center justify-between mt-2 text-[13px] text-gray-500",
+            "grid items-center gap-8 mt-2 text-[13px] text-gray-500",
             wordCount > 0 ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-2"
           )}
         >
-          <div className="flex items-center gap-2 truncate">
-            <Clock className="w-4 h-4" />
-            <p className="truncate">Updated {formatDate(updatedDate)}</p>
+          <div
+            className={cn(
+              "flex items-center gap-2",
+              wordCount > 0 ? " max-w-24 " : "w-min"
+            )}
+          >
+            <p className="">
+              <Clock className="w-4 h-4" />
+            </p>
+            <p
+              className={cn(
+                "flex  ",
+                wordCount > 0 ? "flex-col" : "w-min gap-2 items-center"
+              )}
+            >
+              <span>Updated</span>
+              <span>{formatDate(updatedDate)}</span>
+            </p>
           </div>
 
           {wordCount > 0 && (
-            <div className="text-center truncate">
-              <p>{wordCount} words</p>
+            <div
+              className={cn(
+                "text-center  flex",
+                wordCount > 0 ? "flex-col" : "w-min items-center"
+              )}
+            >
+              <span>{wordCount}</span>
+              <span>Words</span>
             </div>
           )}
 

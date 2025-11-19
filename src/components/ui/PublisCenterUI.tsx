@@ -37,10 +37,6 @@ export const ScheduledPlatformsUI: React.FC<ScheduledPlatformsUIProps> = ({
   const pname = "/editor/publishCenter";
   const clendarPath = "/editor/calendarView";
 
-  const sorted = scheduledArr.sort((a, b) =>
-    a.isPosted === b.isPosted ? 0 : a.isPosted ? -1 : 1
-  );
-
   return (
     <div
       className={cn(
@@ -50,31 +46,41 @@ export const ScheduledPlatformsUI: React.FC<ScheduledPlatformsUIProps> = ({
     >
       <div className="flex items-start flex-wrap gap-2">
         {published.length > 0 && (
-          <div className="font-semibold text-[#00B401] text-[12px] me-3">
-            Published:
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-semibold text-[#00B401] text-[12px]">
+              Published:
+            </span>
+
+            {/* All published icons */}
+            {published.map((item, idx) => (
+              <div key={`pub-${idx}`} className="flex items-center gap-1">
+                {returnPlatformIcon(item.platform, true)}
+              </div>
+            ))}
+
+            {/* ONE separator at end of published group IF upcoming exists */}
+            {upcoming.length > 0 && (
+              <span className="text-slate-400 mx-1">|</span>
+            )}
           </div>
         )}
+        {upcoming.length > 0 && (
+          <div className="flex items-center gap-2 flex-wrap">
+            {upcoming.map((item, idx) => (
+              <div key={`up-${idx}`} className="flex items-center gap-1">
+                {returnPlatformIcon(item.platform, false)}
 
-        <div className="flex flex-wrap gap-3 items-center">
-          {sorted.map((item, idx) => (
-            <div
-              key={item.platform}
-              className="flex items-center gap-2 flex-wrap"
-            >
-              {returnPlatformIcon(item.platform, item.isPosted)}
-
-              {/* Upcoming items */}
-              {!item.isPosted && (
                 <span className="text-[12px] text-slate-700 whitespace-nowrap">
                   {item.date.toString()} {item.time}
                 </span>
-              )}
-              {idx !== sorted.length - 1 && !item.isPosted && (
-                <span className="text-slate-400 mx-1">|</span>
-              )}
-            </div>
-          ))}
-        </div>
+
+                {idx !== upcoming.length - 1 && (
+                  <span className="text-slate-400 mx-1">|</span>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

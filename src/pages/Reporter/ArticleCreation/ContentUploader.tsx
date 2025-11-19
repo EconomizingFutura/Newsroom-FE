@@ -18,6 +18,7 @@ import processAndUploadImages from "../utils";
 import Loading from "@/pages/Shared/agency-feeds/loading";
 import { toast, Toaster } from "sonner";
 import { throttle } from "lodash";
+import { useSidebarRefresh } from "@/store/useSidebarRefresh";
 
 type FormData = {
   title: string;
@@ -46,6 +47,7 @@ const ContentUploader = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
   const [isSavingToDraft, setIsSavingToDraft] = useState(false);
+  const { triggerRefresh } = useSidebarRefresh();
 
   const handleSubmitUI = (type: "DRAFT" | "SUBMIT") => {
     setSubmit({
@@ -265,6 +267,7 @@ const ContentUploader = () => {
         setValue("reporterId", null);
       } else {
         toast.success("Saved as draft! You can continue editing.");
+        setValue('content',modifiedContent)
       }
     } catch (err) {
       console.error(err);
@@ -272,6 +275,7 @@ const ContentUploader = () => {
     } finally {
       setIsSavingDraft(false);
       setIsSavingToDraft(false);
+      triggerRefresh();
     }
   };
   // wrap inside useMemo to preserve the same throttled function instance
@@ -282,6 +286,7 @@ const ContentUploader = () => {
         () => {
           saveDraft(false);
           setIsSavingDraft(true);
+          triggerRefresh();
         },
         5000,
         { trailing: false }
@@ -295,6 +300,7 @@ const ContentUploader = () => {
         () => {
           saveDraft(true);
           setIsSavingToDraft(true);
+          triggerRefresh();
         },
         5000,
         { trailing: false }

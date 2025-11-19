@@ -68,7 +68,7 @@ export function Dashboard() {
             Here's what's happening in your newsroom today.
           </p>
         </div>
-        <div className="flex flex-col sm:flex-row flex-1 w-full sm:flex-wrap gap-6 mb-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-1">
           {stats.map((stat, index) => (
             <StatCard
               key={index}

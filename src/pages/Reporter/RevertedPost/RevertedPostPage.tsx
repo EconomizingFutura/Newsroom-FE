@@ -15,6 +15,7 @@ import { RenderGridView, RenderListView } from "./Components";
 import Loading from "@/pages/Shared/agency-feeds/loading";
 import { usePagination } from "@/hooks/usePagination";
 import Pagination from "@/components/Pagination";
+import { useSidebarRefresh } from "@/store/useSidebarRefresh";
 
 const RevertedPostPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -31,6 +32,7 @@ const RevertedPostPage: React.FC = () => {
 
   const filterOptions = ["All Type", "TEXT", "AUDIO", "VIDEO"];
   const navigate = useNavigate();
+  const { triggerRefresh } = useSidebarRefresh();
 
   const [pageMetaData, setPageMetaData] = useState({
     total: 11,
@@ -101,6 +103,7 @@ const RevertedPostPage: React.FC = () => {
           editor: "",
         }));
         setData(revertedArticles);
+        triggerRefresh();
       },
       data
     );
@@ -140,63 +143,65 @@ const RevertedPostPage: React.FC = () => {
 
         {/* Sticky Toolbar (Filters + Search) */}
         <section className="sticky top-16 z-20 bg-[#F6FAF6] my-3 pb-2">
-         
-            <SearchFilterTab
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              filterOptions={filterOptions}
-              activeFilter={activeFilter}
-              setActiveFilter={(filter: string) =>
-                setActiveFilter(filter as "All Type" | "TEXT" | "AUDIO" | "VIDEO")
-              }
-            />
+          <SearchFilterTab
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            filterOptions={filterOptions}
+            activeFilter={activeFilter}
+            setActiveFilter={(filter: string) =>
+              setActiveFilter(filter as "All Type" | "TEXT" | "AUDIO" | "VIDEO")
+            }
+          />
         </section>
- {loading ? (
-            <Loading />
-          ) :( <div className="flex-1 overflow-y-auto mt-4 pb-10">
-         {filteredArticles.length > 0 ? (
-            viewMode === "grid" ? (
-              <RenderGridView
-                filteredArticles={filteredArticles}
-                handleDeletePost={(id) => setDeletePost({ id, isOpen: true })}
-                handleEdit={handleEdit}
-                status="REVERTED"
-              />
+        {loading ? (
+          <Loading />
+        ) : (
+          <div className="flex-1 overflow-y-auto mt-4 pb-10">
+            {filteredArticles.length > 0 ? (
+              viewMode === "grid" ? (
+                <RenderGridView
+                  filteredArticles={filteredArticles}
+                  handleDeletePost={(id) => setDeletePost({ id, isOpen: true })}
+                  handleEdit={handleEdit}
+                  status="REVERTED"
+                />
+              ) : (
+                <RenderListView
+                  handleDeletePost={(id) => setDeletePost({ id, isOpen: true })}
+                  handleEdit={handleEdit}
+                  filteredArticles={filteredArticles}
+                />
+              )
             ) : (
-              <RenderListView
-                handleDeletePost={(id) => setDeletePost({ id, isOpen: true })}
-                handleEdit={handleEdit}
-                filteredArticles={filteredArticles}
-              />
-            )
-          ) : (
-            <div className="flex flex-col items-center justify-center py-20">
-              <div className="w-16 h-16 bg-red-100 rounded-lg flex items-center justify-center mb-6">
-                <RotateCcw className="w-8 h-8 text-red-500" />
+              <div className="flex flex-col items-center justify-center py-20">
+                <div className="w-16 h-16 bg-red-100 rounded-lg flex items-center justify-center mb-6">
+                  <RotateCcw className="w-8 h-8 text-red-500" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  No reverted posts found
+                </h3>
+                <p className="text-sm text-gray-500">
+                  All your articles are in good standing
+                </p>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                No reverted posts found
-              </h3>
-              <p className="text-sm text-gray-500">
-                All your articles are in good standing
-              </p>
-            </div>
-          )}
-        </div>) }
+            )}
+          </div>
+        )}
         {/* Main Content */}
-       
       </main>
 
       {/* Sticky Pagination */}
       {pageMetaData.totalPages >= 1 && (
         <div className="sticky bottom-0 bg-gray-50 border-t py-5 z-20">
-          <Pagination
-            currentPage={pageMetaData.page}
-            pageCount={pageMetaData.totalPages}
-            onPageChange={handlePageChange}
-            setCurrentPage={setCurrentPage}
-            setSortConfig={handlePageSize}
-          />
+          <div className="ms-16">
+            <Pagination
+              currentPage={pageMetaData.page}
+              pageCount={pageMetaData.totalPages}
+              onPageChange={handlePageChange}
+              setCurrentPage={setCurrentPage}
+              setSortConfig={handlePageSize}
+            />
+          </div>
         </div>
       )}
 

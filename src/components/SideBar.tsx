@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import {
   BookCheck,
@@ -17,6 +17,9 @@ import { Separator } from "@radix-ui/react-separator";
 import type { currentPageType } from "../types/sidebarTypes";
 import { cn } from "./ui/utils";
 import { USER_ROLE } from "@/utils/utils";
+import { POST } from "@/api/apiMethods";
+import { API_LIST } from "@/api/endpoints";
+import { useSidebarRefresh } from "@/store/useSidebarRefresh";
 
 export type UserRole = "REPORTER" | "EDITOR";
 
@@ -37,82 +40,18 @@ export interface SidebarTypes {
   currentView: currentPageType;
 }
 
-const menuConfig = {
-  REPORTER: [
-    {
-      key: "newsFeeds",
-      label: "Agency Feeds",
-      icon: <Rss className="w-4 h-4" />,
-      action: "onNavigateToNewsFeeds",
-    },
-    {
-      key: "dashboard",
-      label: "Dashboard",
-      icon: <Users className="w-4 h-4" />,
-      action: "onNavigateToDashboard",
-    },
-    {
-      key: "drafts",
-      label: "Drafts",
-      icon: <FileText className="w-4 h-4" />,
-      action: "onNavigateToDrafts",
-      badge: 4,
-    },
-    {
-      key: "reverted",
-      label: "Reverted Post",
-      icon: <RotateCcw className="w-4 h-4" />,
-      action: "onNavigateToReverted",
-      badge: 4,
-    },
-    {
-      key: "history",
-      label: "History Log",
-      icon: <History className="w-4 h-4" />,
-      action: "onNavigateToHistory",
-    },
-  ],
-  EDITOR: [
-    {
-      key: "newsFeeds",
-      label: "Agency Feeds",
-      icon: <Rss className="w-4 h-4" />,
-      action: "onNavigateToNewsFeeds",
-    },
-    {
-      key: "editor-dashboard",
-      label: "Dashboard",
-      icon: <Users className="w-4 h-4" />,
-      action: "onNavigateEditorDashboard",
-    },
-    {
-      key: "review-queue",
-      label: "Review Queue",
-      icon: <FileText className="w-4 h-4" />,
-      action: "onNavigateEditorReviewQueue",
-      badge: 4,
-    },
-    {
-      key: "publish-center",
-      label: "Publish Center",
-      icon: <BookCheck className="w-4 h-4" />,
-      action: "onNavigateEditorPublishCenter",
-      badge: 4,
-    },
-    {
-      key: "calendar",
-      label: "Calendar",
-      icon: <Calendar className="w-4 h-4" />,
-      action: "onNavigateEditorCalendarView",
-    },
-    {
-      key: "editor-history",
-      label: "History Log",
-      icon: <History className="w-4 h-4" />,
-      action: "onNavigateEditorHistory",
-    },
-  ],
-};
+interface SidebarStats {
+  DRAFT?: number;
+  REVERTED?: number;
+  SUBMITTED?: number;
+  PUBLISHED?: number;
+  SCHEDULED?: number;
+}
+
+interface SidebarStatsResponse {
+  success: boolean;
+  stats: SidebarStats;
+}
 
 const SideBar: React.FC<SidebarTypes> = (props) => {
   const {
@@ -122,6 +61,8 @@ const SideBar: React.FC<SidebarTypes> = (props) => {
     currentView,
   } = props;
   const currentRole: UserRole = (USER_ROLE() as UserRole) || "REPORTER";
+  const [stats, setStats] = useState<SidebarStats>({});
+  const { refreshToken } = useSidebarRefresh();
 
   // const currentRole: UserRole = "reporter";
   const [multiWindow, setMultiWindow] = useState({
@@ -131,6 +72,102 @@ const SideBar: React.FC<SidebarTypes> = (props) => {
     drafts: false,
     favourites: false,
   });
+
+  const fetchStats = async () => {
+    const url = API_LIST.BASE_URL + API_LIST.SIDEBAR_STATS;
+    try {
+      const data = (await POST(url, {
+        role: currentRole,
+      })) as SidebarStatsResponse;
+      if (data) {
+        setStats(data.stats);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshToken]);
+
+  const menuConfig = {
+    REPORTER: [
+      {
+        key: "newsFeeds",
+        label: "Agency Feeds",
+        icon: <Rss className="w-4 h-4" />,
+        action: "onNavigateToNewsFeeds",
+      },
+      {
+        key: "dashboard",
+        label: "Dashboard",
+        icon: <Users className="w-4 h-4" />,
+        action: "onNavigateToDashboard",
+      },
+      {
+        key: "drafts",
+        label: "Drafts",
+        icon: <FileText className="w-4 h-4" />,
+        action: "onNavigateToDrafts",
+        badge: stats.DRAFT,
+      },
+      {
+        key: "reverted",
+        label: "Reverted Post",
+        icon: <RotateCcw className="w-4 h-4" />,
+        action: "onNavigateToReverted",
+        badge: stats.REVERTED,
+      },
+      {
+        key: "history",
+        label: "History Log",
+        icon: <History className="w-4 h-4" />,
+        action: "onNavigateToHistory",
+      },
+    ],
+    EDITOR: [
+      {
+        key: "newsFeeds",
+        label: "Agency Feeds",
+        icon: <Rss className="w-4 h-4" />,
+        action: "onNavigateToNewsFeeds",
+      },
+      {
+        key: "editor-dashboard",
+        label: "Dashboard",
+        icon: <Users className="w-4 h-4" />,
+        action: "onNavigateEditorDashboard",
+      },
+      {
+        key: "review-queue",
+        label: "Review Queue",
+        icon: <FileText className="w-4 h-4" />,
+        action: "onNavigateEditorReviewQueue",
+        badge: stats.SUBMITTED,
+      },
+      {
+        key: "publish-center",
+        label: "Publish Center",
+        icon: <BookCheck className="w-4 h-4" />,
+        action: "onNavigateEditorPublishCenter",
+        badge: (stats?.PUBLISHED ?? 0) + (stats?.SCHEDULED ?? 0),
+      },
+      {
+        key: "calendar",
+        label: "Calendar",
+        icon: <Calendar className="w-4 h-4" />,
+        action: "onNavigateEditorCalendarView",
+      },
+      {
+        key: "editor-history",
+        label: "History Log",
+        icon: <History className="w-4 h-4" />,
+        action: "onNavigateEditorHistory",
+      },
+    ],
+  };
 
   const toggleCheckbox = (key: keyof typeof multiWindow) => {
     setMultiWindow((prev) => ({
@@ -173,7 +210,7 @@ const SideBar: React.FC<SidebarTypes> = (props) => {
                     {item.icon}
                     {item.label}
                   </span>
-                  {item.badge && false && (
+                  {typeof item.badge === "number" && item.badge > 0 && (
                     <span
                       className={cn(
                         "bg-green-600 text-white text-xs font-medium px-2 rounded-full",
@@ -182,7 +219,7 @@ const SideBar: React.FC<SidebarTypes> = (props) => {
                           : "bg-[#D9F2D9] border border-[#B3E6B3] text-[#006601]"
                       )}
                     >
-                      4
+                      {item.badge}
                     </span>
                   )}
                 </Button>

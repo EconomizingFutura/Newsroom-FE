@@ -19,6 +19,7 @@ import Pagination from "@/components/Pagination";
 import { extractTextSummary } from "../Reporter/utils";
 import Loading from "../Shared/agency-feeds/loading";
 import { PendingReviewEmptyState } from "@/components/EmptyUI";
+import { useSidebarRefresh } from "@/store/useSidebarRefresh";
 
 export function ReviewQueue() {
   const [activeCategory, setActiveCategory] = useState("Politics");
@@ -51,6 +52,7 @@ export function ReviewQueue() {
   });
 
   const { reviewArticle, isLoading, revertArticle } = useEditorReviewArticle();
+  const { triggerRefresh } = useSidebarRefresh();
 
   const fetch = async () => {
     const response = await reviewArticle(activeCategory, currentPage, pageSize);
@@ -98,6 +100,7 @@ export function ReviewQueue() {
     await revertArticle(storyId, "REVIEWED", " ");
     await fetch();
     toggleSuccess();
+    triggerRefresh();
   };
 
   const handleReject = (storyId: string) => {
@@ -111,6 +114,7 @@ export function ReviewQueue() {
     await fetch();
     toggleRemarks();
     setShow((prev) => ({ ...prev, id: "" }));
+    triggerRefresh();
   };
 
   const handlePageSize = (val: string) => {

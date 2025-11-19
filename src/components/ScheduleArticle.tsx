@@ -55,7 +55,7 @@ const ScheduleArticle = ({
       date: undefined,
     },
   });
-  const [hovered, setHovered] = useState(false);
+  const [hoveredPlatform, setHoveredPlatform] = useState<string | null>(null);
 
   const [platformSchedules, setPlatformSchedules] = useState<
     Record<string, { date?: Date; time?: string; isPosted?: boolean } | null>
@@ -66,8 +66,6 @@ const ScheduleArticle = ({
     Twitter: null,
     Facebook: null,
   });
-
-  console.log(contentData, "cddata");
 
   useEffect(() => {
     if (!contentData?.scheduledPosts) return;
@@ -277,6 +275,10 @@ const ScheduleArticle = ({
   const primaryPlatform = watch("primaryPlatform");
   const inputRef = useRef<HTMLInputElement | null>(null);
 
+  const isAllPlatformData =
+    platformSchedules["All Platform"]?.date &&
+    platformSchedules["All Platform"].date;
+
   const handleDateChange = (selectedDate: string) => {
     const newDate = new Date(selectedDate);
     const currentTime = getValues("time");
@@ -423,6 +425,7 @@ const ScheduleArticle = ({
               <div className="min-h-24">
                 {/* Same As Section */}
                 {primaryPlatform !== "All Platform" &&
+                  !isAllPlatformData &&
                   hasAnyPlatformScheduled && (
                     <>
                       <p className="text-[12px] pb-2 font-semibold text-[#6A7282]">
@@ -441,19 +444,27 @@ const ScheduleArticle = ({
                           .map(([name]) => (
                             <div
                               key={name}
-                              onMouseEnter={() => setHovered(true)}
-                              onMouseLeave={() => setHovered(false)}
+                              onMouseEnter={() => setHoveredPlatform(name)}
+                              onMouseLeave={() => setHoveredPlatform(null)}
                               onClick={() =>
                                 handleSameAs(primaryPlatform, name)
                               }
-                              className="flex items-center bg-[#F0F1F2] text-[#6A7282] w-max py-2 px-3 rounded-[8px] space-x-2 cursor-pointer hover:bg-[#008001] hover:text-white"
+                              className={cn(
+                                "flex items-center bg-[#F0F1F2] text-[#6A7282] w-max py-2 px-3 rounded-[8px] space-x-2 cursor-pointer",
+                                hoveredPlatform === name &&
+                                  "bg-[#008001] text-white"
+                              )}
                             >
                               <PlatformIcon
                                 name={name}
-                                color={!hovered ? "#2C3E50" : "#ffffff"}
+                                color={
+                                  hoveredPlatform === name
+                                    ? "#ffffff"
+                                    : "#2C3E50"
+                                }
                               />
 
-                              <p className="font-semibold  text-[14px]">
+                              <p className="font-semibold text-[14px]">
                                 {name}
                               </p>
                             </div>
