@@ -9,7 +9,7 @@ import { createPortal } from "react-dom";
 import { SchedulePlatformCard } from "./TextEditor/SchedulePlatformCard";
 
 interface CalendarSidebarProps {
-  onConfirmdelete: (id: string) => void;
+  onConfirmdelete: (id: string,platforms:string[]) => void;
   onToggle: () => void;
   events: TransformedItem[];
 }
@@ -20,7 +20,7 @@ interface ArticleCardProps {
   onClose?: () => void;
   onCancelClick?: (
     event: TransformedItem,
-    ref: React.RefObject<HTMLButtonElement>
+    ref: React.RefObject<HTMLButtonElement | null>
   ) => void;
 }
 
@@ -66,8 +66,7 @@ const RETURN_CONTENT = (event: TransformedItem) => {
 
 const Article = ({ event, onCancelClick }: ArticleCardProps) => {
   const navigate = useNavigate();
-  const cancelButtonRef = useRef<HTMLButtonElement>(null);
-
+const cancelButtonRef = useRef<HTMLButtonElement | null>(null);
   const showCancel = event.scheduledPosts.some((a) => !a.isPosted);
 
   const handleViewStory = () => {
@@ -98,7 +97,7 @@ const Article = ({ event, onCancelClick }: ArticleCardProps) => {
         {showCancel && (
           <Button
             ref={cancelButtonRef}
-            onClick={() => onCancelClick(event, cancelButtonRef)}
+            onClick={() => onCancelClick?.(event, cancelButtonRef)}
             className="h-full bg-[#FFFFFF] hover:bg-[#FFFFFF] border border-[#1E2939] text-[#1E2939]"
           >
             <X /> <span>Cancel Schedule</span>
@@ -122,7 +121,7 @@ const CalendarSidebar = ({
 
   const handleCancelClick = (
     event: TransformedItem,
-    ref: React.RefObject<HTMLButtonElement>
+    ref: React.RefObject<HTMLButtonElement | null>
   ) => {
     setCancelEvent(event);
     if (ref.current) {

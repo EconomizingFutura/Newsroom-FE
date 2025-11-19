@@ -1,7 +1,6 @@
 import type { DraftArticle } from "@/types/draftPageTypes";
 import { DELETE } from "@/api/apiMethods";
 import { API_LIST } from "@/api/endpoints";
-import { useSidebarRefresh } from "@/store/useSidebarRefresh";
 export const getTypeColor = (type: string) => {
   switch (type) {
     case "text":
