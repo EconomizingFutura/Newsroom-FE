@@ -42,6 +42,7 @@ import Loading from "./Shared/agency-feeds/loading";
 import { toast, Toaster } from "sonner";
 import UnsavedChangesDialog from "@/components/UnsavedDraftsModal";
 import { useSidebarRefresh } from "@/store/useSidebarRefresh";
+import processAndUploadImages from "./Reporter/utils";
 
 type ArticleFormValues = {
   category: string;
@@ -376,6 +377,7 @@ const EditArticle: React.FC = () => {
       toast.info("No changes to save");
       return;
     }
+      console.log(initialState)
 
     try {
       // upload only edited audio
@@ -394,6 +396,10 @@ const EditArticle: React.FC = () => {
         changes.video = await uploadToS3(data.video, "video", "draft");
       }
 
+       if (
+        !isSame(initialState.content, data.content)) {
+        changes.content = await processAndUploadImages(data.content);
+      }
       // upload only edited thumbnail
       if (
         !isSame(initialState.thumbnail, data.thumbnail) &&
@@ -415,6 +421,11 @@ const EditArticle: React.FC = () => {
 
       toast.success("Draft saved");
 
+        if (
+        !isSame(initialState.content, data.content)) {
+      setValue('content',changes.content)
+      }
+      console.log(data)
       // set new initial state so next save works correctly
       setInitialState(data);
     } catch (err) {

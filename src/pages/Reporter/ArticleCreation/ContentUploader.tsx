@@ -267,6 +267,7 @@ const ContentUploader = () => {
         setValue("reporterId", null);
       } else {
         toast.success("Saved as draft! You can continue editing.");
+        setValue('content',modifiedContent)
       }
     } catch (err) {
       console.error(err);
