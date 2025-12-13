@@ -11,6 +11,20 @@ export type Agency = {
 
 export const agencies: Agency[] = [
   {
+    id: "pti",
+    name: "PTI",
+    url: "https://www.ptinews.com/",
+    domain: "ptinews.com",
+    color: "group-hover:bg-emerald-50",
+  },
+  {
+    id: "ani",
+    name: "ANI",
+    url: "https://aninews.in/",
+    domain: "aninews.in",
+    color: "group-hover:bg-emerald-50",
+  },
+  {
     id: "bbc",
     name: "BBC",
     url: "https://www.bbc.com",

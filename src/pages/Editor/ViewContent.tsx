@@ -243,15 +243,27 @@ const ViewContent: React.FC = () => {
   };
 
   const handleRevert = async (remarks: string) => {
-    console.log("Revert content with ID:", remarks);
-    setShow((prev) => ({ ...prev, remarks: !prev.remarks }));
-    if (contentData?.id) {
-      await revertArticle(contentData.id.toString(), "REVERTED", remarks);
-      triggerRefresh();
-    }
-    handleBack();
-  };
+    if (!contentData?.id) return;
 
+    setShow((prev) => ({ ...prev, remarks: false }));
+
+    try {
+      await revertArticle(contentData.id.toString(), "REVERTED", remarks);
+
+      triggerRefresh();
+
+      console.log("Revert completed, from:", from);
+
+      if (from === "dashboard") {
+        navigate("/editor/dashboard", { replace: true });
+        return;
+      }
+
+      navigate(-1);
+    } catch (error) {
+      console.error("Error reverting article:", error);
+    }
+  };
   const handleEditToggle = () => {
     setEnableEdit((prev) => !prev);
     setShowEnableEdit((prev) => !prev);
