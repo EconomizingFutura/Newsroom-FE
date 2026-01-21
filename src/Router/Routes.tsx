@@ -19,7 +19,6 @@ import { HistoryLog } from "@/pages/Editor/HistoryLog";
 import { PublishCenter } from "@/pages/Editor/PublishCenter";
 import { ReviewQueue } from "@/pages/Editor/ReviewQueue";
 import { Dashboard as EditorDashboard } from "@/pages/Editor/Dashboard";
-import LoginPage from "@/pages/Shared/LoginPage";
 import { useCurrentView } from "@/hooks/useCurrentView";
 import EditArticle from "@/pages/EditArticle";
 import AuthRoute from "./AuthRoutes";
@@ -27,6 +26,7 @@ import ProtectedRoutes from "./ProtectedRoutes";
 import PublicRoute from "./PublicRoutes";
 import ViewContent from "@/pages/Editor/ViewContent";
 import CalendarPage from "@/pages/Editor/CalendarPage";
+import NewLoginPage from "@/pages/Shared/NewLoginPage";
 const Layout: React.FC = () => {
   const navigate = useNavigate();
   const getCurrentView = useCurrentView();
@@ -268,7 +268,7 @@ export default function AppRoutes() {
         path="/login"
         element={
           <PublicRoute>
-            <LoginPage />
+            <NewLoginPage />
           </PublicRoute>
         }
       />
