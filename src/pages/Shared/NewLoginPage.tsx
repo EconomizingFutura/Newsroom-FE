@@ -10,8 +10,6 @@ import { API_LIST } from "@/api/endpoints";
 import loginbg from "@/assets/loginbg.svg";
 import { toast, Toaster } from "sonner";
 import Loader from "@/components/Loader";
-import type { UserRole } from "@/components/SideBar";
-import { USER_ROLE } from "@/utils/utils";
 import loginbanner from "@/assets/loginbanner.svg";
 
 type FormData = {
