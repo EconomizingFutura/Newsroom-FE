@@ -4,7 +4,7 @@ export default function handler(req: any, res: any) {
     req.socket?.remoteAddress ||
     ''
 
-  const ALLOWED_PREFIXES = ['122.167.99.']
+  const ALLOWED_PREFIXES = ['122.167.99.'] // your college public IP prefix
 
   const allowed = ALLOWED_PREFIXES.some(prefix => ip.startsWith(prefix))
 
@@ -13,6 +13,6 @@ export default function handler(req: any, res: any) {
     return
   }
 
-  res.writeHead(302, { Location: '/' })
-  res.end()
+  // If allowed, serve the SPA
+  res.rewrite('/')
 }
