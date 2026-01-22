@@ -219,6 +219,7 @@ const ViewContent: React.FC = () => {
       setEnableEdit((p) => !p);
     }
   };
+  const title = watch("title");
 
   // const handleEdit = async();
 
@@ -453,11 +454,26 @@ const ViewContent: React.FC = () => {
                               <InputLabel label="Title" required />
                               <Input
                                 {...field}
+                                maxLength={120}
                                 placeholder="Enter title"
                                 className="bg-[#f7fbf8] h-10 border-[#ECECEC] border"
                                 disabled={!enableEdit}
                               />
-
+                              {title && title.length > 70 && (
+                                <p
+                                  className={`text-xs ${
+                                    title.length > 100
+                                      ? "text-red-500"
+                                      : title.length > 90
+                                      ? "text-orange-500"
+                                      : "text-yellow-600"
+                                  }`}
+                                >
+                                  {title.length}/120 characters used
+                                  {title.length > 100 &&
+                                    " - Consider shortening your title"}
+                                </p>
+                              )}
                               {errors.title && (
                                 <p className="text-red-500 text-xs mt-1">
                                   {errors.title.message as string}
@@ -601,19 +617,36 @@ const ViewContent: React.FC = () => {
                         control={control}
                         rules={{ required: "Title is required" }}
                         render={({ field }) => (
-                          <>
+                          <div className="space-y-2">
                             <InputLabel label="Title" required />
                             <Input
                               {...field}
+                              maxLength={120}
                               placeholder="Enter title"
                               className="bg-[#f7fbf8] h-10 border-[#ECECEC] border"
+                              disabled={!enableEdit}
                             />
-                            {errors.title && (
-                              <p className="text-red-500 text-xs mt-1">
-                                {errors.title.message}
+                            {title && title.length > 70 && (
+                              <p
+                                className={`text-xs ${
+                                  title.length > 100
+                                    ? "text-red-500"
+                                    : title.length > 90
+                                    ? "text-orange-500"
+                                    : "text-yellow-600"
+                                }`}
+                              >
+                                {title.length}/120 characters used
+                                {title.length > 100 &&
+                                  " - Consider shortening your title"}
                               </p>
                             )}
-                          </>
+                            {errors.title && (
+                              <p className="text-red-500 text-xs mt-1">
+                                {errors.title.message as string}
+                              </p>
+                            )}
+                          </div>
                         )}
                       />
                     </div>

@@ -377,7 +377,7 @@ const EditArticle: React.FC = () => {
       toast.info("No changes to save");
       return;
     }
-      console.log(initialState)
+    console.log(initialState);
 
     try {
       // upload only edited audio
@@ -396,8 +396,7 @@ const EditArticle: React.FC = () => {
         changes.video = await uploadToS3(data.video, "video", "draft");
       }
 
-       if (
-        !isSame(initialState.content, data.content)) {
+      if (!isSame(initialState.content, data.content)) {
         changes.content = await processAndUploadImages(data.content);
       }
       // upload only edited thumbnail
@@ -421,11 +420,10 @@ const EditArticle: React.FC = () => {
 
       toast.success("Draft saved");
 
-        if (
-        !isSame(initialState.content, data.content)) {
-      setValue('content',changes.content)
+      if (!isSame(initialState.content, data.content)) {
+        setValue("content", changes.content);
       }
-      console.log(data)
+      console.log(data);
       // set new initial state so next save works correctly
       setInitialState(data);
     } catch (err) {
@@ -437,6 +435,8 @@ const EditArticle: React.FC = () => {
   if (loading) {
     return <Loading />;
   }
+
+  const title = watch("title");
 
   return (
     <div className="min-h-screen flex flex-col pt-16 bg-[#F6FAF6]">
@@ -548,14 +548,30 @@ const EditArticle: React.FC = () => {
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <label className="font-medium">Title</label>
-                    <span>*</span>
+                    <span className="text-red-500">*</span>
                   </div>
                   <Input
                     disabled={isPreviewMode}
+                    maxLength={120}
                     {...register("title")}
                     placeholder="title"
                     className="bg-[#f7fbf8] border-[#ECECEC] border"
                   />
+                  {title && title.length > 70 && (
+                    <p
+                      className={`text-xs ${
+                        title.length > 100
+                          ? "text-red-500"
+                          : title.length > 90
+                          ? "text-orange-500"
+                          : "text-yellow-600"
+                      }`}
+                    >
+                      {title.length}/120 characters used
+                      {title.length > 100 &&
+                        " - Consider shortening your title"}
+                    </p>
+                  )}
                   {errors.title && (
                     <p className="text-sm text-red-500">
                       {errors.title.message}

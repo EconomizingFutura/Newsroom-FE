@@ -38,7 +38,7 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
           Drag & drop your video file or click to browse
         </p>
         <p className="text-sm text-gray-500">
-          Supports MP4, MOV, AVI (Max 1MB)
+          Supports MP4, MOV, AVI (Max 50MB)
         </p>
         <label className="inline-flex items-center gap-2 mt-6 bg-orange-700 text-white px-4 py-2 rounded-lg cursor-pointer">
           <Upload className="h-4 w-4" />
@@ -50,9 +50,9 @@ export const VideoContainer: React.FC<VideoContainerProps> = ({
             onChange={(e) => {
               const file = e.target.files?.[0];
               if (file) {
-                if (file.size > 1 * 1024 * 1024) {
-                  // 1 MB
-                  alert("Video must be less than 1 MB");
+                if (file.size > 50 * 1024 * 1024) {
+                  // 50 MB
+                  alert("Video must be less than 50 MB");
                   e.target.value = ""; // reset input so user can re-select
                   return;
                 }
@@ -117,7 +117,7 @@ export const AudioContainer: React.FC<AudioContainerProps> = ({
           </div>
           <p className="mt-6 font-medium">Upload audio file</p>
           <p className="text-sm text-gray-500 mt-1">
-            Supports MP3, WAV, M4A (Max 1MB)
+            Supports MP3, WAV, M4A (Max 10MB)
           </p>
           <label className="inline-flex items-center gap-2 mt-6 bg-green-100 text-green-800 px-4 py-2 rounded-lg cursor-pointer">
             <Upload className="h-4 w-4" />
@@ -129,9 +129,9 @@ export const AudioContainer: React.FC<AudioContainerProps> = ({
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) {
-                  if (file.size > 1 * 1024 * 1024) {
-                    // 1 MB
-                    alert("File size must be less than 1 MB");
+                  if (file.size > 10 * 1024 * 1024) {
+                    // 10 MB
+                    alert("File size must be less than 10 MB");
                     e.target.value = ""; // reset input
                     return;
                   }

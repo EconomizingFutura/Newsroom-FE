@@ -23,6 +23,7 @@ const Text: React.FC<TextProps> = ({
   enableEdit = false,
 }) => {
   const {
+    watch,
     control,
     formState: { errors },
   } = useFormContext();
@@ -50,6 +51,7 @@ const Text: React.FC<TextProps> = ({
   //   return true;
   // };
 
+  const title = watch("title");
   return (
     <div className="flex-1 flex flex-col">
       {!readOnly && (
@@ -63,10 +65,24 @@ const Text: React.FC<TextProps> = ({
                 <InputLabel label={"Text"} required />
                 <Input
                   {...field}
+                  maxLength={120}
                   placeholder="Title"
                   className="bg-[#f7fbf8] h-10 border-[#ECECEC] border"
                 />
-
+                {title && title.length > 70 && (
+                  <p
+                    className={`text-xs ${
+                      title.length > 100
+                        ? "text-red-500"
+                        : title.length > 90
+                        ? "text-orange-500"
+                        : "text-yellow-600"
+                    }`}
+                  >
+                    {title.length}/120 characters used
+                    {title.length > 100 && " - Consider shortening your title"}
+                  </p>
+                )}
                 {errors.title && (
                   <p className="text-red-500 text-xs mt-1">
                     {errors.title.message as string}

@@ -1,8 +1,14 @@
 {
-    "rewrites": [
-        {
-            "source": "/(.*)",
-            "destination": "/"
-        }
-    ]
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/api/guard"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/"
+    }
+  ]
 }
