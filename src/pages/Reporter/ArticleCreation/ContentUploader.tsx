@@ -267,7 +267,7 @@ const ContentUploader = () => {
         setValue("reporterId", null);
       } else {
         toast.success("Saved as draft! You can continue editing.");
-        setValue('content',modifiedContent)
+        setValue("content", modifiedContent);
       }
     } catch (err) {
       console.error(err);
@@ -522,12 +522,27 @@ const ContentUploader = () => {
                 Title <span className="text-red-500">*</span>
               </label>
               <Input
+                maxLength={120}
                 placeholder="Title"
                 {...register("title", { required: "Title is required" })}
                 className={`bg-[#f7fbf8] border-[#ECECEC] h-[40px] ${
                   errors.title ? "border-red-500" : ""
                 }`}
               />
+              {title && title.length > 70 && (
+                <p
+                  className={`text-xs ${
+                    title.length > 100
+                      ? "text-red-500"
+                      : title.length > 90
+                      ? "text-orange-500"
+                      : "text-yellow-600"
+                  }`}
+                >
+                  {title.length}/120 characters used
+                  {title.length > 100 && " - Consider shortening your title"}
+                </p>
+              )}
             </div>
 
             {/* Content */}
